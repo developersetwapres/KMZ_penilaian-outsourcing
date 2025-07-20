@@ -1,17 +1,20 @@
 <?php
 
+use App\Http\Controllers\EvaluasiController;
+use App\Http\Controllers\PagesController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::get('/', [PagesController::class, 'home'])->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+
+Route::middleware(['auth', 'verified', 'role:outsourcing,kepala-biro,kepala-bagian'])->group(function () {
+    Route::get('/evaluator', [EvaluasiController::class, 'create'])->name('evaluator.create');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
+});
+
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
