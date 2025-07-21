@@ -5,11 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useToast } from '@/hooks/use-toast';
 import { SharedData } from '@/types';
-import { router, usePage } from '@inertiajs/react';
-import { Building2, CheckCircle, ClipboardList, Clock, LogOut, Mail, MapPin, Phone, Search, User } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
+import { Building, Building2, CheckCircle, ClipboardList, Clock, LogOut, Mail, MapPin, Phone, Search, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 // Mock user data - in real app this would come from auth context
@@ -19,51 +18,59 @@ const mockEvaluatorUser = {
     name: 'Ahmad Fauzi',
     nip: 'OUT-2023-001',
     rank: 'Outsourcing',
-    position: 'IT Support Specialist',
+    jabatan: 'IT Support Specialist',
     unit: 'Bagian Teknologi Informasi',
     type: 'outsourcing',
     role: 'evaluator',
 };
 
-// Dummy employees data with more detailed info
+// Updated dummy employees data with database fields
 const employees = [
     {
         id: 1,
         name: 'Ahmad Rizki Pratama',
-        position: 'Technical Support Specialist',
-        unit: 'Bagian Teknologi Informasi',
-        contact: '081234567890',
         email: 'ahmad.rizki@company.com',
+        jabatan: 'Technical Support Specialist',
+        lokasi_kerja: 'Gedung A Lt. 3',
+        unit_kerja: 'Bagian Teknologi Informasi',
+        perusahaan: 'PT Outsourcing Teknologi',
+        phone: '081234567890',
         status: 'draft',
         assignedTo: ['kepala-biro', 'kepala-bagian', 'out001'], // out001 is peer evaluator
     },
     {
         id: 2,
         name: 'Siti Nurhaliza',
-        position: 'HR Assistant',
-        unit: 'Biro Sumber Daya Manusia',
-        contact: '081234567891',
         email: 'siti.nurhaliza@company.com',
+        jabatan: 'HR Assistant',
+        lokasi_kerja: 'Gedung B Lt. 2',
+        unit_kerja: 'Biro Sumber Daya Manusia',
+        perusahaan: 'PT Manpower Solutions',
+        phone: '081234567891',
         status: 'completed',
         assignedTo: ['kepala-biro', 'out002'], // out002 is peer evaluator
     },
     {
         id: 3,
         name: 'Budi Santoso',
-        position: 'Finance Assistant',
-        unit: 'Bagian Keuangan',
-        contact: '081234567892',
         email: 'budi.santoso@company.com',
+        jabatan: 'Finance Assistant',
+        lokasi_kerja: 'Gedung C Lt. 1',
+        unit_kerja: 'Bagian Keuangan',
+        perusahaan: 'PT Outsourcing Teknologi',
+        phone: '081234567892',
         status: 'draft',
         assignedTo: ['kepala-biro', 'kepala-bagian'],
     },
     {
         id: 4,
         name: 'Maya Sari Dewi',
-        position: 'Marketing Assistant',
-        unit: 'Bagian Pemasaran',
-        contact: '081234567893',
         email: 'maya.sari@company.com',
+        jabatan: 'Marketing Assistant',
+        lokasi_kerja: 'Gedung D Lt. 2',
+        unit_kerja: 'Bagian Pemasaran',
+        perusahaan: 'PT Manpower Solutions',
+        phone: '081234567893',
         status: 'draft',
         assignedTo: ['kepala-biro', 'kepala-bagian'],
     },
@@ -96,38 +103,30 @@ export default function EvaluatorPage() {
             return employees.filter((emp) => assignedIds.includes(emp.id));
         } else if (user.type === 'kepala-bagian') {
             // Kepala Bagian sees employees in their unit
-            return employees.filter((emp) => emp.unit === user.unit);
+            return employees.filter((emp) => emp.unit_kerja === user.unit);
         } else if (user.type === 'kepala-biro') {
             // Kepala Biro sees all employees in their biro
-            return employees.filter((emp) => (emp.unit.includes('Biro') ? emp.unit === user.unit : true));
+            return employees.filter((emp) => (emp.unit_kerja.includes('Biro') ? emp.unit_kerja === user.unit : true));
         }
         return [];
     };
 
-    // const assignedEmployees = getAssignedEmployees();
-    const assignedEmployees = employees;
-
+    const assignedEmployees = getAssignedEmployees();
     const filteredEmployees = assignedEmployees.filter(
-        (emp) => emp.name.toLowerCase().includes(searchTerm.toLowerCase()) || emp.unit.toLowerCase().includes(searchTerm.toLowerCase()),
+        (emp) =>
+            emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            emp.unit_kerja.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            emp.perusahaan.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-    const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
-        cleanup();
-        router.flushAll();
-
-        router.post(
-            route('logout'),
-            {},
-            {
-                onSuccess: () => {
-                    toast({
-                        title: 'Logout Berhasil',
-                        description: 'Anda telah keluar dari sistem',
-                    });
-                },
-            },
-        );
+        toast({
+            title: 'Logout Berhasil',
+            description: 'Anda telah keluar dari sistem',
+        });
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1000);
     };
 
     if (selectedEmployee) {
@@ -175,7 +174,7 @@ export default function EvaluatorPage() {
                                 <div>
                                     <CardTitle className="text-2xl text-white">{user.name}</CardTitle>
                                     <CardDescription className="text-green-100">
-                                        {user.jabatan} • {user.unit_kerja}
+                                        {user.jabatan} • {user.unit}
                                     </CardDescription>
                                 </div>
                             </div>
@@ -185,21 +184,21 @@ export default function EvaluatorPage() {
                                 <div className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                         <span className="font-medium">NIP:</span>
-                                        <span>-</span>
+                                        <span>{user.nip}</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <span className="font-medium">Pangkat/Gol:</span>
-                                        <span>{user.role}</span>
+                                        <span>{user.rank}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                         <Building2 className="h-4 w-4" />
-                                        <span>{user.unit_kerja}</span>
+                                        <span>{user.unit}</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Badge variant="secondary" className="border-white/30 bg-white/20 text-white">
-                                            {user.role.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                            {user.type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                                         </Badge>
                                     </div>
                                 </div>
@@ -236,7 +235,7 @@ export default function EvaluatorPage() {
                     <div className="relative w-full sm:w-80">
                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                         <Input
-                            placeholder="Cari pegawai atau unit..."
+                            placeholder="Cari pegawai, unit, atau perusahaan..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10"
@@ -257,7 +256,7 @@ export default function EvaluatorPage() {
                                                 <CardTitle className="text-lg">{employee.name}</CardTitle>
                                                 <CardDescription className="flex items-center space-x-1">
                                                     <Building2 className="h-3 w-3" />
-                                                    <span>{employee.unit}</span>
+                                                    <span>{employee.unit_kerja}</span>
                                                 </CardDescription>
                                             </div>
                                         </div>
@@ -275,19 +274,23 @@ export default function EvaluatorPage() {
                                     <div className="space-y-2 text-sm text-gray-600">
                                         <div className="flex items-center space-x-2">
                                             <span className="font-medium">Jabatan:</span>
-                                            <span>{employee.position}</span>
+                                            <span>{employee.jabatan}</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <MapPin className="h-3 w-3" />
+                                            <span>{employee.lokasi_kerja}</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Building className="h-3 w-3" />
+                                            <span className="text-xs">{employee.perusahaan}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Phone className="h-3 w-3" />
-                                            <span>{employee.contact}</span>
+                                            <span>{employee.phone}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Mail className="h-3 w-3" />
                                             <span className="text-xs">{employee.email}</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <MapPin className="h-3 w-3" />
-                                            <span>{employee.unit}</span>
                                         </div>
                                     </div>
 
