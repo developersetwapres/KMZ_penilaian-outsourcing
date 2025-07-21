@@ -125,14 +125,67 @@ export default function PeerAssignment() {
 
     const handleAssignPeer = () => {
         if (selectedEmployee && selectedPeer) {
+            const timestamp = new Date().toISOString();
+            const peerEmployee = outsourcingEmployees.find((emp) => emp.id === Number.parseInt(selectedPeer));
+            const previousPeer = getPeerName(selectedEmployee.peerEvaluator);
+
+            const submissionData = {
+                timestamp,
+                action: 'PEER_ASSIGNMENT',
+                assignment: {
+                    employeeId: selectedEmployee.id,
+                    employeeName: selectedEmployee.nama,
+                    employeeUnit: selectedEmployee.unit_kerja,
+                    previousPeerId: selectedEmployee.peerEvaluator,
+                    previousPeerName: previousPeer,
+                    newPeerId: Number.parseInt(selectedPeer),
+                    newPeerName: peerEmployee?.nama,
+                    newPeerUnit: peerEmployee?.unit_kerja,
+                },
+                context: {
+                    totalEmployees: outsourcingEmployees.length,
+                    assignedCount: outsourcingEmployees.filter((emp) => emp.peerEvaluator).length,
+                    unassignedCount: outsourcingEmployees.filter((emp) => !emp.peerEvaluator).length,
+                    sameUnitPeers: getAvailablePeers(selectedEmployee).length,
+                },
+            };
+
+            console.log('='.repeat(80));
+            console.log('🤝 PEER ASSIGNMENT OPERATION');
+            console.log('='.repeat(80));
+            console.log('📊 Assignment Overview:', {
+                timestamp: submissionData.timestamp,
+                employee: submissionData.assignment.employeeName,
+                previousPeer: submissionData.assignment.previousPeerName || 'None',
+                newPeer: submissionData.assignment.newPeerName,
+                unit: submissionData.assignment.employeeUnit,
+            });
+            console.log('\n👥 Assignment Details:', submissionData.assignment);
+            console.log('\n📈 System Context:', submissionData.context);
+            console.log('\n💾 Complete Assignment Data:', JSON.stringify(submissionData, null, 2));
+
             // Update assignment logic here
-            console.log(`Assigning peer ${selectedPeer} to evaluate ${selectedEmployee.name}`);
+            console.log(`🔄 Assigning peer ${selectedPeer} to evaluate ${selectedEmployee.nama}`);
 
             // Update the employee's peer evaluator
             const employeeIndex = outsourcingEmployees.findIndex((emp) => emp.id === selectedEmployee.id);
             if (employeeIndex !== -1) {
+                const oldPeerEvaluator = outsourcingEmployees[employeeIndex].peerEvaluator;
                 outsourcingEmployees[employeeIndex].peerEvaluator = Number.parseInt(selectedPeer);
+
+                console.log('✅ Assignment Updated:', {
+                    employeeIndex,
+                    employeeId: selectedEmployee.id,
+                    oldPeerEvaluator,
+                    newPeerEvaluator: Number.parseInt(selectedPeer),
+                });
             }
+
+            console.log('\n📊 Updated Assignment Status:', {
+                totalAssigned: outsourcingEmployees.filter((emp) => emp.peerEvaluator).length,
+                totalUnassigned: outsourcingEmployees.filter((emp) => !emp.peerEvaluator).length,
+            });
+            console.log('='.repeat(80));
 
             setIsDialogOpen(false);
             setSelectedEmployee(null);
@@ -141,7 +194,7 @@ export default function PeerAssignment() {
             // Show success message
             toast({
                 title: 'Penugasan Berhasil',
-                description: `Berhasil menugaskan ${getPeerName(Number.parseInt(selectedPeer))} untuk menilai ${selectedEmployee.name}`,
+                description: `Berhasil menugaskan ${getPeerName(Number.parseInt(selectedPeer))} untuk menilai ${selectedEmployee.nama}`,
             });
         }
     };
@@ -211,7 +264,7 @@ export default function PeerAssignment() {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle>Manajemen Penugasan Teman Setingkat</CardTitle>
+                            <CardTitle className="text-lg">Manajemen Penugasan Teman Setingkat</CardTitle>
                             <CardDescription>Atur siapa yang menilai siapa di antara pegawai outsourcing dalam unit yang sama</CardDescription>
                         </div>
                         <div className="flex items-center space-x-4">

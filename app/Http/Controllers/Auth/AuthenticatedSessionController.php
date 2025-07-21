@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
 
         if (in_array($user->role, ['outsourcing', 'kepala-bagian', 'kepala-biro'])) {
             return redirect()->intended(route('evaluator.create', absolute: false));
-        } elseif ($user == 'admin') {
+        } elseif ($user->role == 'admin') {
             return redirect()->intended(route('dashboard', absolute: false));
         }
 

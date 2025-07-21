@@ -165,6 +165,65 @@ export default function MasterDataManager() {
         }
     };
 
+    const handleSave = () => {
+        const timestamp = new Date().toISOString();
+        const formElements = document.querySelectorAll('#name, #description, #aspect, #criteria');
+        const formData: Record<string, any> = {};
+
+        formElements.forEach((element: any) => {
+            if (element.value) {
+                formData[element.id] = element.value;
+            }
+        });
+
+        const submissionData = {
+            timestamp,
+            action: editingItem ? 'UPDATE' : 'CREATE',
+            level: selectedLevel,
+            editingItem: editingItem,
+            formData: formData,
+            context: {
+                selectedLevel,
+                aspectsCount: masterData.aspects.length,
+                criteriaCount: masterData.criteria.length,
+                indicatorsCount: masterData.indicators.length,
+            },
+        };
+
+        console.log('='.repeat(80));
+        console.log(`🛠️ MASTER DATA ${submissionData.action} - ${selectedLevel.toUpperCase()}`);
+        console.log('='.repeat(80));
+        console.log('📊 Operation Overview:', {
+            timestamp: submissionData.timestamp,
+            action: submissionData.action,
+            level: submissionData.level,
+            itemId: editingItem?.id || 'NEW',
+        });
+        console.log('\n📝 Form Data:', submissionData.formData);
+        console.log('\n🔄 Before Update:', editingItem || 'Creating new item');
+        console.log('\n📈 Context:', submissionData.context);
+        console.log('\n💾 Complete Submission:', JSON.stringify(submissionData, null, 2));
+        console.log('='.repeat(80));
+
+        if (editingItem) {
+            // Update existing item logic
+            console.log(`✏️ Updating ${selectedLevel} with ID: ${editingItem.id}`);
+        } else {
+            // Add new item logic
+            const newId =
+                Math.max(
+                    ...(selectedLevel === 'aspects'
+                        ? masterData.aspects.map((a) => a.id)
+                        : selectedLevel === 'criteria'
+                          ? masterData.criteria.map((c) => c.id)
+                          : masterData.indicators.map((i) => i.id)),
+                ) + 1;
+            console.log(`➕ Creating new ${selectedLevel} with ID: ${newId}`);
+        }
+
+        setIsDialogOpen(false);
+    };
+
     const renderAspects = () => (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -223,7 +282,7 @@ export default function MasterDataManager() {
                 </Button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
                 {masterData.criteria.map((criteria) => {
                     const aspect = masterData.aspects.find((a) => a.id === criteria.aspectId);
                     return (
@@ -369,7 +428,7 @@ export default function MasterDataManager() {
                         {selectedLevel === 'criteria' && (
                             <div className="space-y-2">
                                 <Label htmlFor="aspect">Aspek</Label>
-                                <Select>
+                                <Select id="aspect">
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih aspek" />
                                     </SelectTrigger>
@@ -386,7 +445,7 @@ export default function MasterDataManager() {
                         {selectedLevel === 'indicators' && (
                             <div className="space-y-2">
                                 <Label htmlFor="criteria">Kriteria</Label>
-                                <Select>
+                                <Select id="criteria">
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih kriteria" />
                                     </SelectTrigger>
@@ -416,7 +475,7 @@ export default function MasterDataManager() {
                         )}
                     </div>
                     <DialogFooter>
-                        <Button type="submit" onClick={() => setIsDialogOpen(false)}>
+                        <Button type="submit" onClick={handleSave}>
                             {editingItem ? 'Update' : 'Simpan'}
                         </Button>
                     </DialogFooter>

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Building, Building2, CheckCircle, ClipboardList, Clock, LogOut, Mail, MapPin, Phone, Search, User } from 'lucide-react';
+import { Building, Building2, CheckCircle, ClipboardList, Clock, LogOut, MapPin, Search, User } from 'lucide-react';
 import { useState } from 'react';
 
 // Updated dummy employees data with database fields
@@ -254,14 +254,14 @@ export default function EvaluatorDashboard({ user, onLogout }: EvaluatorDashboar
                                             <Building className="h-3 w-3" />
                                             <span className="text-xs">{employee.perusahaan}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        {/* <div className="flex items-center space-x-2">
                                             <Phone className="h-3 w-3" />
                                             <span>{employee.phone}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Mail className="h-3 w-3" />
                                             <span className="text-xs">{employee.email}</span>
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     <Button
