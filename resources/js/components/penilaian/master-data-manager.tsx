@@ -174,7 +174,7 @@ export default function MasterDataManager() {
                 </div>
             </div>
 
-            <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+            {/* <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
                 <div className="mb-2 flex items-center space-x-2">
                     <Shield className="h-5 w-5 text-blue-600" />
                     <span className="font-medium text-blue-800">Aspek Penilaian Bersifat Absolut</span>
@@ -182,7 +182,7 @@ export default function MasterDataManager() {
                 <p className="text-sm text-blue-700">
                     Sistem menggunakan 3 aspek penilaian yang telah ditetapkan dan tidak dapat diubah atau ditambah.
                 </p>
-            </div>
+            </div> */}
 
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 {masterData.aspects.map((aspect, index) => (

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Building, Building2, CheckCircle, ClipboardList, Clock, LogOut, Mail, MapPin, Phone, Search, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -111,7 +111,8 @@ export default function EvaluatorPage() {
         return [];
     };
 
-    const assignedEmployees = getAssignedEmployees();
+    // const assignedEmployees = getAssignedEmployees();
+    const assignedEmployees = employees;
     const filteredEmployees = assignedEmployees.filter(
         (emp) =>
             emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -120,13 +121,18 @@ export default function EvaluatorPage() {
     );
 
     const handleLogout = () => {
-        toast({
-            title: 'Logout Berhasil',
-            description: 'Anda telah keluar dari sistem',
-        });
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 1000);
+        router.post(
+            route('logout'),
+            {},
+            {
+                onSuccess: () => {
+                    toast({
+                        title: 'Logout Berhasil',
+                        description: 'Anda telah keluar dari sistem',
+                    });
+                },
+            },
+        );
     };
 
     if (selectedEmployee) {
@@ -184,21 +190,21 @@ export default function EvaluatorPage() {
                                 <div className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                         <span className="font-medium">NIP:</span>
-                                        <span>{user.nip}</span>
+                                        <span>-</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <span className="font-medium">Pangkat/Gol:</span>
-                                        <span>{user.rank}</span>
+                                        <span>{user.role}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                         <Building2 className="h-4 w-4" />
-                                        <span>{user.unit}</span>
+                                        <span>{user.unit_kerja}</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Badge variant="secondary" className="border-white/30 bg-white/20 text-white">
-                                            {user.type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                            {user.role.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                                         </Badge>
                                     </div>
                                 </div>

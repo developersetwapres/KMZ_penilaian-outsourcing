@@ -33,6 +33,7 @@ class UserSeeder extends Seeder
             ['name' => 'Hanindita Basmatulhana', 'jabatan' => 'Desainer Grafis dan Multimedia', 'lokasi_kerja' => 'Perbantuan BPMI (Desain Grafis)', 'unit_kerja' => 'Biro Pers, Media, dan Informasi', 'phone' => '08123456789', 'role' => 'outsourcing', 'perusahaan' => 'PT. Miftah Bahtera Mandiri'],
             ['name' => 'Muhammad Hilman', 'jabatan' => 'Programmer', 'lokasi_kerja' => 'Merdeka Selatan', 'unit_kerja' => 'ex Bagian Teknologi Informasi', 'phone' => '08123456789', 'role' => 'outsourcing', 'perusahaan' => 'PT. Miftah Bahtera Mandiri'],
             ['name' => 'Khaeril Maswal Zaid', 'jabatan' => 'Programmer / Desainer Grafis', 'lokasi_kerja' => 'Merdeka Selatan', 'unit_kerja' => 'ex Bagian Teknologi Informasi', 'phone' => '08123456789', 'role' => 'outsourcing', 'perusahaan' => 'PT. Miftah Bahtera Mandiri'],
+            ['name' => 'Exp. Admimin Jeanette', 'jabatan' => 'Admin', 'lokasi_kerja' => 'Merdeka Selatan', 'unit_kerja' => 'Kepegawaian', 'phone' => '08123456789', 'role' => 'admin', 'perusahaan' => 'PT. Miftah Bahtera Mandiri'],
         ];
 
         foreach ($users as $user) {
