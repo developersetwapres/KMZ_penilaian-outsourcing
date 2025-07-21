@@ -3,18 +3,18 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ArrowRight, Building, Building2, CheckCircle, FileText, Mail, MapPin, Phone, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building, Building2, CheckCircle, FileText, Mail, MapPin, Phone, Target, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
 // Validation schema
 const evaluationSchema = z.object({
-    scores: z.record(z.string(), z.string()),
+    scores: z.record(z.string(), z.number().min(0).max(100)),
     overallNotes: z.string().optional(),
 });
 
@@ -91,17 +91,25 @@ const evaluationData = {
     },
 };
 
-const scoreOptions = [
-    { value: '1', label: 'SK (≤50)', color: 'bg-red-100 text-red-800', description: 'Sangat Kurang' },
-    { value: '2', label: 'K (51-75)', color: 'bg-orange-100 text-orange-800', description: 'Kurang' },
-    { value: '3', label: 'B (76-90)', color: 'bg-blue-100 text-blue-800', description: 'Baik' },
-    { value: '4', label: 'SB (91-100)', color: 'bg-green-100 text-green-800', description: 'Sangat Baik' },
+// Classification function
+const getScoreClassification = (score: number) => {
+    if (score <= 50) return { label: 'SK (Sangat Kurang)', color: 'bg-red-100 text-red-800 border-red-200', range: '≤50' };
+    if (score <= 75) return { label: 'K (Kurang)', color: 'bg-orange-100 text-orange-800 border-orange-200', range: '51-75' };
+    if (score <= 90) return { label: 'B (Baik)', color: 'bg-blue-100 text-blue-800 border-blue-200', range: '76-90' };
+    return { label: 'SB (Sangat Baik)', color: 'bg-green-100 text-green-800 border-green-200', range: '91-100' };
+};
+
+const scoreRanges = [
+    { label: 'SK (Sangat Kurang)', range: '≤50', color: 'bg-red-100 text-red-800' },
+    { label: 'K (Kurang)', range: '51-75', color: 'bg-orange-100 text-orange-800' },
+    { label: 'B (Baik)', range: '76-90', color: 'bg-blue-100 text-blue-800' },
+    { label: 'SB (Sangat Baik)', range: '91-100', color: 'bg-green-100 text-green-800' },
 ];
 
 interface EvaluationFormProps {
     employee: {
         id: number;
-        name: string;
+        nama: string;
         email: string;
         jabatan: string;
         lokasi_kerja: string;
@@ -115,7 +123,7 @@ interface EvaluationFormProps {
 
 export default function EvaluationForm({ employee, evaluator, onBack }: EvaluationFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
-    const [scores, setScores] = useState<Record<string, string>>({});
+    const [scores, setScores] = useState<Record<string, number>>({});
     const [overallNotes, setOverallNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showReview, setShowReview] = useState(false);
@@ -131,13 +139,14 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentStep]);
 
-    const handleScoreChange = (indicatorId: string, score: string) => {
-        setScores((prev) => ({ ...prev, [indicatorId]: score }));
+    const handleScoreChange = (indicatorId: string, value: string) => {
+        const numValue = value === '' ? 0 : Math.min(100, Math.max(0, Number.parseInt(value) || 0));
+        setScores((prev) => ({ ...prev, [indicatorId]: numValue }));
     };
 
     const canProceed = () => {
         const currentIndicators = aspectData.criteria.flatMap((c) => c.indicators.map((i) => i.id));
-        return currentIndicators.every((id) => scores[id]);
+        return currentIndicators.every((id) => scores[id] !== undefined && scores[id] > 0);
     };
 
     const handleNext = () => {
@@ -177,12 +186,12 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
             criterion.indicators.forEach((indicator) => {
                 const score = scores[indicator.id];
                 if (score) {
-                    totalScore += Number.parseInt(score);
+                    totalScore += score;
                 }
             });
         });
 
-        return totalIndicators > 0 ? (totalScore / totalIndicators) * 25 : 0;
+        return totalIndicators > 0 ? totalScore / totalIndicators : 0;
     };
 
     const renderReview = () => {
@@ -192,16 +201,16 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
             }, 0) / aspects.length;
 
         const getScoreColor = (score: number) => {
-            if (score >= 90) return 'text-green-600 bg-green-50';
-            if (score >= 76) return 'text-blue-600 bg-blue-50';
-            if (score >= 51) return 'text-orange-600 bg-orange-50';
+            if (score > 90) return 'text-green-600 bg-green-50';
+            if (score > 75) return 'text-blue-600 bg-blue-50';
+            if (score > 50) return 'text-orange-600 bg-orange-50';
             return 'text-red-600 bg-red-50';
         };
 
         const getScoreLabel = (score: number) => {
-            if (score >= 90) return 'Sangat Baik';
-            if (score >= 76) return 'Baik';
-            if (score >= 51) return 'Kurang';
+            if (score > 90) return 'Sangat Baik';
+            if (score > 75) return 'Baik';
+            if (score > 50) return 'Kurang';
             return 'Sangat Kurang';
         };
 
@@ -284,8 +293,8 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
 
                                             <div className="grid gap-3">
                                                 {criterion.indicators.map((indicator, indicatorIndex) => {
-                                                    const score = scores[indicator.id];
-                                                    const scoreOption = scoreOptions.find((option) => option.value === score);
+                                                    const score = scores[indicator.id] || 0;
+                                                    const classification = getScoreClassification(score);
 
                                                     return (
                                                         <div key={indicator.id} className="rounded-lg border border-gray-200 bg-white p-4">
@@ -296,14 +305,15 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                                                     </div>
                                                                     <div className="flex-1">
                                                                         <p className="font-medium text-gray-800">{indicator.text}</p>
+                                                                        <div className="mt-2 text-lg font-bold text-gray-900">Nilai: {score}</div>
                                                                     </div>
                                                                 </div>
                                                                 <div className="ml-4">
-                                                                    {scoreOption && (
-                                                                        <Badge className={`${scoreOption.color} px-3 py-1 text-sm font-semibold`}>
-                                                                            {scoreOption.label}
-                                                                        </Badge>
-                                                                    )}
+                                                                    <Badge
+                                                                        className={`${classification.color} border px-3 py-1 text-sm font-semibold`}
+                                                                    >
+                                                                        {classification.label}
+                                                                    </Badge>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -453,7 +463,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                             </CardHeader>
                             <CardContent className="space-y-2 text-sm">
                                 <div>
-                                    <strong>Nama:</strong> {employee.name}
+                                    <strong>Nama:</strong> {employee.nama}
                                 </div>
                                 <div>
                                     <strong>Jabatan:</strong> {employee.jabatan}
@@ -502,6 +512,28 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                         </CardContent>
                     </Card>
 
+                    {/* Score Classification Reference */}
+                    <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center space-x-2 text-lg text-purple-800">
+                                <Target className="h-5 w-5" />
+                                <span>Panduan Klasifikasi Penilaian</span>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                                {scoreRanges.map((range, index) => (
+                                    <div key={index} className={`rounded-lg border-2 p-3 ${range.color} border-opacity-50`}>
+                                        <div className="text-center">
+                                            <div className="text-sm font-bold">{range.label}</div>
+                                            <div className="mt-1 text-xs opacity-75">{range.range}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     {/* Evaluation Form */}
                     <Card>
                         <CardHeader>
@@ -517,37 +549,71 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                 <div key={criterion.id} className="space-y-6">
                                     <h3 className="border-b-2 border-blue-200 pb-3 text-xl font-semibold text-gray-900">{criterion.name}</h3>
 
-                                    {criterion.indicators.map((indicator, index) => (
-                                        <div key={indicator.id} className="space-y-4 rounded-xl border-l-4 border-l-blue-400 bg-gray-50 p-6">
-                                            <div className="flex items-start space-x-3">
-                                                <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
-                                                    {index + 1}
-                                                </div>
-                                                <h4 className="flex-1 font-medium text-gray-800">{indicator.text}</h4>
-                                            </div>
+                                    {criterion.indicators.map((indicator, index) => {
+                                        const currentScore = scores[indicator.id] || 0;
+                                        const classification = getScoreClassification(currentScore);
 
-                                            <RadioGroup
-                                                value={scores[indicator.id] || ''}
-                                                onValueChange={(value) => handleScoreChange(indicator.id, value)}
-                                                className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
-                                            >
-                                                {scoreOptions.map((option) => (
-                                                    <div
-                                                        key={option.value}
-                                                        className="flex items-center space-x-3 rounded-lg border p-3 transition-colors hover:bg-white"
-                                                    >
-                                                        <RadioGroupItem value={option.value} id={`${indicator.id}-${option.value}`} />
-                                                        <Label htmlFor={`${indicator.id}-${option.value}`} className="flex-1 cursor-pointer">
-                                                            <div className={`rounded-md px-3 py-2 text-center ${option.color}`}>
-                                                                <div className="font-bold">{option.label}</div>
-                                                                <div className="mt-1 text-xs">{option.description}</div>
-                                                            </div>
-                                                        </Label>
+                                        return (
+                                            <div key={indicator.id} className="space-y-4 rounded-xl border-l-4 border-l-blue-400 bg-gray-50 p-6">
+                                                <div className="flex items-start space-x-3">
+                                                    <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
+                                                        {index + 1}
                                                     </div>
-                                                ))}
-                                            </RadioGroup>
-                                        </div>
-                                    ))}
+                                                    <h4 className="flex-1 font-medium text-gray-800">{indicator.text}</h4>
+                                                </div>
+
+                                                <div className="ml-9 space-y-4">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className="flex-1">
+                                                            <Label htmlFor={indicator.id} className="mb-2 block text-sm font-medium text-gray-700">
+                                                                Masukkan Nilai (0-100):
+                                                            </Label>
+                                                            <Input
+                                                                id={indicator.id}
+                                                                type="number"
+                                                                min="0"
+                                                                max="100"
+                                                                value={currentScore || ''}
+                                                                onChange={(e) => handleScoreChange(indicator.id, e.target.value)}
+                                                                className="w-32 text-center text-lg font-bold"
+                                                                placeholder="0"
+                                                            />
+                                                        </div>
+                                                        {currentScore > 0 && (
+                                                            <div className="flex-1">
+                                                                <div className="mb-2 text-sm text-gray-600">Klasifikasi:</div>
+                                                                <Badge
+                                                                    className={`${classification.color} animate-pulse border-2 px-4 py-2 text-sm font-semibold`}
+                                                                >
+                                                                    {classification.label}
+                                                                </Badge>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Real-time feedback */}
+                                                    {currentScore > 0 && (
+                                                        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-white p-4">
+                                                            <div className="flex items-center space-x-3">
+                                                                <div className="text-2xl font-bold text-gray-800">{currentScore}</div>
+                                                                <div className="flex-1">
+                                                                    <div className="text-sm text-gray-600">Nilai yang dimasukkan</div>
+                                                                    <div
+                                                                        className={`text-sm font-medium ${classification.color.replace('bg-', 'text-').replace('-100', '-800')}`}
+                                                                    >
+                                                                        Termasuk kategori: {classification.label}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <div className="text-xs text-gray-500">Range: {classification.range}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             ))}
 
