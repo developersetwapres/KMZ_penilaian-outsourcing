@@ -10,6 +10,7 @@ Route::get('/', [PagesController::class, 'home'])->name('home');
 
 Route::middleware(['auth', 'verified', 'role:outsourcing,kepala-biro,kepala-bagian'])->group(function () {
     Route::get('/evaluator', [EvaluasiController::class, 'create'])->name('evaluator.create');
+    Route::post('/evaluator/post', [EvaluasiController::class, 'store'])->name('evaluator.store');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {

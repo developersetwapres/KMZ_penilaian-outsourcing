@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, Building, Building2, CheckCircle, FileText, Mail, MapPin, Phone, Target, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -109,7 +110,7 @@ const scoreRanges = [
 interface EvaluationFormProps {
     employee: {
         id: number;
-        nama: string;
+        name: string;
         email: string;
         jabatan: string;
         lokasi_kerja: string;
@@ -163,90 +164,37 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setIsSubmitting(true);
 
-        // Comprehensive data logging
-        const submissionData = {
-            timestamp: new Date().toISOString(),
-            evaluator: {
-                id: evaluator.id,
-                name: evaluator.name,
-                nip: evaluator.nip,
-                position: evaluator.position,
-                unit: evaluator.unit,
-                type: evaluator.type,
-                role: evaluator.role,
-            },
-            employee: {
-                id: employee.id,
-                nama: employee.nama,
-                email: employee.email,
-                jabatan: employee.jabatan,
-                lokasi_kerja: employee.lokasi_kerja,
-                unit_kerja: employee.unit_kerja,
-                perusahaan: employee.perusahaan,
-                phone: employee.phone,
-            },
-            scores: scores,
-            aspectScores: aspects.reduce(
-                (acc, aspectKey) => {
-                    acc[aspectKey] = {
-                        score: calculateAspectScore(aspectKey),
-                        classification: getScoreClassification(calculateAspectScore(aspectKey)),
-                    };
-                    return acc;
+        router.post(
+            route('evaluator.store'),
+            {
+                evaluator: {
+                    id: evaluator.id,
+                    name: evaluator.name,
                 },
-                {} as Record<string, any>,
-            ),
-            overallScore: aspects.reduce((total, aspectKey) => total + calculateAspectScore(aspectKey), 0) / aspects.length,
-            overallNotes: overallNotes,
-            detailedBreakdown: aspects.map((aspectKey) => {
-                const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
-                return {
-                    aspectKey,
-                    aspectTitle: aspect.title,
-                    criteria: aspect.criteria.map((criterion) => ({
-                        criterionId: criterion.id,
-                        criterionName: criterion.name,
-                        indicators: criterion.indicators.map((indicator) => ({
-                            indicatorId: indicator.id,
-                            indicatorText: indicator.text,
-                            score: scores[indicator.id] || 0,
-                            classification: getScoreClassification(scores[indicator.id] || 0),
-                        })),
-                    })),
-                };
-            }),
-        };
-
-        console.log('='.repeat(80));
-        console.log('🎯 EVALUATION SUBMISSION DATA');
-        console.log('='.repeat(80));
-        console.log('📊 Submission Overview:', {
-            timestamp: submissionData.timestamp,
-            evaluatorName: submissionData.evaluator.name,
-            employeeName: submissionData.employee.nama,
-            overallScore: submissionData.overallScore.toFixed(2),
-        });
-        console.log('\n👤 Evaluator Details:', submissionData.evaluator);
-        console.log('\n👥 Employee Details:', submissionData.employee);
-        console.log('\n📈 Individual Scores:', submissionData.scores);
-        console.log('\n📊 Aspect Scores:', submissionData.aspectScores);
-        console.log('\n📝 Overall Notes:', submissionData.overallNotes || 'No notes provided');
-        console.log('\n🔍 Detailed Breakdown:', JSON.stringify(submissionData.detailedBreakdown, null, 2));
-        console.log('\n💾 Complete Submission Data:', JSON.stringify(submissionData, null, 2));
-        console.log('='.repeat(80));
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        toast({
-            title: 'Penilaian Berhasil Disimpan!',
-            description: 'Terima kasih atas penilaian yang telah diberikan.',
-        });
-        setIsSubmitting(false);
-        onBack();
+                outsourcing: {
+                    id: employee.id,
+                    name: employee.name,
+                },
+                scores: scores,
+                catatan: overallNotes,
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: 'Penilaian Berhasil Disimpan!',
+                        description: 'Terima kasih atas penilaian yang telah diberikan.',
+                    });
+                    setIsSubmitting(false);
+                    onBack();
+                },
+                onError: () => {
+                    setIsSubmitting(false);
+                },
+            },
+        );
     };
 
     const calculateAspectScore = (aspectKey: string) => {
@@ -537,7 +485,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                             </CardHeader>
                             <CardContent className="space-y-2 text-sm">
                                 <div>
-                                    <strong>Nama:</strong> {employee.nama}
+                                    <strong>Nama:</strong> {employee.name}
                                 </div>
                                 <div>
                                     <strong>Jabatan:</strong> {employee.jabatan}

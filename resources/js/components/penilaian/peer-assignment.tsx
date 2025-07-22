@@ -5,86 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, Building, Building2, CheckCircle, Edit, Mail, MapPin, Phone, Search, UserPlus, Users } from 'lucide-react';
 import { useState } from 'react';
-
-// Enhanced dummy data for outsourcing employees with database fields
-const outsourcingEmployees = [
-    {
-        id: 1,
-        name: 'Ahmad Rizki Pratama',
-        email: 'ahmad.rizki@company.com',
-        jabatan: 'Technical Support Specialist',
-        lokasi_kerja: 'Gedung A Lt. 3',
-        unit_kerja: 'Bagian Teknologi Informasi',
-        perusahaan: 'PT Outsourcing Teknologi',
-        phone: '081234567890',
-        joinDate: '2023-01-15',
-        peerEvaluator: 3, // Ahmad Fauzi
-    },
-    {
-        id: 2,
-        name: 'Siti Nurhaliza',
-        email: 'siti.nurhaliza@company.com',
-        jabatan: 'HR Assistant',
-        lokasi_kerja: 'Gedung B Lt. 2',
-        unit_kerja: 'Biro Sumber Daya Manusia',
-        perusahaan: 'PT Manpower Solutions',
-        phone: '081234567891',
-        joinDate: '2023-02-01',
-        peerEvaluator: 4, // Linda Sari
-    },
-    {
-        id: 3,
-        name: 'Ahmad Fauzi',
-        email: 'ahmad.fauzi@company.com',
-        jabatan: 'IT Support Specialist',
-        lokasi_kerja: 'Gedung A Lt. 3',
-        unit_kerja: 'Bagian Teknologi Informasi',
-        perusahaan: 'PT Outsourcing Teknologi',
-        phone: '081234567892',
-        joinDate: '2023-01-20',
-        peerEvaluator: 1, // Ahmad Rizki
-    },
-    {
-        id: 4,
-        name: 'Linda Sari',
-        email: 'linda.sari@company.com',
-        jabatan: 'HR Assistant',
-        lokasi_kerja: 'Gedung B Lt. 2',
-        unit_kerja: 'Biro Sumber Daya Manusia',
-        perusahaan: 'PT Manpower Solutions',
-        phone: '081234567893',
-        joinDate: '2023-02-10',
-        peerEvaluator: 2, // Siti Nurhaliza
-    },
-    {
-        id: 5,
-        name: 'Budi Santoso',
-        email: 'budi.santoso@company.com',
-        jabatan: 'Finance Assistant',
-        lokasi_kerja: 'Gedung C Lt. 1',
-        unit_kerja: 'Bagian Keuangan',
-        perusahaan: 'PT Outsourcing Teknologi',
-        phone: '081234567894',
-        joinDate: '2023-03-01',
-        peerEvaluator: null, // No peer assigned yet
-    },
-    {
-        id: 6,
-        name: 'Maya Sari Dewi',
-        email: 'maya.sari@company.com',
-        jabatan: 'Marketing Assistant',
-        lokasi_kerja: 'Gedung D Lt. 2',
-        unit_kerja: 'Bagian Pemasaran',
-        perusahaan: 'PT Manpower Solutions',
-        phone: '081234567895',
-        joinDate: '2023-03-15',
-        peerEvaluator: null, // No peer assigned yet
-    },
-];
 
 // Automatic assignments for Kepala Biro and Kepala Bagian
 const automaticAssignments = {
@@ -99,7 +23,7 @@ const automaticAssignments = {
     },
 };
 
-export default function PeerAssignment() {
+export default function PeerAssignment({ outsourcingEmployees }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
@@ -107,85 +31,28 @@ export default function PeerAssignment() {
     const { toast } = useToast();
 
     const filteredEmployees = outsourcingEmployees.filter(
-        (emp) =>
+        (emp: any) =>
             emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             emp.unit_kerja.toLowerCase().includes(searchTerm.toLowerCase()) ||
             emp.perusahaan.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     const getAvailablePeers = (currentEmployee: any) => {
-        return outsourcingEmployees.filter((emp) => emp.id !== currentEmployee.id && emp.unit_kerja === currentEmployee.unit_kerja);
+        return outsourcingEmployees.filter((emp: any) => emp.id !== currentEmployee.id && emp.unit_kerja === currentEmployee.unit_kerja);
     };
 
     const getPeerName = (peerId: number | null) => {
         if (!peerId) return null;
-        const peer = outsourcingEmployees.find((emp) => emp.id === peerId);
+        const peer = outsourcingEmployees.find((emp: any) => emp.id === peerId);
         return peer?.name || null;
     };
 
     const handleAssignPeer = () => {
         if (selectedEmployee && selectedPeer) {
-            const timestamp = new Date().toISOString();
-            const peerEmployee = outsourcingEmployees.find((emp) => emp.id === Number.parseInt(selectedPeer));
+            const peerEmployee = outsourcingEmployees.find((emp: any) => emp.id === Number.parseInt(selectedPeer));
             const previousPeer = getPeerName(selectedEmployee.peerEvaluator);
 
-            const submissionData = {
-                timestamp,
-                action: 'PEER_ASSIGNMENT',
-                assignment: {
-                    employeeId: selectedEmployee.id,
-                    employeeName: selectedEmployee.nama,
-                    employeeUnit: selectedEmployee.unit_kerja,
-                    previousPeerId: selectedEmployee.peerEvaluator,
-                    previousPeerName: previousPeer,
-                    newPeerId: Number.parseInt(selectedPeer),
-                    newPeerName: peerEmployee?.nama,
-                    newPeerUnit: peerEmployee?.unit_kerja,
-                },
-                context: {
-                    totalEmployees: outsourcingEmployees.length,
-                    assignedCount: outsourcingEmployees.filter((emp) => emp.peerEvaluator).length,
-                    unassignedCount: outsourcingEmployees.filter((emp) => !emp.peerEvaluator).length,
-                    sameUnitPeers: getAvailablePeers(selectedEmployee).length,
-                },
-            };
-
-            console.log('='.repeat(80));
-            console.log('🤝 PEER ASSIGNMENT OPERATION');
-            console.log('='.repeat(80));
-            console.log('📊 Assignment Overview:', {
-                timestamp: submissionData.timestamp,
-                employee: submissionData.assignment.employeeName,
-                previousPeer: submissionData.assignment.previousPeerName || 'None',
-                newPeer: submissionData.assignment.newPeerName,
-                unit: submissionData.assignment.employeeUnit,
-            });
-            console.log('\n👥 Assignment Details:', submissionData.assignment);
-            console.log('\n📈 System Context:', submissionData.context);
-            console.log('\n💾 Complete Assignment Data:', JSON.stringify(submissionData, null, 2));
-
-            // Update assignment logic here
-            console.log(`🔄 Assigning peer ${selectedPeer} to evaluate ${selectedEmployee.nama}`);
-
-            // Update the employee's peer evaluator
-            const employeeIndex = outsourcingEmployees.findIndex((emp) => emp.id === selectedEmployee.id);
-            if (employeeIndex !== -1) {
-                const oldPeerEvaluator = outsourcingEmployees[employeeIndex].peerEvaluator;
-                outsourcingEmployees[employeeIndex].peerEvaluator = Number.parseInt(selectedPeer);
-
-                console.log('✅ Assignment Updated:', {
-                    employeeIndex,
-                    employeeId: selectedEmployee.id,
-                    oldPeerEvaluator,
-                    newPeerEvaluator: Number.parseInt(selectedPeer),
-                });
-            }
-
-            console.log('\n📊 Updated Assignment Status:', {
-                totalAssigned: outsourcingEmployees.filter((emp) => emp.peerEvaluator).length,
-                totalUnassigned: outsourcingEmployees.filter((emp) => !emp.peerEvaluator).length,
-            });
-            console.log('='.repeat(80));
+            console.log();
 
             setIsDialogOpen(false);
             setSelectedEmployee(null);
@@ -270,13 +137,13 @@ export default function PeerAssignment() {
                         <div className="flex items-center space-x-4">
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-green-600">
-                                    {outsourcingEmployees.filter((emp) => emp.peerEvaluator).length}
+                                    {outsourcingEmployees.filter((emp: any) => emp.peerEvaluator).length}
                                 </div>
                                 <div className="text-sm text-gray-500">Sudah Ditugaskan</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-orange-600">
-                                    {outsourcingEmployees.filter((emp) => !emp.peerEvaluator).length}
+                                    {outsourcingEmployees.filter((emp: any) => !emp.peerEvaluator).length}
                                 </div>
                                 <div className="text-sm text-gray-500">Belum Ditugaskan</div>
                             </div>
@@ -297,7 +164,7 @@ export default function PeerAssignment() {
 
                     {/* Employee Cards */}
                     <div className="space-y-4">
-                        {filteredEmployees.map((employee) => {
+                        {filteredEmployees.map((employee: any) => {
                             const peerName = getPeerName(employee.peerEvaluator);
                             const availablePeers = getAvailablePeers(employee);
 
@@ -443,10 +310,24 @@ export default function PeerAssignment() {
                                     <label className="text-sm font-medium text-gray-700">Pilih Penilai Teman Setingkat:</label>
                                     <Select value={selectedPeer} onValueChange={setSelectedPeer}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Pilih teman setingkat..." />
+                                            {(() => {
+                                                const selected = getAvailablePeers(selectedEmployee).find(
+                                                    (p: any) => p.id.toString() === selectedPeer,
+                                                );
+
+                                                return selected ? (
+                                                    <span>
+                                                        {selected.name}
+                                                        <span className="text-gray-500"> – {selected.jabatan}</span>
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-400">Pilih teman setingkat...</span>
+                                                );
+                                            })()}
                                         </SelectTrigger>
+
                                         <SelectContent>
-                                            {getAvailablePeers(selectedEmployee).map((peer) => (
+                                            {getAvailablePeers(selectedEmployee).map((peer: any) => (
                                                 <SelectItem key={peer.id} value={peer.id.toString()}>
                                                     <div className="flex flex-col">
                                                         <span>{peer.name}</span>
@@ -459,7 +340,7 @@ export default function PeerAssignment() {
                                 </div>
 
                                 {getAvailablePeers(selectedEmployee).length === 0 && (
-                                    <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3">
+                                    <div className="mt-3 rounded-md border border-yellow-200 bg-yellow-50 p-3">
                                         <p className="text-sm text-yellow-800">
                                             Tidak ada teman setingkat lain di unit yang sama untuk ditugaskan sebagai penilai.
                                         </p>

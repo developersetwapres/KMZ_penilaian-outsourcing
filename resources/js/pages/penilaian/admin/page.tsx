@@ -24,7 +24,7 @@ const mockAdminUser = {
     role: 'admin',
 };
 
-export default function AdminPage() {
+export default function AdminPage({ outsourcing }: any) {
     const [activeTab, setActiveTab] = useState('master-data');
     const [user, setUser] = useState(mockAdminUser);
     const { toast } = useToast();
@@ -155,7 +155,7 @@ export default function AdminPage() {
                         </TabsContent>
 
                         <TabsContent value="assignment">
-                            <PeerAssignment />
+                            <PeerAssignment outsourcingEmployees={outsourcing} />
                         </TabsContent>
 
                         <TabsContent value="results">
