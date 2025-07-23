@@ -8,18 +8,17 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { router } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, Building, Building2, CheckCircle, FileText, Mail, MapPin, Phone, Target, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, FileText, Info, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
-// Validation schema
+// Validation schema - now for criteria scores
 const evaluationSchema = z.object({
     scores: z.record(z.string(), z.number().min(0).max(100)),
     overallNotes: z.string().optional(),
 });
 
-// Dummy evaluation data
+// Updated evaluation data - scoring per criteria
 const evaluationData = {
     'aspek-teknis': {
         title: 'Aspek Teknis',
@@ -27,19 +26,21 @@ const evaluationData = {
             {
                 id: 'teknis-1',
                 name: 'Penguasaan Teknologi',
+                description: 'Kemampuan dalam menggunakan teknologi dan sistem yang diperlukan dalam pekerjaan',
                 indicators: [
-                    { id: 't1-1', text: 'Kemampuan menggunakan software/aplikasi kerja sesuai bidang tugas' },
-                    { id: 't1-2', text: 'Pemahaman terhadap sistem dan prosedur teknis yang berlaku' },
-                    { id: 't1-3', text: 'Kemampuan troubleshooting dan mengatasi masalah teknis dasar' },
+                    'Kemampuan menggunakan software/aplikasi kerja sesuai bidang tugas',
+                    'Pemahaman terhadap sistem dan prosedur teknis yang berlaku',
+                    'Kemampuan troubleshooting dan mengatasi masalah teknis dasar',
                 ],
             },
             {
                 id: 'teknis-2',
                 name: 'Kualitas Kerja',
+                description: 'Standar dan kualitas hasil kerja yang dihasilkan',
                 indicators: [
-                    { id: 't2-1', text: 'Ketepatan dan keakuratan dalam menyelesaikan tugas' },
-                    { id: 't2-2', text: 'Kesesuaian hasil kerja dengan standar yang ditetapkan' },
-                    { id: 't2-3', text: 'Kemampuan menyelesaikan pekerjaan sesuai deadline' },
+                    'Ketepatan dan keakuratan dalam menyelesaikan tugas',
+                    'Kesesuaian hasil kerja dengan standar yang ditetapkan',
+                    'Kemampuan menyelesaikan pekerjaan sesuai deadline',
                 ],
             },
         ],
@@ -50,19 +51,21 @@ const evaluationData = {
             {
                 id: 'perilaku-1',
                 name: 'Disiplin',
+                description: 'Ketaatan terhadap aturan dan konsistensi dalam menjalankan tugas',
                 indicators: [
-                    { id: 'p1-1', text: 'Kehadiran dan ketepatan waktu dalam bekerja' },
-                    { id: 'p1-2', text: 'Kepatuhan terhadap aturan dan tata tertib perusahaan' },
-                    { id: 'p1-3', text: 'Konsistensi dalam menjalankan tugas dan tanggung jawab' },
+                    'Kehadiran dan ketepatan waktu dalam bekerja',
+                    'Kepatuhan terhadap aturan dan tata tertib perusahaan',
+                    'Konsistensi dalam menjalankan tugas dan tanggung jawab',
                 ],
             },
             {
                 id: 'perilaku-2',
                 name: 'Kerjasama dan Komunikasi',
+                description: 'Kemampuan berinteraksi dan bekerja sama dengan rekan kerja',
                 indicators: [
-                    { id: 'p2-1', text: 'Kemampuan bekerja dalam tim dan berkolaborasi' },
-                    { id: 'p2-2', text: 'Komunikasi yang efektif dengan rekan kerja dan atasan' },
-                    { id: 'p2-3', text: 'Sikap saling membantu dan mendukung rekan kerja' },
+                    'Kemampuan bekerja dalam tim dan berkolaborasi',
+                    'Komunikasi yang efektif dengan rekan kerja dan atasan',
+                    'Sikap saling membantu dan mendukung rekan kerja',
                 ],
             },
         ],
@@ -73,19 +76,21 @@ const evaluationData = {
             {
                 id: 'keahlian-1',
                 name: 'Inisiatif dan Kreativitas',
+                description: 'Kemampuan mengambil inisiatif dan memberikan ide-ide kreatif',
                 indicators: [
-                    { id: 'k1-1', text: 'Proaktif dalam mengidentifikasi dan mengatasi masalah' },
-                    { id: 'k1-2', text: 'Memberikan saran dan ide untuk perbaikan proses kerja' },
-                    { id: 'k1-3', text: 'Inisiatif dalam mengembangkan kemampuan diri' },
+                    'Proaktif dalam mengidentifikasi dan mengatasi masalah',
+                    'Memberikan saran dan ide untuk perbaikan proses kerja',
+                    'Inisiatif dalam mengembangkan kemampuan diri',
                 ],
             },
             {
                 id: 'keahlian-2',
                 name: 'Adaptabilitas',
+                description: 'Kemampuan menyesuaikan diri dengan perubahan dan situasi baru',
                 indicators: [
-                    { id: 'k2-1', text: 'Kemampuan menyesuaikan diri dengan perubahan kebijakan' },
-                    { id: 'k2-2', text: 'Fleksibilitas dalam menjalankan tugas yang bervariasi' },
-                    { id: 'k2-3', text: 'Kemampuan belajar hal-hal baru dengan cepat' },
+                    'Kemampuan menyesuaikan diri dengan perubahan kebijakan',
+                    'Fleksibilitas dalam menjalankan tugas yang bervariasi',
+                    'Kemampuan belajar hal-hal baru dengan cepat',
                 ],
             },
         ],
@@ -117,6 +122,7 @@ interface EvaluationFormProps {
         unit_kerja: string;
         perusahaan: string;
         phone: string;
+        foto?: string;
     };
     evaluator: any;
     onBack: () => void;
@@ -124,7 +130,7 @@ interface EvaluationFormProps {
 
 export default function EvaluationForm({ employee, evaluator, onBack }: EvaluationFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
-    const [scores, setScores] = useState<Record<string, number>>({});
+    const [scores, setScores] = useState<Record<string, number>>({}); // Now stores criteria scores
     const [overallNotes, setOverallNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showReview, setShowReview] = useState(false);
@@ -140,14 +146,14 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentStep]);
 
-    const handleScoreChange = (indicatorId: string, value: string) => {
+    const handleScoreChange = (criteriaId: string, value: string) => {
         const numValue = value === '' ? 0 : Math.min(100, Math.max(0, Number.parseInt(value) || 0));
-        setScores((prev) => ({ ...prev, [indicatorId]: numValue }));
+        setScores((prev) => ({ ...prev, [criteriaId]: numValue }));
     };
 
     const canProceed = () => {
-        const currentIndicators = aspectData.criteria.flatMap((c) => c.indicators.map((i) => i.id));
-        return currentIndicators.every((id) => scores[id] !== undefined && scores[id] > 0);
+        const currentCriteria = aspectData.criteria.map((c) => c.id);
+        return currentCriteria.every((id) => scores[id] !== undefined && scores[id] > 0);
     };
 
     const handleNext = () => {
@@ -164,56 +170,99 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setIsSubmitting(true);
 
-        router.post(
-            route('evaluator.store'),
-            {
-                evaluator: {
-                    id: evaluator.id,
-                    name: evaluator.name,
-                },
-                outsourcing: {
-                    id: employee.id,
-                    name: employee.name,
-                },
-                scores: scores,
-                catatan: overallNotes,
+        // Comprehensive data logging
+        const submissionData = {
+            timestamp: new Date().toISOString(),
+            evaluator: {
+                id: evaluator.id,
+                name: evaluator.name,
+                nip: evaluator.nip,
+                position: evaluator.position,
+                unit: evaluator.unit,
+                type: evaluator.type,
+                role: evaluator.role,
             },
-            {
-                onSuccess: () => {
-                    toast({
-                        title: 'Penilaian Berhasil Disimpan!',
-                        description: 'Terima kasih atas penilaian yang telah diberikan.',
-                    });
-                    setIsSubmitting(false);
-                    onBack();
-                },
-                onError: () => {
-                    setIsSubmitting(false);
-                },
+            employee: {
+                id: employee.id,
+                name: employee.name,
+                email: employee.email,
+                jabatan: employee.jabatan,
+                lokasi_kerja: employee.lokasi_kerja,
+                unit_kerja: employee.unit_kerja,
+                perusahaan: employee.perusahaan,
+                phone: employee.phone,
             },
-        );
+            criteriaScores: scores, // Now criteria-level scores
+            aspectScores: aspects.reduce(
+                (acc, aspectKey) => {
+                    acc[aspectKey] = {
+                        score: calculateAspectScore(aspectKey),
+                        classification: getScoreClassification(calculateAspectScore(aspectKey)),
+                    };
+                    return acc;
+                },
+                {} as Record<string, any>,
+            ),
+            overallScore: aspects.reduce((total, aspectKey) => total + calculateAspectScore(aspectKey), 0) / aspects.length,
+            overallNotes: overallNotes,
+            detailedBreakdown: aspects.map((aspectKey) => {
+                const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+                return {
+                    aspectKey,
+                    aspectTitle: aspect.title,
+                    criteria: aspect.criteria.map((criterion) => ({
+                        criterionId: criterion.id,
+                        criterionName: criterion.name,
+                        criterionDescription: criterion.description,
+                        score: scores[criterion.id] || 0,
+                        classification: getScoreClassification(scores[criterion.id] || 0),
+                        indicators: criterion.indicators,
+                    })),
+                };
+            }),
+        };
+
+        console.log('='.repeat(80));
+        console.log('🎯 EVALUATION SUBMISSION DATA (CRITERIA-BASED)');
+        console.log('='.repeat(80));
+        console.log('📊 Submission Overview:', {
+            timestamp: submissionData.timestamp,
+            evaluatorName: submissionData.evaluator.name,
+            evaluatorType: submissionData.evaluator.type,
+            employeeName: submissionData.employee.name,
+            overallScore: submissionData.overallScore.toFixed(2),
+        });
+        console.log('\n👤 Evaluator Details:', submissionData.evaluator);
+        console.log('\n👥 Employee Details:', submissionData.employee);
+        console.log('\n📈 Criteria Scores:', submissionData.criteriaScores);
+        console.log('\n📊 Aspect Scores:', submissionData.aspectScores);
+        console.log('\n📝 Overall Notes:', submissionData.overallNotes || 'No notes provided');
+        console.log('\n🔍 Detailed Breakdown:', JSON.stringify(submissionData.detailedBreakdown, null, 2));
+        console.log('\n💾 Complete Submission Data:', JSON.stringify(submissionData, null, 2));
+        console.log('='.repeat(80));
+
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        toast({
+            title: 'Penilaian Berhasil Disimpan!',
+            description: 'Terima kasih atas penilaian yang telah diberikan.',
+        });
+        setIsSubmitting(false);
+        onBack();
     };
 
     const calculateAspectScore = (aspectKey: string) => {
         const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
         if (!aspect) return 0;
 
-        const totalIndicators = aspect.criteria.reduce((count, criterion) => count + criterion.indicators.length, 0);
-        let totalScore = 0;
+        const criteriaScores = aspect.criteria.map((criterion) => scores[criterion.id] || 0);
+        const totalScore = criteriaScores.reduce((sum, score) => sum + score, 0);
 
-        aspect.criteria.forEach((criterion) => {
-            criterion.indicators.forEach((indicator) => {
-                const score = scores[indicator.id];
-                if (score) {
-                    totalScore += score;
-                }
-            });
-        });
-
-        return totalIndicators > 0 ? totalScore / totalIndicators : 0;
+        return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
     };
 
     const renderReview = () => {
@@ -262,12 +311,9 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                             </div>
                             <div className="text-center">
                                 <div className="mb-2 text-4xl font-bold">
-                                    {Object.values(evaluationData).reduce(
-                                        (total, aspect) => total + aspect.criteria.reduce((sum, criterion) => sum + criterion.indicators.length, 0),
-                                        0,
-                                    )}
+                                    {Object.values(evaluationData).reduce((total, aspect) => total + aspect.criteria.length, 0)}
                                 </div>
-                                <div className="text-blue-100">Total Indikator</div>
+                                <div className="text-blue-100">Total Kriteria</div>
                                 <div className="mt-1 text-sm text-blue-200">Yang Dinilai</div>
                             </div>
                         </div>
@@ -289,10 +335,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                         </div>
                                         <div>
                                             <CardTitle className="text-2xl text-blue-800">{aspect.title}</CardTitle>
-                                            <CardDescription className="text-blue-600">
-                                                {aspect.criteria.length} Kriteria • {aspect.criteria.reduce((sum, c) => sum + c.indicators.length, 0)}{' '}
-                                                Indikator
-                                            </CardDescription>
+                                            <CardDescription className="text-blue-600">{aspect.criteria.length} Kriteria</CardDescription>
                                         </div>
                                     </div>
                                     <div className={`rounded-xl px-6 py-3 ${getScoreColor(aspectScore)}`}>
@@ -304,46 +347,48 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
 
                             <CardContent className="p-6">
                                 <div className="space-y-6">
-                                    {aspect.criteria.map((criterion, criterionIndex) => (
-                                        <div key={criterion.id} className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-5">
-                                            <div className="mb-4 flex items-center space-x-3">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-600 text-sm font-bold text-white">
-                                                    {aspectIndex + 1}.{criterionIndex + 1}
-                                                </div>
-                                                <h4 className="text-xl font-semibold text-gray-800">{criterion.name}</h4>
-                                            </div>
+                                    {aspect.criteria.map((criterion, criterionIndex) => {
+                                        const score = scores[criterion.id] || 0;
+                                        const classification = getScoreClassification(score);
 
-                                            <div className="grid gap-3">
-                                                {criterion.indicators.map((indicator, indicatorIndex) => {
-                                                    const score = scores[indicator.id] || 0;
-                                                    const classification = getScoreClassification(score);
-
-                                                    return (
-                                                        <div key={indicator.id} className="rounded-lg border border-gray-200 bg-white p-4">
-                                                            <div className="flex items-start justify-between">
-                                                                <div className="flex flex-1 items-start space-x-3">
-                                                                    <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600">
-                                                                        {indicatorIndex + 1}
-                                                                    </div>
-                                                                    <div className="flex-1">
-                                                                        <p className="font-medium text-gray-800">{indicator.text}</p>
-                                                                        <div className="mt-2 text-lg font-bold text-gray-900">Nilai: {score}</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="my-auto ml-4">
-                                                                    <Badge
-                                                                        className={`${classification.color} border px-3 py-1 text-sm font-semibold`}
-                                                                    >
-                                                                        {classification.label}
-                                                                    </Badge>
-                                                                </div>
-                                                            </div>
+                                        return (
+                                            <div key={criterion.id} className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-5">
+                                                <div className="mb-4 flex items-start justify-between">
+                                                    <div className="flex flex-1 items-start space-x-3">
+                                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-600 text-sm font-bold text-white">
+                                                            {aspectIndex + 1}.{criterionIndex + 1}
                                                         </div>
-                                                    );
-                                                })}
+                                                        <div className="flex-1">
+                                                            <h4 className="text-xl font-semibold text-gray-800">{criterion.name}</h4>
+                                                            <p className="mt-1 text-gray-600">{criterion.description}</p>
+                                                            <div className="mt-2 text-lg font-bold text-gray-900">Nilai: {score}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <Badge className={`${classification.color} border px-3 py-1 text-sm font-semibold`}>
+                                                            {classification.label}
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+
+                                                {/* Indicators as information */}
+                                                <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+                                                    <h5 className="mb-2 flex items-center space-x-2 font-medium text-gray-700">
+                                                        <Info className="h-4 w-4" />
+                                                        <span>Indikator Penilaian:</span>
+                                                    </h5>
+                                                    <ul className="space-y-1 text-sm text-gray-600">
+                                                        {criterion.indicators.map((indicator, idx) => (
+                                                            <li key={idx} className="flex items-start space-x-2">
+                                                                <span className="mt-1 text-blue-500">•</span>
+                                                                <span>{indicator}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </CardContent>
                         </Card>
@@ -446,70 +491,40 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
 
             <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="space-y-8">
-                    {/* Evaluator and Employee Info */}
+                    {/* Evaluator and Employee Info - Simplified */}
                     <div className="grid gap-6 md:grid-cols-2">
                         {/* Evaluator Info */}
                         <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2 text-lg text-white">
-                                    <User className="h-5 w-5" />
-                                    <span>Penilai</span>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2 text-sm">
-                                <div>
-                                    <strong>Nama:</strong> {evaluator.name}
-                                </div>
-                                <div>
-                                    <strong>NIP:</strong> {evaluator.nip}
-                                </div>
-                                <div>
-                                    <strong>Pangkat/Gol:</strong> {evaluator.rank}
-                                </div>
-                                <div>
-                                    <strong>Jabatan:</strong> {evaluator.position}
-                                </div>
-                                <div>
-                                    <strong>Unit Kerja:</strong> {evaluator.unit}
-                                </div>
+                            <CardContent className="p-6 text-center">
+                                <img
+                                    src={`/placeholder.svg?height=80&width=80&text=${evaluator.name
+                                        .split(' ')
+                                        .map((n: string) => n[0])
+                                        .join('')}`}
+                                    alt={evaluator.name}
+                                    className="mx-auto mb-4 h-20 w-20 rounded-full border-4 border-white/20"
+                                />
+                                <h3 className="text-xl font-bold text-white">{evaluator.name}</h3>
+                                <p className="text-green-100">{evaluator.jabatan}</p>
                             </CardContent>
                         </Card>
 
                         {/* Employee Info */}
                         <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2 text-lg text-white">
-                                    <User className="h-5 w-5" />
-                                    <span>Yang Dinilai</span>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2 text-sm">
-                                <div>
-                                    <strong>Nama:</strong> {employee.name}
-                                </div>
-                                <div>
-                                    <strong>Jabatan:</strong> {employee.jabatan}
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <MapPin className="h-3 w-3" />
-                                    <span>{employee.lokasi_kerja}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Building2 className="h-3 w-3" />
-                                    <span className="text-xs">{employee.unit_kerja}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Building className="h-3 w-3" />
-                                    <span className="text-xs">{employee.perusahaan}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Phone className="h-3 w-3" />
-                                    <span>{employee.phone}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Mail className="h-3 w-3" />
-                                    <span className="text-xs">{employee.email}</span>
-                                </div>
+                            <CardContent className="p-6 text-center">
+                                <img
+                                    src={
+                                        employee.foto ||
+                                        `/placeholder.svg?height=80&width=80&text=${employee.name
+                                            .split(' ')
+                                            .map((n: string) => n[0])
+                                            .join('')}`
+                                    }
+                                    alt={employee.name}
+                                    className="mx-auto mb-4 h-20 w-20 rounded-full border-4 border-white/20"
+                                />
+                                <h3 className="text-xl font-bold text-white">{employee.name}</h3>
+                                <p className="text-blue-100">{employee.jabatan}</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -556,7 +571,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                         </CardContent>
                     </Card>
 
-                    {/* Evaluation Form */}
+                    {/* Evaluation Form - Now per criteria */}
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center space-x-2 text-2xl text-blue-600">
@@ -565,38 +580,55 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                 </div>
                                 <span>{aspectData.title}</span>
                             </CardTitle>
+                            <CardDescription className="mt-2 text-gray-600">
+                                Berikan penilaian untuk setiap kriteria berdasarkan indikator yang tersedia
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-8">
-                            {aspectData.criteria.map((criterion) => (
-                                <div key={criterion.id} className="space-y-6">
-                                    <h3 className="border-b-2 border-blue-200 pb-3 text-xl font-semibold text-gray-900">{criterion.name}</h3>
+                            {aspectData.criteria.map((criterion, index) => {
+                                const currentScore = scores[criterion.id] || 0;
+                                const classification = getScoreClassification(currentScore);
 
-                                    {criterion.indicators.map((indicator, index) => {
-                                        const currentScore = scores[indicator.id] || 0;
-                                        const classification = getScoreClassification(currentScore);
+                                return (
+                                    <div key={criterion.id} className="space-y-6 rounded-xl border-l-4 border-l-blue-400 bg-gray-50 p-6">
+                                        <div className="flex items-start space-x-3">
+                                            <div className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
+                                                {index + 1}
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="mb-2 text-xl font-semibold text-gray-900">{criterion.name}</h3>
+                                                <p className="mb-4 text-gray-600">{criterion.description}</p>
 
-                                        return (
-                                            <div key={indicator.id} className="space-y-4 rounded-xl border-l-4 border-l-blue-400 bg-gray-50 p-6">
-                                                <div className="flex items-start space-x-3">
-                                                    <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
-                                                        {index + 1}
-                                                    </div>
-                                                    <h4 className="flex-1 font-medium text-gray-800">{indicator.text}</h4>
+                                                {/* Indicators as information */}
+                                                <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
+                                                    <h4 className="mb-3 flex items-center space-x-2 font-medium text-gray-700">
+                                                        <Info className="h-4 w-4 text-blue-500" />
+                                                        <span>Indikator Penilaian:</span>
+                                                    </h4>
+                                                    <ul className="space-y-2 text-sm text-gray-600">
+                                                        {criterion.indicators.map((indicator, idx) => (
+                                                            <li key={idx} className="flex items-start space-x-2">
+                                                                <span className="mt-1 font-bold text-blue-500">•</span>
+                                                                <span>{indicator}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
                                                 </div>
 
-                                                <div className="ml-9 space-y-4">
+                                                {/* Score input */}
+                                                <div className="space-y-4">
                                                     <div className="flex items-center space-x-4">
                                                         <div className="flex-1">
-                                                            <Label htmlFor={indicator.id} className="mb-2 block text-sm font-medium text-gray-700">
-                                                                Masukkan Nilai (0-100):
+                                                            <Label htmlFor={criterion.id} className="mb-2 block text-sm font-medium text-gray-700">
+                                                                Nilai untuk kriteria ini (0-100):
                                                             </Label>
                                                             <Input
-                                                                id={indicator.id}
+                                                                id={criterion.id}
                                                                 type="number"
                                                                 min="0"
                                                                 max="100"
                                                                 value={currentScore || ''}
-                                                                onChange={(e) => handleScoreChange(indicator.id, e.target.value)}
+                                                                onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
                                                                 className="w-32 text-center text-lg font-bold"
                                                                 placeholder="0"
                                                             />
@@ -619,11 +651,11 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                                             <div className="flex items-center space-x-3">
                                                                 <div className="text-2xl font-bold text-gray-800">{currentScore}</div>
                                                                 <div className="flex-1">
-                                                                    <div className="text-sm text-gray-600">Nilai yang dimasukkan</div>
+                                                                    <div className="text-sm text-gray-600">Nilai yang diberikan</div>
                                                                     <div
                                                                         className={`text-sm font-medium ${classification.color.replace('bg-', 'text-').replace('-100', '-800')}`}
                                                                     >
-                                                                        Termasuk kategori: {classification.label}
+                                                                        Kategori: {classification.label}
                                                                     </div>
                                                                 </div>
                                                                 <div className="text-right">
@@ -634,10 +666,10 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                                     )}
                                                 </div>
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })}
 
                             {/* Overall Notes - Show only on last step */}
                             {currentStep === aspects.length - 1 && (
