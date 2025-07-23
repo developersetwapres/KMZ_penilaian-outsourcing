@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ArrowRight, CheckCircle, FileText, Info, Target } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Award, CheckCircle, ClipboardCheck, FileText, Info, Star, Target, UserCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
@@ -122,7 +122,7 @@ interface EvaluationFormProps {
         unit_kerja: string;
         perusahaan: string;
         phone: string;
-        foto?: string;
+        image?: string;
     };
     evaluator: any;
     onBack: () => void;
@@ -491,40 +491,99 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
 
             <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="space-y-8">
-                    {/* Evaluator and Employee Info - Simplified */}
-                    <div className="grid gap-6 md:grid-cols-2">
-                        {/* Evaluator Info */}
-                        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-                            <CardContent className="p-6 text-center">
-                                <img
-                                    src={`/placeholder.svg?height=80&width=80&text=${evaluator.name
-                                        .split(' ')
-                                        .map((n: string) => n[0])
-                                        .join('')}`}
-                                    alt={evaluator.name}
-                                    className="mx-auto mb-4 h-20 w-20 rounded-full border-4 border-white/20"
-                                />
-                                <h3 className="text-xl font-bold text-white">{evaluator.name}</h3>
-                                <p className="text-green-100">{evaluator.jabatan}</p>
+                    {/* Enhanced Evaluator and Employee Info Cards */}
+                    <div className="grid gap-8 md:grid-cols-2">
+                        {/* Evaluator Card - Enhanced with Clear Label */}
+                        <Card className="relative gap-1 overflow-hidden border-0 bg-gradient-to-br from-green-500 to-emerald-600 pb-0 text-white shadow-2xl">
+                            {/* Decorative Elements */}
+                            <div className="absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full bg-white/10"></div>
+                            <div className="absolute bottom-0 left-0 h-24 w-24 -translate-x-12 translate-y-12 rounded-full bg-white/10"></div>
+
+                            <CardHeader className="relative z-10">
+                                <div className="mb-4 flex items-center space-x-3">
+                                    <div className="rounded-full bg-white/20 p-2">
+                                        <UserCheck className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <Badge className="border-white/30 bg-white/20 font-semibold text-white">PENILAI</Badge>
+                                        <CardTitle className="mt-1 text-sm text-green-100">Yang Memberikan Penilaian</CardTitle>
+                                    </div>
+                                </div>
+                            </CardHeader>
+
+                            <CardContent className="relative pb-8 text-center">
+                                {/* Photo with Enhanced Styling */}
+                                <div className="relative mx-2 mb-6">
+                                    <div className="absolute inset-0 scale-110 animate-pulse rounded-full bg-white/20"></div>
+                                    <img
+                                        src={`/storage/${evaluator.image}`}
+                                        alt={evaluator.name}
+                                        className="mx-auto h-20 w-20 rounded-full border-4 border-white shadow-lg"
+                                    />
+                                    <div className="absolute -top-2 -right-2 rounded-full bg-yellow-400 p-2 text-yellow-900 shadow-lg">
+                                        <Star className="h-4 w-4" />
+                                    </div>
+                                </div>
+
+                                {/* Name and Position */}
+                                <h3 className="mb-1 text-2xl font-bold text-white">{evaluator.name}</h3>
+                                <p className="text-lg font-medium text-green-100">{evaluator.jabatan}</p>
+
+                                {/* Role Badge */}
+                                <div className="mt-4">
+                                    <Badge className="border-white/30 bg-white/20 px-4 py-2 text-sm font-semibold text-white">
+                                        {evaluator.type === 'kepala-biro'
+                                            ? 'Kepala Biro'
+                                            : evaluator.type === 'kepala-bagian'
+                                              ? 'Kepala Bagian'
+                                              : 'Teman Setingkat'}
+                                    </Badge>
+                                </div>
                             </CardContent>
                         </Card>
 
-                        {/* Employee Info */}
-                        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                            <CardContent className="p-6 text-center">
-                                <img
-                                    src={
-                                        employee.foto ||
-                                        `/placeholder.svg?height=80&width=80&text=${employee.name
-                                            .split(' ')
-                                            .map((n: string) => n[0])
-                                            .join('')}`
-                                    }
-                                    alt={employee.name}
-                                    className="mx-auto mb-4 h-20 w-20 rounded-full border-4 border-white/20"
-                                />
-                                <h3 className="text-xl font-bold text-white">{employee.name}</h3>
-                                <p className="text-blue-100">{employee.jabatan}</p>
+                        {/* Employee Card - Enhanced with Clear Label */}
+                        <Card className="relative gap-1 overflow-hidden border-0 bg-gradient-to-br from-blue-500 to-indigo-600 pb-0 text-white shadow-2xl">
+                            {/* Decorative Elements */}
+                            <div className="absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full bg-white/10"></div>
+                            <div className="absolute bottom-0 left-0 h-24 w-24 -translate-x-12 translate-y-12 rounded-full bg-white/10"></div>
+
+                            <CardHeader className="relative z-10">
+                                <div className="mb-4 flex items-center space-x-3">
+                                    <div className="rounded-full bg-white/20 p-2">
+                                        <ClipboardCheck className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <Badge className="border-white/30 bg-white/20 font-semibold text-white">YANG DINILAI</Badge>
+                                        <CardTitle className="mt-1 text-sm text-blue-100">Pegawai yang Sedang Dievaluasi</CardTitle>
+                                    </div>
+                                </div>
+                            </CardHeader>
+
+                            <CardContent className="relative pb-8 text-center">
+                                {/* Photo with Enhanced Styling */}
+                                <div className="relative mx-2 mb-6">
+                                    <div className="absolute inset-0 scale-110 animate-pulse rounded-full bg-white/20"></div>
+                                    <img
+                                        src={`/storage/${employee.image}`}
+                                        alt={employee.name}
+                                        className="mx-auto h-20 w-20 rounded-full border-4 border-white shadow-lg"
+                                    />
+                                    <div className="absolute -top-2 -right-2 rounded-full bg-orange-400 p-2 text-orange-900 shadow-lg">
+                                        <Award className="h-4 w-4" />
+                                    </div>
+                                </div>
+
+                                {/* Name and Position */}
+                                <h3 className="mb-1 text-2xl font-bold text-white">{employee.name}</h3>
+                                <p className="text-lg font-medium text-blue-100">{employee.jabatan}</p>
+
+                                {/* Unit Badge */}
+                                <div className="mt-4">
+                                    <Badge className="border-white/30 bg-white/20 px-4 py-2 text-sm font-semibold text-white">
+                                        {employee.unit_kerja}
+                                    </Badge>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

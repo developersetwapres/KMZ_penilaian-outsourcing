@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('role');
             $table->string('phone');
             $table->string('status');
+            $table->string('image');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

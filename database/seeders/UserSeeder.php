@@ -50,6 +50,7 @@ class UserSeeder extends Seeder
                 'phone' => $user['phone'],
                 'role' => $user['role'],
                 'status' => 'active',
+                'image' => '/image/user.png',
                 'email_verified_at' => now(),
                 'password' => static::$password ??= Hash::make('password'),
                 'remember_token' => Str::random(10),
