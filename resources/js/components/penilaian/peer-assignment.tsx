@@ -10,19 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, Building, Building2, CheckCircle, Edit, Mail, MapPin, Phone, Search, UserPlus, Users } from 'lucide-react';
 import { useState } from 'react';
 
-// Automatic assignments for Kepala Biro and Kepala Bagian
-const automaticAssignments = {
-    'kepala-biro': {
-        'Dr. Andi Wijaya': ['Biro Sumber Daya Manusia'],
-        'Dr. Bambang Sutrisno': ['Bagian Teknologi Informasi', 'Bagian Keuangan', 'Bagian Pemasaran'],
-    },
-    'kepala-bagian': {
-        'Ir. Sari Dewi': ['Bagian Teknologi Informasi'],
-        'Dra. Rina Sari': ['Bagian Keuangan'],
-        'S.E. Agus Pratama': ['Bagian Pemasaran'],
-    },
-};
-
 export default function PeerAssignment({ outsourcingEmployees }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -52,7 +39,7 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
             const peerEmployee = outsourcingEmployees.find((emp: any) => emp.id === Number.parseInt(selectedPeer));
             const previousPeer = getPeerName(selectedEmployee.peerEvaluator);
 
-            console.log();
+            console.log(peerEmployee, previousPeer);
 
             setIsDialogOpen(false);
             setSelectedEmployee(null);
@@ -88,43 +75,6 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                     </CardDescription>
                 </CardHeader>
             </Card>
-
-            {/* Automatic Assignment Info */}
-            <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center space-x-2 text-lg text-blue-600">
-                            <Building2 className="h-5 w-5" />
-                            <span>Penugasan Otomatis - Kepala Biro</span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        {Object.entries(automaticAssignments['kepala-biro']).map(([name, units]) => (
-                            <div key={name} className="rounded-lg bg-blue-50 p-3">
-                                <div className="font-medium text-blue-900">{name}</div>
-                                <div className="mt-1 text-sm text-blue-700">Menilai semua outsourcing di: {units.join(', ')}</div>
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center space-x-2 text-lg text-green-600">
-                            <Building2 className="h-5 w-5" />
-                            <span>Penugasan Otomatis - Kepala Bagian</span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        {Object.entries(automaticAssignments['kepala-bagian']).map(([name, units]) => (
-                            <div key={name} className="rounded-lg bg-green-50 p-3">
-                                <div className="font-medium text-green-900">{name}</div>
-                                <div className="mt-1 text-sm text-green-700">Menilai outsourcing di: {units.join(', ')}</div>
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
 
             {/* Peer Assignment Management */}
             <Card>

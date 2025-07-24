@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ArrowRight, Award, CheckCircle, ClipboardCheck, FileText, Info, Star, Target, UserCheck } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { ArrowLeft, ArrowRight, CheckCircle, ClipboardCheck, FileText, Info, Target, UserCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
@@ -20,13 +21,12 @@ const evaluationSchema = z.object({
 
 // Updated evaluation data - scoring per criteria
 const evaluationData = {
-    'aspek-teknis': {
+    'aspek-teknis-dan-hasil-kerja-inisiatif': {
         title: 'Aspek Teknis',
         criteria: [
             {
                 id: 'teknis-1',
                 name: 'Penguasaan Teknologi',
-                description: 'Kemampuan dalam menggunakan teknologi dan sistem yang diperlukan dalam pekerjaan',
                 indicators: [
                     'Kemampuan menggunakan software/aplikasi kerja sesuai bidang tugas',
                     'Pemahaman terhadap sistem dan prosedur teknis yang berlaku',
@@ -36,7 +36,6 @@ const evaluationData = {
             {
                 id: 'teknis-2',
                 name: 'Kualitas Kerja',
-                description: 'Standar dan kualitas hasil kerja yang dihasilkan',
                 indicators: [
                     'Ketepatan dan keakuratan dalam menyelesaikan tugas',
                     'Kesesuaian hasil kerja dengan standar yang ditetapkan',
@@ -51,7 +50,6 @@ const evaluationData = {
             {
                 id: 'perilaku-1',
                 name: 'Disiplin',
-                description: 'Ketaatan terhadap aturan dan konsistensi dalam menjalankan tugas',
                 indicators: [
                     'Kehadiran dan ketepatan waktu dalam bekerja',
                     'Kepatuhan terhadap aturan dan tata tertib perusahaan',
@@ -61,7 +59,6 @@ const evaluationData = {
             {
                 id: 'perilaku-2',
                 name: 'Kerjasama dan Komunikasi',
-                description: 'Kemampuan berinteraksi dan bekerja sama dengan rekan kerja',
                 indicators: [
                     'Kemampuan bekerja dalam tim dan berkolaborasi',
                     'Komunikasi yang efektif dengan rekan kerja dan atasan',
@@ -76,7 +73,6 @@ const evaluationData = {
             {
                 id: 'keahlian-1',
                 name: 'Inisiatif dan Kreativitas',
-                description: 'Kemampuan mengambil inisiatif dan memberikan ide-ide kreatif',
                 indicators: [
                     'Proaktif dalam mengidentifikasi dan mengatasi masalah',
                     'Memberikan saran dan ide untuk perbaikan proses kerja',
@@ -86,7 +82,6 @@ const evaluationData = {
             {
                 id: 'keahlian-2',
                 name: 'Adaptabilitas',
-                description: 'Kemampuan menyesuaikan diri dengan perubahan dan situasi baru',
                 indicators: [
                     'Kemampuan menyesuaikan diri dengan perubahan kebijakan',
                     'Fleksibilitas dalam menjalankan tugas yang bervariasi',
@@ -125,10 +120,10 @@ interface EvaluationFormProps {
         image?: string;
     };
     evaluator: any;
-    onBack: () => void;
+    evaluationData: any;
 }
 
-export default function EvaluationForm({ employee, evaluator, onBack }: EvaluationFormProps) {
+export default function EvaluationForm({ employee, evaluator, evaluationData }: EvaluationFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [scores, setScores] = useState<Record<string, number>>({}); // Now stores criteria scores
     const [overallNotes, setOverallNotes] = useState('');
@@ -152,8 +147,8 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
     };
 
     const canProceed = () => {
-        const currentCriteria = aspectData.criteria.map((c) => c.id);
-        return currentCriteria.every((id) => scores[id] !== undefined && scores[id] > 0);
+        const currentCriteria = aspectData.criteria.map((c: any) => c.id);
+        return currentCriteria.every((id: any) => scores[id] !== undefined && scores[id] > 0);
     };
 
     const handleNext = () => {
@@ -170,97 +165,43 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setIsSubmitting(true);
 
         // Comprehensive data logging
         const submissionData = {
-            timestamp: new Date().toISOString(),
             evaluator: {
                 id: evaluator.id,
                 name: evaluator.name,
-                nip: evaluator.nip,
-                position: evaluator.position,
-                unit: evaluator.unit,
-                type: evaluator.type,
-                role: evaluator.role,
             },
             employee: {
                 id: employee.id,
                 name: employee.name,
-                email: employee.email,
-                jabatan: employee.jabatan,
-                lokasi_kerja: employee.lokasi_kerja,
-                unit_kerja: employee.unit_kerja,
-                perusahaan: employee.perusahaan,
-                phone: employee.phone,
             },
             criteriaScores: scores, // Now criteria-level scores
-            aspectScores: aspects.reduce(
-                (acc, aspectKey) => {
-                    acc[aspectKey] = {
-                        score: calculateAspectScore(aspectKey),
-                        classification: getScoreClassification(calculateAspectScore(aspectKey)),
-                    };
-                    return acc;
-                },
-                {} as Record<string, any>,
-            ),
-            overallScore: aspects.reduce((total, aspectKey) => total + calculateAspectScore(aspectKey), 0) / aspects.length,
             overallNotes: overallNotes,
-            detailedBreakdown: aspects.map((aspectKey) => {
-                const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
-                return {
-                    aspectKey,
-                    aspectTitle: aspect.title,
-                    criteria: aspect.criteria.map((criterion) => ({
-                        criterionId: criterion.id,
-                        criterionName: criterion.name,
-                        criterionDescription: criterion.description,
-                        score: scores[criterion.id] || 0,
-                        classification: getScoreClassification(scores[criterion.id] || 0),
-                        indicators: criterion.indicators,
-                    })),
-                };
-            }),
         };
 
         console.log('='.repeat(80));
-        console.log('🎯 EVALUATION SUBMISSION DATA (CRITERIA-BASED)');
-        console.log('='.repeat(80));
-        console.log('📊 Submission Overview:', {
-            timestamp: submissionData.timestamp,
-            evaluatorName: submissionData.evaluator.name,
-            evaluatorType: submissionData.evaluator.type,
-            employeeName: submissionData.employee.name,
-            overallScore: submissionData.overallScore.toFixed(2),
-        });
+
         console.log('\n👤 Evaluator Details:', submissionData.evaluator);
         console.log('\n👥 Employee Details:', submissionData.employee);
         console.log('\n📈 Criteria Scores:', submissionData.criteriaScores);
-        console.log('\n📊 Aspect Scores:', submissionData.aspectScores);
         console.log('\n📝 Overall Notes:', submissionData.overallNotes || 'No notes provided');
-        console.log('\n🔍 Detailed Breakdown:', JSON.stringify(submissionData.detailedBreakdown, null, 2));
-        console.log('\n💾 Complete Submission Data:', JSON.stringify(submissionData, null, 2));
-        console.log('='.repeat(80));
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
 
         toast({
             title: 'Penilaian Berhasil Disimpan!',
             description: 'Terima kasih atas penilaian yang telah diberikan.',
         });
         setIsSubmitting(false);
-        onBack();
     };
 
     const calculateAspectScore = (aspectKey: string) => {
         const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
         if (!aspect) return 0;
 
-        const criteriaScores = aspect.criteria.map((criterion) => scores[criterion.id] || 0);
-        const totalScore = criteriaScores.reduce((sum, score) => sum + score, 0);
+        const criteriaScores = aspect.criteria.map((criterion: any) => scores[criterion.id] || 0);
+        const totalScore = criteriaScores.reduce((sum: any, score: any) => sum + score, 0);
 
         return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
     };
@@ -347,7 +288,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
 
                             <CardContent className="p-6">
                                 <div className="space-y-6">
-                                    {aspect.criteria.map((criterion, criterionIndex) => {
+                                    {aspect.criteria.map((criterion: any, criterionIndex: any) => {
                                         const score = scores[criterion.id] || 0;
                                         const classification = getScoreClassification(score);
 
@@ -360,7 +301,6 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                                         </div>
                                                         <div className="flex-1">
                                                             <h4 className="text-xl font-semibold text-gray-800">{criterion.name}</h4>
-                                                            <p className="mt-1 text-gray-600">{criterion.description}</p>
                                                             <div className="mt-2 text-lg font-bold text-gray-900">Nilai: {score}</div>
                                                         </div>
                                                     </div>
@@ -378,7 +318,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                                         <span>Indikator Penilaian:</span>
                                                     </h5>
                                                     <ul className="space-y-1 text-sm text-gray-600">
-                                                        {criterion.indicators.map((indicator, idx) => (
+                                                        {criterion.indicators.map((indicator: any, idx: any) => (
                                                             <li key={idx} className="flex items-start space-x-2">
                                                                 <span className="mt-1 text-blue-500">•</span>
                                                                 <span>{indicator}</span>
@@ -474,10 +414,12 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
             <header className="sticky top-0 z-10 border-b bg-white shadow-sm">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-4">
-                        <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
-                            <ArrowLeft className="h-4 w-4" />
-                            <span>Kembali</span>
-                        </Button>
+                        <Link href={route('evaluator.card')}>
+                            <Button variant="ghost" className="flex items-center space-x-2">
+                                <ArrowLeft className="h-4 w-4" />
+                                <span>Kembali</span>
+                            </Button>
+                        </Link>
 
                         <div className="flex items-center space-x-4">
                             <Badge variant="outline" className="px-3 py-1">
@@ -520,9 +462,6 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                         alt={evaluator.name}
                                         className="mx-auto h-20 w-20 rounded-full border-4 border-white shadow-lg"
                                     />
-                                    <div className="absolute -top-2 -right-2 rounded-full bg-yellow-400 p-2 text-yellow-900 shadow-lg">
-                                        <Star className="h-4 w-4" />
-                                    </div>
                                 </div>
 
                                 {/* Name and Position */}
@@ -569,9 +508,6 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                         alt={employee.name}
                                         className="mx-auto h-20 w-20 rounded-full border-4 border-white shadow-lg"
                                     />
-                                    <div className="absolute -top-2 -right-2 rounded-full bg-orange-400 p-2 text-orange-900 shadow-lg">
-                                        <Award className="h-4 w-4" />
-                                    </div>
                                 </div>
 
                                 {/* Name and Position */}
@@ -644,7 +580,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-8">
-                            {aspectData.criteria.map((criterion, index) => {
+                            {aspectData.criteria.map((criterion: any, index: any) => {
                                 const currentScore = scores[criterion.id] || 0;
                                 const classification = getScoreClassification(currentScore);
 
@@ -656,7 +592,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="mb-2 text-xl font-semibold text-gray-900">{criterion.name}</h3>
-                                                <p className="mb-4 text-gray-600">{criterion.description}</p>
+                                                {/* <p className="mb-4 text-gray-600">{criterion.description}</p> */}
 
                                                 {/* Indicators as information */}
                                                 <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
@@ -665,7 +601,7 @@ export default function EvaluationForm({ employee, evaluator, onBack }: Evaluati
                                                         <span>Indikator Penilaian:</span>
                                                     </h4>
                                                     <ul className="space-y-2 text-sm text-gray-600">
-                                                        {criterion.indicators.map((indicator, idx) => (
+                                                        {criterion.indicators.map((indicator: any, idx: any) => (
                                                             <li key={idx} className="flex items-start space-x-2">
                                                                 <span className="mt-1 font-bold text-blue-500">•</span>
                                                                 <span>{indicator}</span>

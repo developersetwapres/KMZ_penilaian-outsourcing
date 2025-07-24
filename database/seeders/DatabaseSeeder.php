@@ -16,6 +16,5 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UserSeeder::class);
         $this->call(KriteriaSeeder::class);
-        $this->call(IndikatorSeeder::class);
     }
 }

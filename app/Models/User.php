@@ -45,4 +45,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // di User.php
+    public function penilaiRelasi()
+    {
+        return $this->hasMany(PenugasanPeer::class, 'outsourcing_id');
+    }
+
+    public function outsourcingDinilai()
+    {
+        return $this->hasMany(PenugasanPeer::class, 'penilai_id');
+    }
 }

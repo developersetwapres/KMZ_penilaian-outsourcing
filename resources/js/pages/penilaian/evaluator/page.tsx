@@ -1,6 +1,5 @@
 'use client';
 
-import EvaluationForm from '@/components/penilaian/evaluation-form';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,13 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 import { SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { CheckCircle, ClipboardList, Clock, LogOut, User } from 'lucide-react';
-import { useState } from 'react';
 
 // Updated dummy employees data with simplified display
 const employees = [
     {
         id: 1,
-        nama: 'Ahmad Rizki Pratama',
+        name: 'Ahmad Rizki Pratama',
         email: 'ahmad.rizki@company.com',
         jabatan: 'Technical Support Specialist',
         lokasi_kerja: 'Gedung A Lt. 3',
@@ -27,7 +25,7 @@ const employees = [
     },
     {
         id: 2,
-        nama: 'Siti Nurhaliza',
+        name: 'Siti Nurhaliza',
         email: 'siti.nurhaliza@company.com',
         jabatan: 'HR Assistant',
         lokasi_kerja: 'Gedung B Lt. 2',
@@ -40,7 +38,7 @@ const employees = [
     },
     {
         id: 3,
-        nama: 'Budi Santoso',
+        name: 'Budi Santoso',
         email: 'budi.santoso@company.com',
         jabatan: 'Finance Assistant',
         lokasi_kerja: 'Gedung C Lt. 1',
@@ -53,7 +51,7 @@ const employees = [
     },
     {
         id: 4,
-        nama: 'Maya Sari Dewi',
+        name: 'Maya Sari Dewi',
         email: 'maya.sari@company.com',
         jabatan: 'Marketing Assistant',
         lokasi_kerja: 'Gedung D Lt. 2',
@@ -72,12 +70,20 @@ export default function EvaluatorPage() {
 
     const user = auth.user;
 
-    const [selectedEmployee, setSelectedEmployee] = useState<number | null>(null);
-
-    if (selectedEmployee) {
-        const employee = employees.find((emp) => emp.id === selectedEmployee);
-        return <EvaluationForm employee={employee!} evaluator={user} onBack={() => setSelectedEmployee(null)} />;
-    }
+    const setSelectedEmployee = (id: number, name: string) => {
+        router.post(
+            route('evaluator.create'),
+            {
+                id: id,
+                name: name,
+            },
+            {
+                onError: (err) => {
+                    console.log(err);
+                },
+            },
+        );
+    };
 
     const handleLogout = () => {
         router.flushAll();
@@ -199,14 +205,14 @@ export default function EvaluatorPage() {
                                     <div className="relative mb-4">
                                         <img
                                             src={`/storage/${employee.image}` || '/placeholder.svg'}
-                                            alt={employee.nama}
+                                            alt={employee.name}
                                             className="mx-auto h-27 w-27 rounded-full border-4 border-white shadow-md transition-transform duration-300 group-hover:scale-110"
                                         />
                                     </div>
 
                                     {/* Name with Gradient Text */}
                                     <h3 className="mb-1 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-xl font-bold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-indigo-600">
-                                        {employee.nama}
+                                        {employee.name}
                                     </h3>
 
                                     {/* Position with Icon */}
@@ -216,7 +222,7 @@ export default function EvaluatorPage() {
 
                                     {/* Action Button with Gradient */}
                                     <Button
-                                        onClick={() => setSelectedEmployee(employee.id)}
+                                        onClick={() => setSelectedEmployee(employee.id, employee.name)}
                                         className={`w-full transform py-3 font-semibold text-white shadow-lg transition-all duration-300 group-hover:scale-105 ${
                                             employee.status === 'completed'
                                                 ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'

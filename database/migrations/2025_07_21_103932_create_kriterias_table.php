@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('kriterias', function (Blueprint $table) {
             $table->id();
+            $table->string('slug');
+            $table->string('jenis');
             $table->string('aspek');
             $table->string('nama');
             $table->string('deskripsi');
+            $table->json('indikator');
             $table->timestamps();
         });
     }

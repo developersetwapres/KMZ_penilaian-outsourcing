@@ -1,9 +1,9 @@
 'use client';
 
-import EvaluationForm from '@/components/penilaian/evaluation-form';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import EvaluationForm from '@/pages/penilaian/evaluator/evaluation-form';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { CheckCircle, ClipboardList, Clock, LogOut, User } from 'lucide-react';
