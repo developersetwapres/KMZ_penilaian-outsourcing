@@ -46,14 +46,33 @@ class User extends Authenticatable
         ];
     }
 
-    // di User.php
-    public function penilaiRelasi()
+    public function evaluators()
+    {
+        return $this->hasMany(PenugasanPeer::class, 'outsourcing_id')->with('penilai');
+    }
+
+
+    // Sebagai outsourcing (yang dinilai)
+    public function penilaianMasuk()
     {
         return $this->hasMany(PenugasanPeer::class, 'outsourcing_id');
     }
 
-    public function outsourcingDinilai()
+    // Penilai atasan
+    public function penilaiAtasan()
     {
-        return $this->hasMany(PenugasanPeer::class, 'penilai_id');
+        return $this->hasOne(PenugasanPeer::class, 'outsourcing_id')->where('tipe', 'atasan')->with('penilai');
+    }
+
+    // Penilai teman
+    public function penilaiTeman()
+    {
+        return $this->hasOne(PenugasanPeer::class, 'outsourcing_id')->where('tipe', 'teman')->with('penilai');
+    }
+
+    // Penilai bawahan
+    public function penilaiBawahan()
+    {
+        return $this->hasOne(PenugasanPeer::class, 'outsourcing_id')->where('tipe', 'bawahan')->with('penilai');
     }
 }

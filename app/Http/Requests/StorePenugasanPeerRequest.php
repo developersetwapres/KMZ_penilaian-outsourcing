@@ -22,41 +22,60 @@ class StorePenugasanPeerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'outsourcing_id' => [
+            // Outsourcing yang dinilai
+            'outsourcing.id' => [
                 'required',
                 'integer',
                 'exists:users,id',
             ],
-            'penilai_id' => [
+            'outsourcing.name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            // Penilai
+            'penilai.id' => [
                 'required',
                 'integer',
-                'different:outsourcing_id', // tidak boleh menilai diri sendiri
+                'different:outsourcing.id',
                 'exists:users,id',
             ],
-            'type_penilai' => [
+            'penilai.name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'penilai.type' => [
                 'required',
                 'in:teman,kabag,kabiro',
             ],
         ];
     }
 
-    /**
-     * Pesan custom untuk error
-     */
     public function messages(): array
     {
         return [
-            'outsourcing_id.required' => 'Pegawai yang dinilai wajib dipilih.',
-            'outsourcing_id.integer' => 'ID pegawai yang dinilai harus berupa angka.',
-            'outsourcing_id.exists' => 'Pegawai yang dinilai tidak ditemukan.',
+            // outsourcing
+            'outsourcing.id.required' => 'ID outsourcing wajib diisi.',
+            'outsourcing.id.integer'  => 'ID outsourcing harus berupa angka.',
+            'outsourcing.id.exists'   => 'Outsourcing tidak ditemukan.',
+            'outsourcing.name.required' => 'Nama outsourcing wajib diisi.',
+            'outsourcing.name.string'   => 'Nama outsourcing harus berupa teks.',
+            'outsourcing.name.max'      => 'Nama outsourcing maksimal 255 karakter.',
 
-            'penilai_id.required' => 'Penilai wajib dipilih.',
-            'penilai_id.integer' => 'ID penilai harus berupa angka.',
-            'penilai_id.exists' => 'Penilai tidak ditemukan.',
-            'penilai_id.different' => 'Penilai tidak boleh orang yang sama dengan pegawai yang dinilai.',
+            // penilai
+            'penilai.id.required' => 'ID penilai wajib diisi.',
+            'penilai.id.integer'  => 'ID penilai harus berupa angka.',
+            'penilai.id.exists'   => 'Penilai tidak ditemukan.',
+            'penilai.id.different' => 'Penilai tidak boleh sama dengan outsourcing yang dinilai.',
 
-            'type_penilai.required' => 'Tipe penilai wajib diisi.',
-            'type_penilai.in' => 'Tipe penilai harus salah satu dari: teman, kabag, atau kabiro.',
+            'penilai.name.required' => 'Nama penilai wajib diisi.',
+            'penilai.name.string'   => 'Nama penilai harus berupa teks.',
+            'penilai.name.max'      => 'Nama penilai maksimal 255 karakter.',
+
+            'penilai.type.required' => 'Tipe penilai wajib diisi.',
+            'penilai.type.in'       => 'Tipe penilai harus salah satu dari: teman, kabag, atau kabiro.',
         ];
     }
 }
