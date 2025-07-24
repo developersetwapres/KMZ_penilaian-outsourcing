@@ -18,4 +18,9 @@ class EvaluasiController extends Controller
     {
         dd($request->all());
     }
+
+    public function show(): Response
+    {
+        return Inertia::render('penilaian/admin/results');
+    }
 }

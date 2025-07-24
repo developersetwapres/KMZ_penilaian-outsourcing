@@ -15,6 +15,7 @@ Route::middleware(['auth', 'verified', 'role:outsourcing,kepala-biro,kepala-bagi
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
+    Route::get('dashboard/result', [EvaluasiController::class, 'show'])->name('evaluasi.show');
 });
 
 require __DIR__ . '/settings.php';
