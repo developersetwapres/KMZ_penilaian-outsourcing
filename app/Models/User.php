@@ -50,29 +50,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(PenugasanPeer::class, 'outsourcing_id')->with('penilai');
     }
-
-
-    // Sebagai outsourcing (yang dinilai)
-    public function penilaianMasuk()
-    {
-        return $this->hasMany(PenugasanPeer::class, 'outsourcing_id');
-    }
-
-    // Penilai atasan
-    public function penilaiAtasan()
-    {
-        return $this->hasOne(PenugasanPeer::class, 'outsourcing_id')->where('tipe', 'atasan')->with('penilai');
-    }
-
-    // Penilai teman
-    public function penilaiTeman()
-    {
-        return $this->hasOne(PenugasanPeer::class, 'outsourcing_id')->where('tipe', 'teman')->with('penilai');
-    }
-
-    // Penilai bawahan
-    public function penilaiBawahan()
-    {
-        return $this->hasOne(PenugasanPeer::class, 'outsourcing_id')->where('tipe', 'bawahan')->with('penilai');
-    }
 }

@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('penugasan_peers', function (Blueprint $table) {
             $table->id();
 
-
             $table->foreignId('outsourcing_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('penilai_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('type_penilai', ['teman', 'user', 'atasan']);
+            $table->enum('type_penilai', ['teman', 'penerima_layanan', 'atasan']);
             $table->timestamps();
 
             // untuk mencegah duplikat data yang sama

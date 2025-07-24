@@ -23,7 +23,7 @@ class PagesController extends Controller
                 ->get()
                 ->map(function ($user) {
                     $evaluators = $user->evaluators->mapWithKeys(function ($item) {
-                        return [$item->tipe => $item->penilai];
+                        return [$item->type_penilai => $item->penilai];
                     });
 
                     return [

@@ -31,7 +31,7 @@ import { useState } from 'react';
 export default function PeerAssignment({ outsourcingEmployees }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [selectedEmployee, setSelectedEmployee] = useState<{ id: number; name: string; unit_kerja: string } | null>(null);
+    const [selectedEmployee, setSelectedEmployee] = useState<{ id: number; name: string; unit_kerja: string; jabatan: string } | null>(null);
     const [selectedEvaluators, setSelectedEvaluators] = useState({
         atasan: {},
         penerima_layanan: {},
@@ -150,9 +150,6 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                     {/* Employee Cards */}
                     <div className="space-y-4">
                         {filteredEmployees.map((employee: any) => {
-                            const peerName = '';
-                            const availablePeers = '';
-
                             const assignedCount = Object.values(employee.evaluators).filter(Boolean).length;
                             const completionPercentage = (assignedCount / 3) * 100;
 
@@ -226,10 +223,12 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                         <Button
                                                             size="sm"
                                                             onClick={() => {
+                                                                setSelectedEvaluators({ atasan: {}, penerima_layanan: {}, teman: {} });
                                                                 setSelectedEmployee({
                                                                     id: employee.id,
                                                                     name: employee.name,
                                                                     unit_kerja: employee.unit_kerja,
+                                                                    jabatan: employee.jabatan,
                                                                 });
                                                                 setIsDialogOpen(true);
                                                             }}
@@ -251,7 +250,7 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                                     <div className="flex items-center space-x-1">
                                                                         <CheckCircle className="h-3 w-3 text-green-600" />
                                                                         <span className="text-xs font-medium text-green-700">
-                                                                            {employee.evaluators.atasan}
+                                                                            {employee.evaluators.atasan.name} - {employee.evaluators.atasan.jabatan}
                                                                         </span>
                                                                     </div>
                                                                 ) : (
@@ -272,7 +271,8 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                                     <div className="flex items-center space-x-1">
                                                                         <CheckCircle className="h-3 w-3 text-green-600" />
                                                                         <span className="text-xs font-medium text-green-700">
-                                                                            {employee.evaluators.penerima_layanan}
+                                                                            {employee.evaluators.penerima_layanan.name} -{' '}
+                                                                            {employee.evaluators.penerima_layanan.jabatan}
                                                                         </span>
                                                                     </div>
                                                                 ) : (
@@ -293,7 +293,7 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                                     <div className="flex items-center space-x-1">
                                                                         <CheckCircle className="h-3 w-3 text-green-600" />
                                                                         <span className="text-xs font-medium text-green-700">
-                                                                            {employee.evaluators.teman}
+                                                                            {employee.evaluators.teman.name} - {employee.evaluators.teman.jabatan}
                                                                         </span>
                                                                     </div>
                                                                 ) : (
@@ -440,6 +440,7 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                                 <span>
                                                                     {selectedEvaluators.penerima_layanan.name}
                                                                     <span className="text-gray-500">
+                                                                        {' '}
                                                                         - {selectedEvaluators.penerima_layanan.jabatan}
                                                                     </span>
                                                                 </span>
