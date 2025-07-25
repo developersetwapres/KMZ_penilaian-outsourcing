@@ -21,7 +21,7 @@ class EvaluasiController extends Controller
 
     public function create(Request $request): Response | RedirectResponse
     {
-        $employee = User::select('name', 'jabatan', 'image', 'unit_kerja')->findOrFail($request->id);
+        $employee = User::select(['id', 'name', 'jabatan', 'image', 'unit_kerja'])->findOrFail($request->id);
         $evaluator = Auth::user();
 
         //Kalau nama tidak sama dengan nama hasil query berdasarkan id

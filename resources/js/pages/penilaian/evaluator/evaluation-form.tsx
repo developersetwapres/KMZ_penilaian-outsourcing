@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, CheckCircle, ClipboardCheck, FileText, Info, Target, UserCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -18,79 +18,6 @@ const evaluationSchema = z.object({
     scores: z.record(z.string(), z.number().min(0).max(100)),
     overallNotes: z.string().optional(),
 });
-
-// Updated evaluation data - scoring per criteria
-const evaluationData = {
-    'aspek-teknis-dan-hasil-kerja-inisiatif': {
-        title: 'Aspek Teknis',
-        criteria: [
-            {
-                id: 'teknis-1',
-                name: 'Penguasaan Teknologi',
-                indicators: [
-                    'Kemampuan menggunakan software/aplikasi kerja sesuai bidang tugas',
-                    'Pemahaman terhadap sistem dan prosedur teknis yang berlaku',
-                    'Kemampuan troubleshooting dan mengatasi masalah teknis dasar',
-                ],
-            },
-            {
-                id: 'teknis-2',
-                name: 'Kualitas Kerja',
-                indicators: [
-                    'Ketepatan dan keakuratan dalam menyelesaikan tugas',
-                    'Kesesuaian hasil kerja dengan standar yang ditetapkan',
-                    'Kemampuan menyelesaikan pekerjaan sesuai deadline',
-                ],
-            },
-        ],
-    },
-    'aspek-perilaku': {
-        title: 'Aspek Perilaku',
-        criteria: [
-            {
-                id: 'perilaku-1',
-                name: 'Disiplin',
-                indicators: [
-                    'Kehadiran dan ketepatan waktu dalam bekerja',
-                    'Kepatuhan terhadap aturan dan tata tertib perusahaan',
-                    'Konsistensi dalam menjalankan tugas dan tanggung jawab',
-                ],
-            },
-            {
-                id: 'perilaku-2',
-                name: 'Kerjasama dan Komunikasi',
-                indicators: [
-                    'Kemampuan bekerja dalam tim dan berkolaborasi',
-                    'Komunikasi yang efektif dengan rekan kerja dan atasan',
-                    'Sikap saling membantu dan mendukung rekan kerja',
-                ],
-            },
-        ],
-    },
-    'aspek-keahlian': {
-        title: 'Aspek Keahlian',
-        criteria: [
-            {
-                id: 'keahlian-1',
-                name: 'Inisiatif dan Kreativitas',
-                indicators: [
-                    'Proaktif dalam mengidentifikasi dan mengatasi masalah',
-                    'Memberikan saran dan ide untuk perbaikan proses kerja',
-                    'Inisiatif dalam mengembangkan kemampuan diri',
-                ],
-            },
-            {
-                id: 'keahlian-2',
-                name: 'Adaptabilitas',
-                indicators: [
-                    'Kemampuan menyesuaikan diri dengan perubahan kebijakan',
-                    'Fleksibilitas dalam menjalankan tugas yang bervariasi',
-                    'Kemampuan belajar hal-hal baru dengan cepat',
-                ],
-            },
-        ],
-    },
-};
 
 // Classification function
 const getScoreClassification = (score: number) => {
@@ -170,30 +97,28 @@ export default function EvaluationForm({ employee, evaluator, evaluationData }: 
 
         // Comprehensive data logging
         const submissionData = {
-            evaluator: {
-                id: evaluator.id,
-                name: evaluator.name,
-            },
             employee: {
                 id: employee.id,
                 name: employee.name,
             },
-            criteriaScores: scores, // Now criteria-level scores
+            criteriaScores: scores,
             overallNotes: overallNotes,
         };
 
-        console.log('='.repeat(80));
-
-        console.log('\n👤 Evaluator Details:', submissionData.evaluator);
-        console.log('\n👥 Employee Details:', submissionData.employee);
-        console.log('\n📈 Criteria Scores:', submissionData.criteriaScores);
-        console.log('\n📝 Overall Notes:', submissionData.overallNotes || 'No notes provided');
-
-        toast({
-            title: 'Penilaian Berhasil Disimpan!',
-            description: 'Terima kasih atas penilaian yang telah diberikan.',
+        router.post(route('evaluator.store'), submissionData, {
+            onSuccess: () => {
+                toast({
+                    title: 'Penilaian Berhasil Disimpan!',
+                    description: 'Terima kasih atas penilaian yang telah diberikan.',
+                });
+            },
+            onError: (err) => {
+                console.log(err);
+            },
+            onFinish: () => {
+                setIsSubmitting(false);
+            },
         });
-        setIsSubmitting(false);
     };
 
     const calculateAspectScore = (aspectKey: string) => {
