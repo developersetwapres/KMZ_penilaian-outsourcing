@@ -10,10 +10,11 @@ use Inertia\Inertia;
 Route::get('/', [PagesController::class, 'home'])->name('home');
 
 
-Route::middleware(['auth', 'verified', 'role:outsourcing,kepala-biro,kepala-bagian'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:outsourcing,penerima_layanan,atasan'])->group(function () {
     Route::get('/evaluator', [EvaluasiController::class, 'card'])->name('evaluator.card');
 
     Route::post('/evaluator', [EvaluasiController::class, 'create'])->name('evaluator.create');
+    Route::post('/evaluator-viewscore', [EvaluasiController::class, 'viewscore'])->name('evaluator.viewscore');
 
     Route::post('/evaluator/post', [EvaluasiController::class, 'store'])->name('evaluator.store');
 });

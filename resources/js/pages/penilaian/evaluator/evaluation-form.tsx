@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Link, router } from '@inertiajs/react';
@@ -48,9 +47,10 @@ interface EvaluationFormProps {
     };
     evaluator: any;
     evaluationData: any;
+    idPenugasanPeer: number;
 }
 
-export default function EvaluationForm({ employee, evaluator, evaluationData }: EvaluationFormProps) {
+export default function EvaluationForm({ employee, evaluator, evaluationData, idPenugasanPeer }: EvaluationFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [scores, setScores] = useState<Record<string, number>>({}); // Now stores criteria scores
     const [overallNotes, setOverallNotes] = useState('');
@@ -97,12 +97,12 @@ export default function EvaluationForm({ employee, evaluator, evaluationData }: 
 
         // Comprehensive data logging
         const submissionData = {
-            employee: {
-                id: employee.id,
-                name: employee.name,
-            },
-            criteriaScores: scores,
-            overallNotes: overallNotes,
+            penugasan_peer_id: idPenugasanPeer,
+            catatan: overallNotes,
+            nilai: Object.entries(scores).map(([kriteriaId, skor]) => ({
+                kriteria_id: Number(kriteriaId),
+                skor: skor,
+            })),
         };
 
         router.post(route('evaluator.store'), submissionData, {
@@ -450,7 +450,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData }: 
                     </div>
 
                     {/* Progress */}
-                    <Card>
+                    {/* <Card>
                         <CardContent className="pt-6">
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm text-gray-600">
@@ -467,7 +467,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData }: 
                                 </div>
                             </div>
                         </CardContent>
-                    </Card>
+                    </Card> */}
 
                     {/* Score Classification Reference */}
                     <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50">

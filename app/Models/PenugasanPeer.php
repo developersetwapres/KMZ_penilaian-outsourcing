@@ -11,6 +11,8 @@ class PenugasanPeer extends Model
         'outsourcing_id',
         'penilai_id',
         'type_penilai',
+        'catatan',
+        'status',
     ];
 
     // siapa yang sedang dinilai

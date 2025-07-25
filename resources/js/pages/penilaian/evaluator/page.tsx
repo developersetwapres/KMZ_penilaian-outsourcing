@@ -8,74 +8,19 @@ import { SharedData } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { CheckCircle, ClipboardList, Clock, LogOut, User } from 'lucide-react';
 
-// Updated dummy employees data with simplified display
-const employees = [
-    {
-        id: 1,
-        name: 'Ahmad Rizki Pratama',
-        email: 'ahmad.rizki@company.com',
-        jabatan: 'Technical Support Specialist',
-        lokasi_kerja: 'Gedung A Lt. 3',
-        unit_kerja: 'Bagian Teknologi Informasi',
-        perusahaan: 'PT Outsourcing Teknologi',
-        phone: '081234567890',
-        image: '/image/user.png',
-        status: 'draft',
-        assignedTo: ['kepala-biro', 'kepala-bagian', 'out001'],
-    },
-    {
-        id: 2,
-        name: 'Siti Nurhaliza',
-        email: 'siti.nurhaliza@company.com',
-        jabatan: 'HR Assistant',
-        lokasi_kerja: 'Gedung B Lt. 2',
-        unit_kerja: 'Biro Sumber Daya Manusia',
-        perusahaan: 'PT Manpower Solutions',
-        phone: '081234567891',
-        image: '/image/user.png',
-        status: 'completed',
-        assignedTo: ['kepala-biro', 'out002'],
-    },
-    {
-        id: 3,
-        name: 'Budi Santoso',
-        email: 'budi.santoso@company.com',
-        jabatan: 'Finance Assistant',
-        lokasi_kerja: 'Gedung C Lt. 1',
-        unit_kerja: 'Bagian Keuangan',
-        perusahaan: 'PT Outsourcing Teknologi',
-        phone: '081234567892',
-        image: '/image/user.png',
-        status: 'draft',
-        assignedTo: ['kepala-biro', 'kepala-bagian'],
-    },
-    {
-        id: 4,
-        name: 'Maya Sari Dewi',
-        email: 'maya.sari@company.com',
-        jabatan: 'Marketing Assistant',
-        lokasi_kerja: 'Gedung D Lt. 2',
-        unit_kerja: 'Bagian Pemasaran',
-        perusahaan: 'PT Manpower Solutions',
-        phone: '081234567893',
-        image: '/image/user.png',
-        status: 'draft',
-        assignedTo: ['kepala-biro', 'kepala-bagian'],
-    },
-];
-
-export default function EvaluatorPage() {
+export default function EvaluatorPage({ penugasanPeer }: any) {
     const { auth } = usePage<SharedData>().props;
-    const { toast } = useToast();
-
     const user = auth.user;
 
-    const setSelectedEmployee = (id: number, name: string) => {
+    const { toast } = useToast();
+
+    const setSelectedEmployee = (idPenugasanPeer: number, idOutsourching: number, nameOutsourching: string) => {
         router.post(
             route('evaluator.create'),
             {
-                id: id,
-                name: name,
+                idPenugasanPeer: idPenugasanPeer,
+                idOutsourching: idOutsourching,
+                nameOutsourching: nameOutsourching,
             },
             {
                 onError: (err) => {
@@ -83,6 +28,12 @@ export default function EvaluatorPage() {
                 },
             },
         );
+    };
+
+    const viewScores = (idPenugasanPeer: number) => {
+        router.post(route('evaluator.viewscore'), {
+            idPenugasanPeer: idPenugasanPeer,
+        });
     };
 
     const handleLogout = () => {
@@ -143,7 +94,12 @@ export default function EvaluatorPage() {
                                     </div>
                                     <div>
                                         <CardTitle className="text-2xl text-white">{user.name}</CardTitle>
-                                        <CardDescription className="text-green-100">{user.jabatan}</CardDescription>
+                                        <CardDescription className="text-green-100">
+                                            {user.role
+                                                .replace(/_/g, ' ') // ubah _ jadi spasi
+                                                .replace(/\b\w/g, (char) => char.toUpperCase())}{' '}
+                                            - {user.jabatan}
+                                        </CardDescription>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -162,12 +118,12 @@ export default function EvaluatorPage() {
 
                             <div className="flex items-center space-x-4">
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-blue-600">{employees.length}</div>
+                                    <div className="text-2xl font-bold text-blue-600">{penugasanPeer?.length}</div>
                                     <div className="text-sm text-gray-500">Total Pegawai</div>
                                 </div>
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-green-600">
-                                        {employees.filter((emp) => emp.status === 'completed').length}
+                                        {penugasanPeer?.filter((emp: any) => emp.status === 'completed').length}
                                     </div>
                                     <div className="text-sm text-gray-500">Selesai</div>
                                 </div>
@@ -176,7 +132,7 @@ export default function EvaluatorPage() {
 
                         {/* Creative Employee Cards */}
                         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {employees.map((employee) => (
+                            {penugasanPeer?.map((employee: any) => (
                                 <Card
                                     key={employee.id}
                                     className="group relative overflow-hidden border-0 bg-gradient-to-br from-white to-blue-50 pb-2 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl"
@@ -192,7 +148,7 @@ export default function EvaluatorPage() {
                                             }`}
                                         >
                                             {employee.status === 'completed' ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                                            <span className="text-xs font-medium">{employee.status === 'completed' ? 'Selesai' : 'Belum'}</span>
+                                            <span className="text-xs font-medium">{employee.status == 'completed' ? 'Selesai' : 'Belum'}</span>
                                         </Badge>
                                     </div>
 
@@ -206,25 +162,29 @@ export default function EvaluatorPage() {
                                         {/* Photo with Decorative Ring */}
                                         <div className="relative mb-4">
                                             <img
-                                                src={`/storage/${employee.image}` || '/placeholder.svg'}
-                                                alt={employee.name}
+                                                src={`/storage/${employee.outsourcing.image}` || '/placeholder.svg'}
+                                                alt={employee.outsourcing.name}
                                                 className="mx-auto h-27 w-27 rounded-full border-4 border-white shadow-md transition-transform duration-300 group-hover:scale-110"
                                             />
                                         </div>
 
                                         {/* Name with Gradient Text */}
                                         <h3 className="mb-1 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-xl font-bold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-indigo-600">
-                                            {employee.name}
+                                            {employee.outsourcing.name}
                                         </h3>
 
                                         {/* Position with Icon */}
                                         <div className="mb-6 flex items-center justify-center space-x-2">
-                                            <p className="text-sm font-medium text-gray-600">{employee.jabatan}</p>
+                                            <p className="text-sm font-medium text-gray-600">{employee.outsourcing.jabatan}</p>
                                         </div>
 
                                         {/* Action Button with Gradient */}
                                         <Button
-                                            onClick={() => setSelectedEmployee(employee.id, employee.name)}
+                                            onClick={() =>
+                                                employee.status === 'completed'
+                                                    ? viewScores(employee.id)
+                                                    : setSelectedEmployee(employee.id, employee.outsourcing.id, employee.outsourcing.name)
+                                            }
                                             className={`w-full transform py-3 font-semibold text-white shadow-lg transition-all duration-300 group-hover:scale-105 ${
                                                 employee.status === 'completed'
                                                     ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
@@ -244,7 +204,7 @@ export default function EvaluatorPage() {
                             ))}
                         </div>
 
-                        {employees.length === 0 && (
+                        {penugasanPeer?.length === 0 && (
                             <Card className="border-0 bg-gradient-to-br from-gray-50 to-blue-50 py-16 text-center shadow-lg">
                                 <CardContent>
                                     <div className="relative">
@@ -256,10 +216,10 @@ export default function EvaluatorPage() {
                                                 <User className="h-12 w-12 text-gray-400" />
                                             </div>
                                             <h3 className="mb-2 text-xl font-bold text-gray-900">
-                                                {employees.length === 0 ? 'Tidak ada pegawai yang ditugaskan' : 'Tidak ada pegawai ditemukan'}
+                                                {penugasanPeer?.length === 0 ? 'Tidak ada pegawai yang ditugaskan' : 'Tidak ada pegawai ditemukan'}
                                             </h3>
                                             <p className="mx-auto max-w-md text-gray-500">
-                                                {employees.length === 0
+                                                {penugasanPeer?.length === 0
                                                     ? 'Hubungi administrator untuk penugasan penilaian pegawai outsourcing'
                                                     : 'Coba ubah kata kunci pencarian Anda atau periksa filter yang digunakan'}
                                             </p>

@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('avaluasis', function (Blueprint $table) {
+        Schema::create('evaluasis', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('penugasan_peer_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('kriteria_id')->constrained()->cascadeOnDelete();
+            $table->integer('skor');
             $table->timestamps();
+
+            $table->unique(['penugasan_peer_id', 'kriteria_id']); // tidak boleh double
         });
     }
 
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('avaluasis');
+        Schema::dropIfExists('evaluasis');
     }
 };

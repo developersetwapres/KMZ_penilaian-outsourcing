@@ -27,6 +27,8 @@ class PenugasanPeerController extends Controller
                     'outsourcing_id' => $outsourcingId,
                     'penilai_id' => $info['id'],
                     'type_penilai' => $mapTipe[$tipe] ?? $tipe,
+                    'catatan' => '',
+                    'status' => 'incomplete'
                 ],
                 []
             );

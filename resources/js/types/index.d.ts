@@ -36,7 +36,13 @@ export interface User {
     id: number;
     name: string;
     jabatan: string;
+    lokasi_kerja: string;
+    unit_kerja: string;
+    perusahaan: string;
     email: string;
+    role: string;
+    phone: string;
+    image: string;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;

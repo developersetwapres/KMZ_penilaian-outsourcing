@@ -26,8 +26,8 @@ class RoleUserMiddleware
                 return redirect()->route('dashboard');
 
             case 'outsourcing':
-            case 'kepala-bagian':
-            case 'kepala-bagian':
+            case 'penerima_layanan':
+            case 'atasan':
                 return redirect()->route('evaluator.create');
 
             default:

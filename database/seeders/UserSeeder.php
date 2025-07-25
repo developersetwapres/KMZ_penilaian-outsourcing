@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
                 'perusahaan' => 'PT. Miftah Bahtera Mandiri'
             ],
             [
-                'name' => 'Muhammad Iqbal',
+                'name' => 'Muhamad Iqbal',
                 'jabatan' => 'Teknisi Jaringan',
                 'lokasi_kerja' => 'Kediaman Diponegoro - Merdeka Selatan - Merdeka Utara',
                 'unit_kerja' => 'ex Bagian Teknologi Informasi',
