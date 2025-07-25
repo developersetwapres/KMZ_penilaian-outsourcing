@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
 
     Route::get('dashboard/result', [EvaluasiController::class, 'show'])->name('evaluasi.show');
+    Route::post('dashboard/result', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
 });
 
 require __DIR__ . '/settings.php';

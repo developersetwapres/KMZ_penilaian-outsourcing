@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { router } from '@inertiajs/react';
 import { BarChart3, Calculator, Download, Eye, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -216,8 +217,13 @@ export default function ResultsRecap() {
     const units = [...new Set(evaluationResults.map((r) => r.unit))];
 
     const handleViewDetail = (employee: any) => {
-        setSelectedEmployee(employee);
-        setIsDetailOpen(true);
+        router.post(route('evaluasi.scoredetail'), employee, {
+            onError: (error) => {
+                console.error('Error fetching employee details:', error);
+            },
+        });
+        // setSelectedEmployee(employee);
+        // setIsDetailOpen(true);
     };
 
     return (
@@ -361,6 +367,7 @@ export default function ResultsRecap() {
                 </CardContent>
             </Card>
 
+            {/* Meski tidak terpakai tapi tetap disimpan untuk referensi, keren soalnya! */}
             {/* Detail Dialog */}
             <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
                 <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[900px]">

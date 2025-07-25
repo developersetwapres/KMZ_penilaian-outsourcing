@@ -162,4 +162,41 @@ class EvaluasiController extends Controller
 
         return Inertia::render('penilaian/evaluator/viewscore', $data);
     }
+
+    public function scoredetail(Request $request): Response
+    {
+        $idPenugasanPeer = $request->idPenugasanPeer;
+        $evaluations = Evaluasi::where('penugasan_peer_id', $idPenugasanPeer)
+            ->with('kriteria')
+            ->get();
+
+        $evaluationData = [];
+
+        foreach ($evaluations as $evaluation) {
+            $kriteria = $evaluation->kriteria;
+
+            // Lewati jika tidak ada relasi kriteria
+            if (!$kriteria) continue;
+
+            $groupKey = Str::slug($kriteria->aspek);
+
+            if (!isset($evaluationData[$groupKey])) {
+                $evaluationData[$groupKey] = [
+                    'title' => $kriteria->aspek,
+                    'criteria' => [],
+                ];
+            }
+
+            $evaluationData[$groupKey]['criteria'][] = [
+                'id' => $kriteria->id,
+                'name' => $kriteria->nama,
+                'indicators' => $kriteria->indikator,
+                'score' => $evaluation->skor,
+            ];
+        }
+
+        return Inertia::render('penilaian/admin/employee-detail-page', [
+            'evaluationData' => $evaluationData,
+        ]);
+    }
 }
