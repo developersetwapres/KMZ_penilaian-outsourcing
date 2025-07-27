@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\EvaluasiController;
+use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PenugasanPeerController;
-use App\Models\PenugasanPeer;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+
 
 Route::get('/', [PagesController::class, 'home'])->name('home');
 
@@ -24,8 +24,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
     Route::post('penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
 
-    Route::get('dashboard/result', [EvaluasiController::class, 'show'])->name('evaluasi.show');
-    Route::post('dashboard/result', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
+    Route::post('dashboard', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
+
+    Route::post('dashboard/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
+    Route::put('dashboard/kriteria/{kriteria}', [KriteriaController::class, 'update'])->name('kriteria.update');
+
+    Route::post('dashboard/user/store', [PagesController::class, 'storeUser'])->name('user.store');
+    Route::put('dashboard/user/update/{user}', [PagesController::class, 'updateUser'])->name('user.update');
 });
 
 require __DIR__ . '/settings.php';

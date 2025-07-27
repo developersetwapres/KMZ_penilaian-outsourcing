@@ -3,19 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Kriteria extends Model
 {
     protected $fillable = [
         'slug',
         'jenis',
-        'aspek',
+        'aspek_id',
         'nama',
-        'deskripsi',
         'indikator',
     ];
 
     protected $casts = [
         'indikator' => 'array'
     ];
+
+    public function getAspek(): BelongsTo
+    {
+        return $this->belongsTo(Aspek::class, 'aspek_id');
+    }
 }

@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kriterias', function (Blueprint $table) {
+        Schema::create('aspeks', function (Blueprint $table) {
             $table->id();
-            $table->string('slug');
-            $table->string('jenis');
-            $table->foreignId('aspek_id')->constrained()->cascadeOnDelete();
             $table->string('nama');
-            $table->json('indikator');
+            $table->string('deskripsi');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kriterias');
+        Schema::dropIfExists('aspeks');
     }
 };

@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\Aspek;
 use App\Models\Kriteria;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,31 +22,58 @@ class PagesController extends Controller
 
     public function dashboard(): Response
     {
-        $data = [
-            'outsourcing' => User::whereNot('role', 'admin')
-                ->with('evaluators.penilai')
-                ->get()
-                ->map(function ($user) {
-                    $evaluators = $user->evaluators->mapWithKeys(function ($item) {
-                        return [$item->type_penilai => $item->penilai];
-                    });
+        $user = new User();
 
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'jabatan' => $user->jabatan,
-                        'lokasi_kerja' => $user->lokasi_kerja,
-                        'unit_kerja' => $user->unit_kerja,
-                        'perusahaan' => $user->perusahaan,
-                        'phone' => $user->phone,
-                        'image' => $user->image,
-                        'role' => $user->role,
-                        'evaluators' => $evaluators,
-                    ];
-                })
+        $data = [
+            'outsourcing' => $user->outsourcings(),
+            'users' => User::all(),
+            'masterData' => [
+                'aspects' => Aspek::select(['id', 'nama', 'deskripsi'])->withCount('countKriteria')->get(),
+                'criteria' => Kriteria::select(['id', 'nama', 'indikator', 'aspek_id', 'jenis'])
+                    ->where('jenis', 'umum')
+                    ->with('getAspek')
+                    ->get(),
+                'criteriaKhusus' => Kriteria::select(['id', 'nama', 'indikator', 'aspek_id', 'jenis'])
+                    ->whereNot('jenis', 'umum')
+                    ->with('getAspek')
+                    ->get()
+            ],
         ];
 
         return Inertia::render('penilaian/admin/page', $data);
+    }
+
+    public function storeUser(StoreUserRequest $request)
+    {
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'jabatan' => $request->jabatan,
+            'lokasi_kerja' => $request->lokasi_kerja,
+            'unit_kerja' => $request->unit_kerja,
+            'perusahaan' => $request->perusahaan,
+            'role' => $request->role,
+            'phone' => $request->phone,
+            'status' => $request->status,
+            'image' => $request->image,
+            'password' => Hash::make($request->password),
+        ]);
+    }
+
+    public function updateUser(UpdateUserRequest $request, User $user)
+    {
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'jabatan' => $request->jabatan,
+            'lokasi_kerja' => $request->lokasi_kerja,
+            'unit_kerja' => $request->unit_kerja,
+            'perusahaan' => $request->perusahaan,
+            'role' => $request->role,
+            'phone' => $request->phone,
+            'status' => $request->status,
+            'image' => $request->image,
+            'password' => Hash::make($request->password),
+        ]);
     }
 }

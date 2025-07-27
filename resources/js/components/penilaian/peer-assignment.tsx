@@ -9,23 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { router } from '@inertiajs/react';
 import { Separator } from '@radix-ui/react-separator';
-import {
-    AlertCircle,
-    Building,
-    Building2,
-    CheckCircle,
-    Crown,
-    Edit,
-    Mail,
-    MapPin,
-    Phone,
-    Search,
-    Shield,
-    UserCheck,
-    UserPlus,
-    Users,
-    Users2,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle, Crown, Edit, Search, Shield, UserCheck, UserPlus, Users, Users2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PeerAssignment({ outsourcingEmployees }: any) {
@@ -88,16 +72,6 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
         }
     };
 
-    const getUnitColor = (unit: string) => {
-        const colors = {
-            'Bagian Teknologi Informasi': 'bg-blue-100 text-blue-800',
-            'Biro Sumber Daya Manusia': 'bg-green-100 text-green-800',
-            'Bagian Keuangan': 'bg-purple-100 text-purple-800',
-            'Bagian Pemasaran': 'bg-orange-100 text-orange-800',
-        };
-        return colors[unit as keyof typeof colors] || 'bg-gray-100 text-gray-800';
-    };
-
     return (
         <div className="space-y-6">
             {/* Header Card */}
@@ -149,100 +123,70 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
 
                     {/* Employee Cards */}
                     <div className="space-y-4">
-                        {filteredEmployees.map((employee: any) => {
-                            const assignedCount = Object.values(employee.evaluators).filter(Boolean).length;
-                            const completionPercentage = (assignedCount / 3) * 100;
+                        <div className="grid gap-3 lg:grid-cols-2">
+                            {filteredEmployees.map((employee: any) => {
+                                const assignedCount = Object.values(employee.evaluators).filter(Boolean).length;
+                                const completionPercentage = (assignedCount / 3) * 100;
 
-                            return (
-                                <Card key={employee.id} className="border-l-4 border-l-indigo-500 py-3">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <div className="mb-3 flex items-center space-x-3">
-                                                    <div className="rounded-full bg-indigo-100 p-2">
-                                                        <Users className="h-5 w-5 text-indigo-600" />
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-lg font-semibold text-gray-900">{employee.name}</h3>
-                                                        <p className="text-gray-600">{employee.jabatan}</p>
-                                                    </div>
+                                return (
+                                    <Card key={employee.id} className="gap-0 border-l-4 border-l-indigo-500 pt-0.5 pb-0">
+                                        <CardContent className="p-6">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <div className="mb-3 flex items-center space-x-3">
+                                                        <div className="rounded-full bg-indigo-100 p-2">
+                                                            <Users className="h-5 w-5 text-indigo-600" />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="text-lg font-semibold text-gray-900">{employee.name}</h3>
+                                                            <p className="mb-1.5 text-sm text-gray-600">{employee.unit_kerja}</p>
+                                                            <Badge className="bg-blue-100 text-xs text-blue-800">{employee.jabatan}</Badge>
+                                                        </div>
 
-                                                    {/* Kanan: Progress */}
-                                                    <div className="ml-auto text-right">
-                                                        <div className="text-sm font-medium text-gray-700">Progress: {assignedCount}/3</div>
-                                                        <div className="mt-1 flex h-2 w-24 rounded-full bg-gray-200">
-                                                            <div
-                                                                className={`h-2 rounded-full ${
-                                                                    completionPercentage === 100
-                                                                        ? 'bg-green-500'
-                                                                        : completionPercentage > 0
-                                                                          ? 'bg-yellow-500'
-                                                                          : 'bg-red-500'
-                                                                }`}
-                                                                style={{ width: `${completionPercentage}%` }}
-                                                            ></div>
+                                                        {/* Kanan: Progress */}
+                                                        <div className="ml-auto text-right">
+                                                            <div className="text-sm font-medium text-gray-700">Progress: {assignedCount}/3</div>
+                                                            <div className="mt-1 flex h-2 w-24 rounded-full bg-gray-200">
+                                                                <div
+                                                                    className={`h-2 rounded-full ${
+                                                                        completionPercentage === 100
+                                                                            ? 'bg-green-500'
+                                                                            : completionPercentage > 0
+                                                                              ? 'bg-yellow-500'
+                                                                              : 'bg-red-500'
+                                                                    }`}
+                                                                    style={{ width: `${completionPercentage}%` }}
+                                                                ></div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="grid gap-4 text-sm text-gray-600 md:grid-cols-2">
-                                                    <div className="space-y-2">
-                                                        <div className="flex items-center space-x-2">
-                                                            <Building2 className="h-4 w-4" />
-                                                            <Badge className={getUnitColor(employee.unit_kerja)}>{employee.unit_kerja}</Badge>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <MapPin className="h-4 w-4" />
-                                                            <span>{employee.lokasi_kerja}</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <Building className="h-4 w-4" />
-                                                            <span className="text-xs">{employee.perusahaan}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <div className="flex items-center space-x-2">
-                                                            <Phone className="h-4 w-4" />
-                                                            <span>{employee.phone}</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <Mail className="h-4 w-4" />
-                                                            <span className="text-xs">{employee.email}</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <span className="font-medium">Bergabung:</span>
-                                                            <span>{new Date(employee.joinDate).toLocaleDateString('id-ID')}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Evaluator Assignment Status */}
-                                                <div className="mt-5 rounded-lg bg-gray-50 p-4">
-                                                    <div className="mb-3 flex items-center justify-between">
-                                                        <h4 className="font-medium text-gray-900">Status Penugasan Evaluator</h4>
-                                                        <Button
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                setSelectedEvaluators({ atasan: {}, penerima_layanan: {}, teman: {} });
-                                                                setSelectedEmployee({
-                                                                    id: employee.id,
-                                                                    name: employee.name,
-                                                                    unit_kerja: employee.unit_kerja,
-                                                                    jabatan: employee.jabatan,
-                                                                });
-                                                                setIsDialogOpen(true);
-                                                            }}
-                                                            className="flex items-center space-x-2"
-                                                            disabled={false} // Remove the disabled condition
-                                                        >
-                                                            {assignedCount > 0 ? <Edit className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-                                                            <span>{assignedCount > 0 ? 'Kelola' : 'Tugaskan'}</span>
-                                                        </Button>
                                                     </div>
 
-                                                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                                                    {/* Evaluator Assignment Status */}
+                                                    <div className="mt-5 rounded-lg bg-gray-50 p-4">
+                                                        <div className="mb-3 flex items-center justify-between">
+                                                            <h4 className="font-medium text-gray-900">Status Penugasan Evaluator</h4>
+                                                            <Button
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    setSelectedEvaluators({ atasan: {}, penerima_layanan: {}, teman: {} });
+                                                                    setSelectedEmployee({
+                                                                        id: employee.id,
+                                                                        name: employee.name,
+                                                                        unit_kerja: employee.unit_kerja,
+                                                                        jabatan: employee.jabatan,
+                                                                    });
+                                                                    setIsDialogOpen(true);
+                                                                }}
+                                                                className="flex items-center space-x-2"
+                                                                disabled={false} // Remove the disabled condition
+                                                            >
+                                                                {assignedCount > 0 ? <Edit className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                                                                <span>{assignedCount > 0 ? 'Kelola' : 'Tugaskan'}</span>
+                                                            </Button>
+                                                        </div>
+
                                                         {/* Atasan */}
-                                                        <div className="flex items-center space-x-2 rounded border p-2">
+                                                        <div className="mb-2.5 flex items-center space-x-2 rounded border p-2">
                                                             <Crown className="h-4 w-4 text-amber-600" />
                                                             <div className="flex-1">
                                                                 <div className="text-xs font-medium text-gray-700">Atasan</div>
@@ -263,7 +207,7 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                         </div>
 
                                                         {/* Penerima Layanan */}
-                                                        <div className="flex items-center space-x-2 rounded border p-2">
+                                                        <div className="mb-2.5 flex items-center space-x-2 rounded border p-2">
                                                             <Shield className="h-4 w-4 text-blue-600" />
                                                             <div className="flex-1">
                                                                 <div className="text-xs font-medium text-gray-700">Penerima Layanan</div>
@@ -285,7 +229,7 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                         </div>
 
                                                         {/* Teman */}
-                                                        <div className="flex items-center space-x-2 rounded border p-2">
+                                                        <div className="mb-2.5 flex items-center space-x-2 rounded border p-2">
                                                             <Users2 className="h-4 w-4 text-green-600" />
                                                             <div className="flex-1">
                                                                 <div className="text-xs font-medium text-gray-700">Teman Setingkat</div>
@@ -307,11 +251,11 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {filteredEmployees.length === 0 && (
@@ -338,25 +282,16 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                     <div className="space-y-6 pb-4">
                         {selectedEmployee && (
                             <>
-                                {/* Employee Info */}
-                                <div className="rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4">
-                                    <h4 className="mb-3 flex items-center space-x-2 font-medium text-blue-900">
-                                        <Users className="h-4 w-4" />
-                                        <span>Pegawai yang akan dinilai</span>
-                                    </h4>
-                                    <div className="gap-4 text-sm text-blue-800">
-                                        <div className="mb-0.5">
-                                            <strong>Nama:</strong> {selectedEmployee.name}
-                                        </div>
-                                        <div className="mb-0.5">
-                                            <strong>Jabatan:</strong> {selectedEmployee.jabatan}
-                                        </div>
-                                        <div className="mb-0.5">
-                                            <strong>Unit Kerja:</strong> {selectedEmployee.unit_kerja}
-                                        </div>
+                                <div className="mt-3 mb-8 flex items-center space-x-3 rounded-lg bg-gradient-to-r from-indigo-50 to-green-100 p-4">
+                                    <div className="rounded-full bg-indigo-100 p-2">
+                                        <Users className="h-5 w-5 text-green-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900">{selectedEmployee.name}</h3>
+                                        <p className="mb-1.5 text-sm text-gray-600">{selectedEmployee.unit_kerja}</p>
+                                        <Badge className="bg-green-200 text-xs text-green-800">{selectedEmployee.jabatan}</Badge>
                                     </div>
                                 </div>
-
                                 {/* Evaluator Selection */}
                                 <div className="space-y-6">
                                     {/* Atasan */}

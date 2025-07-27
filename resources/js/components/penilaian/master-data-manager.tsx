@@ -3,222 +3,124 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckSquare, Edit, FileText, Plus, Shield, Target, Trash2 } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { ClipboardList, Edit, FileText, Plus, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 
-// Dummy master data
-const masterData = {
-    aspects: [
-        {
-            id: 1,
-            name: 'Aspek Teknis',
-            description: 'Penilaian terhadap kemampuan teknis dan profesional dalam menjalankan tugas.',
-            criteriaCount: 3,
-            isFixed: true,
-        },
-        {
-            id: 2,
-            name: 'Aspek Perilaku',
-            description: 'Penilaian terhadap sikap, disiplin, dan perilaku kerja sehari-hari.',
-            criteriaCount: 4,
-            isFixed: true,
-        },
-        {
-            id: 3,
-            name: 'Aspek Keahlian',
-            description: 'Penilaian terhadap keahlian khusus, inisiatif, dan kemampuan adaptasi.',
-            criteriaCount: 2,
-            isFixed: true,
-        },
-    ],
-    criteria: [
-        {
-            id: 1,
-            aspectId: 1,
-            name: 'Responsif',
-            description: 'Cepat tanggap terhadap kebutuhan pelanggan.',
-            indicatorCount: 3,
-        },
-        {
-            id: 2,
-            aspectId: 1,
-            name: 'Ramah',
-            description: 'Menyambut pelanggan dengan senyum dan sopan.',
-            indicatorCount: 2,
-        },
-        {
-            id: 3,
-            aspectId: 1,
-            name: 'Solutif',
-            description: 'Memberikan solusi yang tepat dan efektif.',
-            indicatorCount: 2,
-        },
-        {
-            id: 4,
-            aspectId: 2,
-            name: 'Kecepatan',
-            description: 'Menyelesaikan tugas dengan cepat.',
-            indicatorCount: 3,
-        },
-        {
-            id: 5,
-            aspectId: 2,
-            name: 'Ketepatan',
-            description: 'Tidak melakukan kesalahan dalam bekerja.',
-            indicatorCount: 2,
-        },
-        {
-            id: 6,
-            aspectId: 2,
-            name: 'Organisasi',
-            description: 'Mampu mengatur pekerjaan dengan baik.',
-            indicatorCount: 2,
-        },
-        {
-            id: 7,
-            aspectId: 3,
-            name: 'Proaktif',
-            description: 'Mengambil inisiatif tanpa disuruh.',
-            indicatorCount: 3,
-        },
-        {
-            id: 8,
-            aspectId: 3,
-            name: 'Kreatif',
-            description: 'Memberikan ide-ide baru yang inovatif.',
-            indicatorCount: 2,
-        },
-        {
-            id: 9,
-            aspectId: 4,
-            name: 'Komunikasi',
-            description: 'Berkomunikasi dengan jelas dan efektif.',
-            indicatorCount: 2,
-        },
-        {
-            id: 10,
-            aspectId: 4,
-            name: 'Kolaborasi',
-            description: 'Bekerja sama dengan baik dalam tim.',
-            indicatorCount: 3,
-        },
-        {
-            id: 11,
-            aspectId: 4,
-            name: 'Dukungan',
-            description: 'Memberikan dukungan kepada anggota tim lainnya.',
-            indicatorCount: 2,
-        },
-    ],
-    indicators: [
-        { id: 1, criteriaId: 1, text: 'Memberikan respon cepat terhadap pertanyaan pelanggan.' },
-        { id: 2, criteriaId: 1, text: 'Menanggapi keluhan pelanggan dengan segera.' },
-        { id: 3, criteriaId: 1, text: 'Menyediakan informasi yang akurat dan relevan.' },
-        { id: 4, criteriaId: 2, text: 'Menyapa pelanggan dengan senyum dan ramah.' },
-        { id: 5, criteriaId: 2, text: 'Menggunakan bahasa yang sopan dan santun.' },
-        { id: 6, criteriaId: 3, text: 'Menawarkan solusi yang sesuai dengan masalah pelanggan.' },
-        { id: 7, criteriaId: 3, text: 'Menindaklanjuti masalah pelanggan hingga selesai.' },
-        { id: 8, criteriaId: 4, text: 'Menyelesaikan tugas sesuai dengan target waktu.' },
-        { id: 9, criteriaId: 4, text: 'Tidak menunda-nunda pekerjaan.' },
-        { id: 10, criteriaId: 4, text: 'Bekerja dengan cepat dan efisien.' },
-        { id: 11, criteriaId: 5, text: 'Tidak melakukan kesalahan dalam perhitungan.' },
-        { id: 12, criteriaId: 5, text: 'Memastikan data yang dimasukkan akurat.' },
-        { id: 13, criteriaId: 6, text: 'Menyusun jadwal kerja yang teratur.' },
-        { id: 14, criteriaId: 6, text: 'Mengelola waktu dengan efektif.' },
-        { id: 15, criteriaId: 7, text: 'Mencari cara untuk meningkatkan kinerja.' },
-        { id: 16, criteriaId: 7, text: 'Mengajukan ide-ide baru untuk perbaikan.' },
-        { id: 17, criteriaId: 8, text: 'Menghasilkan solusi yang inovatif.' },
-        { id: 18, criteriaId: 8, text: 'Menciptakan ide-ide yang orisinal.' },
-        { id: 19, criteriaId: 9, text: 'Berbicara dengan jelas dan mudah dimengerti.' },
-        { id: 20, criteriaId: 9, text: 'Mendengarkan dengan seksama pendapat orang lain.' },
-        { id: 21, criteriaId: 10, text: 'Berkontribusi dalam diskusi tim.' },
-        { id: 22, criteriaId: 10, text: 'Membantu anggota tim lainnya.' },
-        { id: 23, criteriaId: 11, text: 'Memberikan semangat kepada rekan kerja.' },
-        { id: 24, criteriaId: 11, text: 'Menawarkan bantuan kepada yang membutuhkan.' },
-    ],
-};
+const jabatan = [
+    'Pengemudi',
+    'Pramubakti/Pramusaji',
+    'Sekretaris/Administrasi',
+    'Petugas Tata Tempat',
+    'Teknisi IT',
+    'Teknisi ME',
+    'Cleaning Service',
+];
 
-export default function MasterDataManager() {
-    const [selectedLevel, setSelectedLevel] = useState<'aspects' | 'criteria' | 'indicators'>('aspects');
+export default function MasterDataManager({ masterData }: any) {
+    const [selectedLevel, setSelectedLevel] = useState<'aspects' | 'criteria'>('aspects');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
+    const [indicators, setIndicators] = useState<string[]>(['']);
+    const [isKriteriaKeahlian, setKriteriaKeahlian] = useState(false);
+    const [selectedCriteria, setSelectedCriteria] = useState('');
+    const [selectedJenis, setSelectedJenis] = useState('');
 
     const handleAdd = () => {
         setEditingItem(null);
+        setIndicators(['']);
         setIsDialogOpen(true);
     };
 
     const handleEdit = (item: any) => {
+        setKriteriaKeahlian(false);
+        setSelectedJenis('');
+
         setEditingItem(item);
+        if (selectedLevel === 'criteria' && item.indikator) {
+            setIndicators(item.indikator);
+        } else {
+            setIndicators(['']);
+        }
         setIsDialogOpen(true);
     };
 
     const handleDelete = (id: number) => {
         if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
-            // Handle delete logic
             console.log('Delete item:', id);
         }
     };
 
+    const addIndicator = () => {
+        setIndicators([...indicators, '']);
+    };
+
+    const removeIndicator = (index: number) => {
+        if (indicators.length > 1) {
+            setIndicators(indicators.filter((_, i) => i !== index));
+        }
+    };
+
+    const updateIndicator = (index: number, value: string) => {
+        const newIndicators = [...indicators];
+        newIndicators[index] = value;
+        setIndicators(newIndicators);
+    };
+
     const handleSave = () => {
-        const timestamp = new Date().toISOString();
-        const formElements = document.querySelectorAll('#name, #description, #aspect, #criteria');
-        const formData: Record<string, any> = {};
+        const nameInput = document.querySelector('#name') as HTMLInputElement;
+        const descriptionInput = document.querySelector('#description') as HTMLTextAreaElement;
 
-        formElements.forEach((element: any) => {
-            if (element.value) {
-                formData[element.id] = element.value;
-            }
-        });
+        let idAspek = editingItem?.get_aspek.id;
+        if (selectedCriteria) {
+            idAspek = selectedCriteria;
+        }
 
-        const submissionData = {
-            timestamp,
-            action: editingItem ? 'UPDATE' : 'CREATE',
-            level: selectedLevel,
-            editingItem: editingItem,
-            formData: formData,
-            context: {
-                selectedLevel,
-                aspectsCount: masterData.aspects.length,
-                criteriaCount: masterData.criteria.length,
-                indicatorsCount: masterData.indicators.length,
-            },
+        let jenis = selectedJenis;
+        let nama = 'Keahlian';
+        if (selectedJenis == '') {
+            jenis = 'umum';
+            nama = nameInput?.value || '';
+        }
+
+        const formData: Record<string, any> = {
+            name: nama,
         };
 
-        console.log('='.repeat(80));
-        console.log(`🛠️ MASTER DATA ${submissionData.action} - ${selectedLevel.toUpperCase()}`);
-        console.log('='.repeat(80));
-        console.log('📊 Operation Overview:', {
-            timestamp: submissionData.timestamp,
-            action: submissionData.action,
-            level: submissionData.level,
-            itemId: editingItem?.id || 'NEW',
-        });
-        console.log('\n📝 Form Data:', submissionData.formData);
-        console.log('\n🔄 Before Update:', editingItem || 'Creating new item');
-        console.log('\n📈 Context:', submissionData.context);
-        console.log('\n💾 Complete Submission:', JSON.stringify(submissionData, null, 2));
-        console.log('='.repeat(80));
+        if (selectedLevel === 'aspects') {
+            formData.description = descriptionInput?.value || '';
+        }
+
+        if (selectedLevel === 'criteria') {
+            formData.aspek_id = idAspek;
+            formData.jenis = jenis;
+            formData.indicators = indicators.filter((indicator) => indicator.trim() !== '');
+        }
 
         if (editingItem) {
-            // Update existing item logic
-            console.log(`✏️ Updating ${selectedLevel} with ID: ${editingItem.id}`);
+            router.put(route('kriteria.update', editingItem.id), formData, {
+                onSuccess: () => {
+                    //
+                },
+                onError: (err) => {
+                    console.log(err);
+                },
+            });
         } else {
-            // Add new item logic
-            const newId =
-                Math.max(
-                    ...(selectedLevel === 'aspects'
-                        ? masterData.aspects.map((a) => a.id)
-                        : selectedLevel === 'criteria'
-                          ? masterData.criteria.map((c) => c.id)
-                          : masterData.indicators.map((i) => i.id)),
-                ) + 1;
-            console.log(`➕ Creating new ${selectedLevel} with ID: ${newId}`);
+            router.post(route('kriteria.store'), formData, {
+                onSuccess: () => {
+                    //
+                },
+                onError: (err) => {
+                    console.log(err);
+                },
+            });
         }
 
         setIsDialogOpen(false);
@@ -227,43 +129,38 @@ export default function MasterDataManager() {
     const renderAspects = () => (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Aspek Penilaian (Absolut)</h3>
-                <div className="rounded-full bg-blue-50 px-3 py-1">
-                    <span className="text-sm font-medium text-blue-700">3 Aspek Tetap</span>
-                </div>
+                <h3 className="text-lg font-semibold">Aspek Penilaian</h3>
+                <Button onClick={handleAdd} className="flex items-center space-x-2">
+                    <Plus className="h-4 w-4" />
+                    <span>Tambah Aspek</span>
+                </Button>
             </div>
 
-            {/* <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-                <div className="mb-2 flex items-center space-x-2">
-                    <Shield className="h-5 w-5 text-blue-600" />
-                    <span className="font-medium text-blue-800">Aspek Penilaian Bersifat Absolut</span>
-                </div>
-                <p className="text-sm text-blue-700">
-                    Sistem menggunakan 3 aspek penilaian yang telah ditetapkan dan tidak dapat diubah atau ditambah.
-                </p>
-            </div> */}
-
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-                {masterData.aspects.map((aspect, index) => (
-                    <Card key={aspect.id} className="border-2 border-blue-200 bg-blue-50/30">
+                {masterData.aspects.map((aspect: any, index: number) => (
+                    <Card key={aspect.nama} className="border-2 border-blue-200 bg-blue-50/30">
                         <CardHeader className="pb-3">
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center space-x-2">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
                                         {index + 1}
                                     </div>
-                                    <CardTitle className="text-base text-blue-800">{aspect.name}</CardTitle>
+                                    <CardTitle className="text-base text-blue-800">{aspect.nama}</CardTitle>
                                 </div>
                                 <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                                    {aspect.criteriaCount} kriteria
+                                    {aspect.count_kriteria_count} kriteria
                                 </Badge>
                             </div>
-                            <CardDescription className="text-blue-700">{aspect.description}</CardDescription>
+                            <CardDescription className="text-blue-700">{aspect.deskripsi}</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-0">
-                            <div className="flex items-center space-x-2 text-sm text-blue-600">
-                                <Shield className="h-4 w-4" />
-                                <span className="font-medium">Aspek Tetap</span>
+                            <div className="flex space-x-2">
+                                <Button size="sm" variant="outline" onClick={() => handleEdit(aspect)}>
+                                    <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => handleDelete(aspect.id)}>
+                                    <Trash2 className="h-3 w-3" />
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -273,7 +170,7 @@ export default function MasterDataManager() {
     );
 
     const renderCriteria = () => (
-        <div className="space-y-4">
+        <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Kriteria Penilaian</h3>
                 <Button onClick={handleAdd} className="flex items-center space-x-2">
@@ -282,28 +179,101 @@ export default function MasterDataManager() {
                 </Button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-                {masterData.criteria.map((criteria) => {
-                    const aspect = masterData.aspects.find((a) => a.id === criteria.aspectId);
-                    return (
-                        <Card key={criteria.id}>
+            {masterData.aspects.map((aspect: any, index: number) => {
+                const aspectCriteria = masterData.criteria.filter((c: any) => c.aspek_id === aspect.id);
+                if (aspectCriteria.length === 0) return null;
+
+                return (
+                    <div key={index} className="space-y-4">
+                        <div className="flex items-center space-x-3 rounded-lg border-b-2 border-blue-200 bg-gradient-to-r from-blue-50 to-transparent p-3 pb-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+                                {index + 1}
+                            </div>
+                            <div>
+                                <h4 className="text-lg font-semibold text-blue-800">{aspect.nama}</h4>
+                                <p className="text-sm text-blue-600">{aspectCriteria.length} kriteria penilaian</p>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-4 pl-4 md:grid-cols-2 lg:grid-cols-3">
+                            {aspectCriteria.map((criteria: any) => (
+                                <Card key={criteria.id} className="gap-0 border-l-4 border-l-blue-500 transition-shadow hover:shadow-md">
+                                    <CardHeader className="pb-3">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center space-x-2">
+                                                <ClipboardList className="h-5 w-5 text-blue-600" />
+                                                <CardTitle className="text-base">{criteria?.nama}</CardTitle>
+                                            </div>
+                                            <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                                                {criteria.indikator.length} indikator
+                                            </Badge>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="pt-0">
+                                        <div className="mb-3">
+                                            <p className="mb-2 text-sm font-medium text-gray-700">Indikator Penilaian:</p>
+                                            <ul className="max-h-24 space-y-1 overflow-y-auto text-xs text-gray-600">
+                                                {criteria.indikator.map((indicator: any, idx: number) => (
+                                                    <li key={idx} className="flex items-start space-x-1">
+                                                        <span className="font-bold text-blue-400">•</span>
+                                                        <span className="leading-relaxed">{indicator}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <Button size="sm" variant="outline" onClick={() => handleEdit(criteria)}>
+                                                <Edit className="h-3 w-3" />
+                                            </Button>
+                                            <Button size="sm" variant="outline" onClick={() => handleDelete(criteria.id)}>
+                                                <Trash2 className="h-3 w-3" />
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })}
+
+            <div className="space-y-4">
+                <div className="flex items-center space-x-3 rounded-lg border-b-2 border-blue-200 bg-gradient-to-r from-blue-50 to-transparent p-3 pb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+                        {masterData.aspects.length + 1}
+                    </div>
+                    <div>
+                        <h4 className="text-lg font-semibold text-blue-800">Khusus Kriteria Keahlian</h4>
+                        <p className="text-sm text-blue-600">{masterData.criteriaKhusus.length} kriteria penilaian</p>
+                    </div>
+                </div>
+
+                <div className="grid gap-4 pl-4 md:grid-cols-2 lg:grid-cols-3">
+                    {masterData.criteriaKhusus.map((criteria: any) => (
+                        <Card key={criteria.id} className="gap-0 border-l-4 border-l-blue-500 transition-shadow hover:shadow-md">
                             <CardHeader className="pb-3">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center space-x-2">
-                                        <Target className="h-5 w-5 text-green-600" />
-                                        <CardTitle className="text-base">{criteria.name}</CardTitle>
+                                        <ClipboardList className="h-5 w-5 text-blue-600" />
+                                        <CardTitle className="text-base">{criteria?.nama}</CardTitle>
                                     </div>
-                                    <Badge variant="secondary">{criteria.indicatorCount} indikator</Badge>
-                                </div>
-                                <CardDescription>
-                                    <Badge variant="outline" className="mb-2">
-                                        {aspect?.name}
+                                    <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                                        {criteria.indikator.length} indikator
                                     </Badge>
-                                    <br />
-                                    {criteria.description}
-                                </CardDescription>
+                                </div>
                             </CardHeader>
                             <CardContent className="pt-0">
+                                <div className="mb-3">
+                                    <p className="mb-2 text-sm font-medium text-gray-700">Indikator Penilaian:</p>
+                                    <ul className="max-h-24 space-y-1 overflow-y-auto text-xs text-gray-600">
+                                        {criteria.indikator.map((indicator: any, idx: number) => (
+                                            <li key={idx} className="flex items-start space-x-1">
+                                                <span className="font-bold text-blue-400">•</span>
+                                                <span className="leading-relaxed">{indicator}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                                 <div className="flex space-x-2">
                                     <Button size="sm" variant="outline" onClick={() => handleEdit(criteria)}>
                                         <Edit className="h-3 w-3" />
@@ -314,58 +284,8 @@ export default function MasterDataManager() {
                                 </div>
                             </CardContent>
                         </Card>
-                    );
-                })}
-            </div>
-        </div>
-    );
-
-    const renderIndicators = () => (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Indikator Penilaian</h3>
-                <Button onClick={handleAdd} className="flex items-center space-x-2">
-                    <Plus className="h-4 w-4" />
-                    <span>Tambah Indikator</span>
-                </Button>
-            </div>
-
-            <div className="space-y-3">
-                {masterData.indicators.map((indicator) => {
-                    const criteria = masterData.criteria.find((c) => c.id === indicator.criteriaId);
-                    const aspect = masterData.aspects.find((a) => a.id === criteria?.aspectId);
-                    return (
-                        <Card key={indicator.id}>
-                            <CardContent className="p-4">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-start space-x-3">
-                                        <CheckSquare className="mt-0.5 h-5 w-5 text-purple-600" />
-                                        <div>
-                                            <p className="font-medium">{indicator.text}</p>
-                                            <div className="mt-1 flex items-center space-x-2">
-                                                <Badge variant="outline" className="text-xs">
-                                                    {aspect?.name}
-                                                </Badge>
-                                                <span className="text-xs text-gray-400">•</span>
-                                                <Badge variant="outline" className="text-xs">
-                                                    {criteria?.name}
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex space-x-2">
-                                        <Button size="sm" variant="outline" onClick={() => handleEdit(indicator)}>
-                                            <Edit className="h-3 w-3" />
-                                        </Button>
-                                        <Button size="sm" variant="outline" onClick={() => handleDelete(indicator.id)}>
-                                            <Trash2 className="h-3 w-3" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -374,8 +294,8 @@ export default function MasterDataManager() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Kelola Master Data</CardTitle>
-                    <CardDescription>Kelola aspek, kriteria, dan indikator penilaian kinerja</CardDescription>
+                    <CardTitle>Kelola Master Data Penilaian Outsourcing</CardTitle>
+                    <CardDescription>Kelola aspek dan kriteria penilaian kinerja outsourcing beserta indikatornya</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-6 flex space-x-2">
@@ -392,85 +312,140 @@ export default function MasterDataManager() {
                             onClick={() => setSelectedLevel('criteria')}
                             className="flex items-center space-x-2"
                         >
-                            <Target className="h-4 w-4" />
+                            <ClipboardList className="h-4 w-4" />
                             <span>Kriteria</span>
-                        </Button>
-                        <Button
-                            variant={selectedLevel === 'indicators' ? 'default' : 'outline'}
-                            onClick={() => setSelectedLevel('indicators')}
-                            className="flex items-center space-x-2"
-                        >
-                            <CheckSquare className="h-4 w-4" />
-                            <span>Indikator</span>
                         </Button>
                     </div>
 
                     {selectedLevel === 'aspects' && renderAspects()}
                     {selectedLevel === 'criteria' && renderCriteria()}
-                    {selectedLevel === 'indicators' && renderIndicators()}
                 </CardContent>
             </Card>
 
             {/* Add/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
                     <DialogHeader>
                         <DialogTitle>
-                            {editingItem ? 'Edit' : 'Tambah'}{' '}
-                            {selectedLevel === 'aspects' ? 'Aspek' : selectedLevel === 'criteria' ? 'Kriteria' : 'Indikator'}
+                            {editingItem ? 'Edit' : 'Tambah'} {selectedLevel === 'aspects' ? 'Aspek' : 'Kriteria'}
                         </DialogTitle>
                         <DialogDescription>
-                            {editingItem ? 'Edit' : 'Tambahkan'}{' '}
-                            {selectedLevel === 'aspects' ? 'aspek' : selectedLevel === 'criteria' ? 'kriteria' : 'indikator'} penilaian baru
+                            {editingItem ? 'Edit' : 'Tambahkan'} {selectedLevel === 'aspects' ? 'aspek' : 'kriteria'} penilaian
+                            {selectedLevel === 'criteria' && ' beserta indikatornya'}
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+
+                    <div className="grid gap-4">
                         {selectedLevel === 'criteria' && (
+                            <>
+                                <div className="space-y-2">
+                                    <Label htmlFor="aspect">Aspek</Label>
+                                    <Select
+                                        defaultValue={editingItem?.get_aspek.id}
+                                        onValueChange={(value) => {
+                                            setSelectedCriteria(value);
+                                        }}
+                                    >
+                                        <SelectTrigger id="aspect">
+                                            <SelectValue placeholder="Pilih aspek" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {masterData.aspects.map((aspect: any) => (
+                                                <SelectItem key={aspect.id} value={aspect.id}>
+                                                    {aspect.nama}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {
+                                    <div className="flex items-center space-x-3">
+                                        <Checkbox
+                                            id="keahlian"
+                                            name="keahlian"
+                                            checked={isKriteriaKeahlian}
+                                            onClick={() => setKriteriaKeahlian(!isKriteriaKeahlian)}
+                                        />
+                                        <Label htmlFor="keahlian">Kriteria Keahlian ?</Label>
+                                    </div>
+                                }
+
+                                {isKriteriaKeahlian && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="jenis">Jabatan</Label>
+                                        <Select
+                                            onValueChange={(value) => {
+                                                setSelectedJenis(value);
+                                            }}
+                                        >
+                                            <SelectTrigger id="jenis">
+                                                <SelectValue placeholder="Pilih aspek" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {jabatan.map((jabatan: any) => (
+                                                    <SelectItem key={jabatan} value={jabatan}>
+                                                        {jabatan}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {!isKriteriaKeahlian && (
                             <div className="space-y-2">
-                                <Label htmlFor="aspect">Aspek</Label>
-                                <Select id="aspect">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih aspek" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {masterData.aspects.map((aspect) => (
-                                            <SelectItem key={aspect.id} value={aspect.id.toString()}>
-                                                {aspect.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <Label htmlFor="name">Nama {selectedLevel === 'aspects' ? 'Aspek' : 'Kriteria'}</Label>
+                                <Input
+                                    id="name"
+                                    placeholder={`Masukkan nama ${selectedLevel === 'aspects' ? 'aspek' : 'kriteria'}`}
+                                    defaultValue={editingItem?.nama || ''}
+                                />
                             </div>
                         )}
-                        {selectedLevel === 'indicators' && (
-                            <div className="space-y-2">
-                                <Label htmlFor="criteria">Kriteria</Label>
-                                <Select id="criteria">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih kriteria" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {masterData.criteria.map((criteria) => (
-                                            <SelectItem key={criteria.id} value={criteria.id.toString()}>
-                                                {criteria.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
-                        <div className="space-y-2">
-                            <Label htmlFor="name">{selectedLevel === 'indicators' ? 'Teks Indikator' : 'Nama'}</Label>
-                            <Input
-                                id="name"
-                                placeholder={`Masukkan ${selectedLevel === 'indicators' ? 'teks indikator' : 'nama'}`}
-                                defaultValue={editingItem?.name || editingItem?.text || ''}
-                            />
-                        </div>
-                        {selectedLevel !== 'indicators' && (
+
+                        {selectedLevel === 'aspects' && (
                             <div className="space-y-2">
                                 <Label htmlFor="description">Deskripsi</Label>
-                                <Textarea id="description" placeholder="Masukkan deskripsi" defaultValue={editingItem?.description || ''} />
+                                <Textarea id="description" placeholder="Masukkan deskripsi aspek" defaultValue={editingItem?.description || ''} />
+                            </div>
+                        )}
+
+                        {selectedLevel === 'criteria' && (
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label>Indikator Penilaian</Label>
+                                </div>
+                                <div className="max-h-64 space-y-3 overflow-y-auto">
+                                    {indicators.map((indicator, index) => (
+                                        <div key={index} className="flex items-start space-x-2">
+                                            <Textarea
+                                                placeholder={`Indikator ${index + 1}`}
+                                                value={indicator}
+                                                onChange={(e) => updateIndicator(index, e.target.value)}
+                                                className="min-h-[60px] flex-1"
+                                                rows={2}
+                                            />
+                                            {indicators.length > 1 && (
+                                                <Button type="button" size="sm" variant="outline" onClick={() => removeIndicator(index)}>
+                                                    <X className="h-3 w-3" />
+                                                </Button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    onClick={addIndicator}
+                                    className="flex items-center space-x-1 border bg-transparent text-gray-600 hover:bg-gray-100"
+                                >
+                                    <Plus className="h-3 w-3" />
+                                    <span>Tambah Indikator</span>
+                                </Button>
                             </div>
                         )}
                     </div>

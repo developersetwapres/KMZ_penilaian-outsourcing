@@ -234,28 +234,6 @@ export default function ResultsRecap() {
                     <CardDescription>Lihat dan analisis hasil penilaian kinerja pegawai outsourcing dengan sistem bobot</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {/* Weighted Scoring Info */}
-                    <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-                        <div className="mb-2 flex items-center space-x-2">
-                            <Calculator className="h-5 w-5 text-blue-600" />
-                            <span className="font-medium text-blue-800">Sistem Penilaian Berbobot</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm text-blue-700">
-                            <div className="rounded bg-blue-100 p-2 text-center">
-                                <div className="font-bold">50%</div>
-                                <div>Kepala Biro</div>
-                            </div>
-                            <div className="rounded bg-blue-100 p-2 text-center">
-                                <div className="font-bold">25%</div>
-                                <div>Kepala Bagian</div>
-                            </div>
-                            <div className="rounded bg-blue-100 p-2 text-center">
-                                <div className="font-bold">10%</div>
-                                <div>Teman Setingkat</div>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Filters */}
                     <div className="mb-6 flex flex-col gap-4 sm:flex-row">
                         <div className="relative flex-1">

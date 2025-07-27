@@ -15,7 +15,7 @@ class KriteriaSeeder extends Seeder
     {
         $data = [
             [
-                'aspek' => 'Aspek teknis dan hasil kerja',
+                'aspek' => 1,
                 'jenis' => 'umum',
                 'nama' => 'Inisiatif',
                 'deskripsi' => 'Kemampuan untuk mengambil tindakan proaktif tanpa harus menunggu perintah atau arahan.',
@@ -24,7 +24,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek teknis dan hasil kerja',
+                'aspek' => 1,
                 'jenis' => 'umum',
                 'nama' => 'Inovasi',
                 'deskripsi' => 'Kemampuan menciptakan ide atau pendekatan baru yang meningkatkan efisiensi atau efektivitas kerja.',
@@ -34,7 +34,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek teknis dan hasil kerja',
+                'aspek' => 1,
                 'jenis' => 'umum',
                 'nama' => 'Komunikasi',
                 'deskripsi' => 'Kemampuan menyampaikan informasi secara jelas dan efektif baik lisan maupun tulisan.',
@@ -45,7 +45,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek teknis dan hasil kerja',
+                'aspek' => 1,
                 'jenis' => 'umum',
                 'nama' => 'Kemampuan Adaptasi',
                 'deskripsi' => 'Kemampuan menyesuaikan diri dengan perubahan tugas, lingkungan kerja, atau teknologi baru.',
@@ -54,7 +54,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek teknis dan hasil kerja',
+                'aspek' => 1,
                 'jenis' => 'umum',
                 'nama' => 'Motivasi',
                 'deskripsi' => 'Dorongan internal untuk menyelesaikan pekerjaan secara maksimal dan berorientasi pada hasil.',
@@ -64,7 +64,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek teknis dan hasil kerja',
+                'aspek' => 1,
                 'jenis' => 'umum',
                 'nama' => 'Kerja sama',
                 'deskripsi' => 'Kemampuan bekerja dengan orang lain secara harmonis dan produktif untuk mencapai tujuan bersama.',
@@ -74,7 +74,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek teknis dan hasil kerja',
+                'aspek' => 1,
                 'jenis' => 'umum',
                 'nama' => 'Kemandirian',
                 'deskripsi' => 'Kemampuan menyelesaikan pekerjaan tanpa bergantung secara berlebihan pada orang lain.',
@@ -87,7 +87,7 @@ class KriteriaSeeder extends Seeder
             //-------------------------------------------------------------------
 
             [
-                'aspek' => 'Aspek perilaku',
+                'aspek' => 2,
                 'jenis' => 'umum',
                 'nama' => 'Kedisiplinan',
                 'deskripsi' => 'Kepatuhan terhadap aturan, waktu, dan prosedur yang telah ditetapkan dalam organisasi.',
@@ -96,7 +96,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek perilaku',
+                'aspek' => 2,
                 'jenis' => 'umum',
                 'nama' => 'Komitmen',
                 'deskripsi' => 'Kesungguhan dalam menjalankan tugas dan tanggung jawab secara konsisten.',
@@ -105,7 +105,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek perilaku',
+                'aspek' => 2,
                 'jenis' => 'umum',
                 'nama' => 'Penampilan',
                 'deskripsi' => 'Sikap dan tampilan pribadi yang mencerminkan profesionalisme di lingkungan kerja.',
@@ -114,7 +114,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek perilaku',
+                'aspek' => 2,
                 'jenis' => 'umum',
                 'nama' => 'Etika dan Kesopanan',
                 'deskripsi' => 'Sikap hormat dan sopan dalam berinteraksi dengan rekan kerja maupun pihak lain.',
@@ -123,7 +123,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek perilaku',
+                'aspek' => 2,
                 'jenis' => 'umum',
                 'nama' => 'Kejujuran',
                 'deskripsi' => 'Perilaku yang mencerminkan integritas dan tidak menyembunyikan kebenaran.',
@@ -133,7 +133,7 @@ class KriteriaSeeder extends Seeder
                 ]
             ],
             [
-                'aspek' => 'Aspek perilaku',
+                'aspek' => 2,
                 'jenis' => 'umum',
                 'nama' => 'Loyalitas',
                 'deskripsi' => 'Kesetiaan terhadap organisasi serta dukungan terhadap visi dan misi instansi.',
@@ -149,9 +149,8 @@ class KriteriaSeeder extends Seeder
             Kriteria::create([
                 'slug' => Str::slug($value['aspek'] . '-' . $value['nama'], '-'),
                 'jenis' => $value['jenis'],
-                'aspek' => $value['aspek'],
+                'aspek_id' => $value['aspek'],
                 'nama' => $value['nama'],
-                'deskripsi' => $value['deskripsi'],
                 'indikator' => $value['indikator'],
             ]);
         }

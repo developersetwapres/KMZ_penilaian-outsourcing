@@ -1,5 +1,8 @@
 'use client';
 
+import type React from 'react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,103 +10,54 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, Crown, Edit, Mail, Phone, Plus, Search, Shield, Trash2, User, UserCog, Users } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { Building2, Crown, Edit, Eye, EyeOff, Mail, MapPin, Phone, Plus, Search, Shield, Trash2, Upload, User, UserCog, Users } from 'lucide-react';
 import { useState } from 'react';
-
-// Dummy users data
-const initialUsers = [
-    {
-        id: 1,
-        email: 'bambang.sutrisno@company.com',
-        name: 'Dr. Bambang Sutrisno',
-        nip: '196801011990031001',
-        position: 'Administrator Sistem',
-        unit: 'Bagian Kepegawaian',
-        role: 'admin',
-        phone: '081234567890',
-        status: 'active',
-    },
-    {
-        id: 2,
-        email: 'andi.wijaya@company.com',
-        name: 'Dr. Andi Wijaya, M.Si',
-        nip: '196505151990031002',
-        rank: 'Pembina Tk. I (IV/b)',
-        position: 'Kepala Biro SDM',
-        unit: 'Biro Sumber Daya Manusia',
-        role: 'kepala-biro',
-        phone: '081234567891',
-        status: 'active',
-    },
-    {
-        id: 3,
-        email: 'sari.dewi@company.com',
-        name: 'Ir. Sari Dewi, M.T',
-        nip: '197203101995032001',
-        rank: 'Penata Tk. I (III/d)',
-        position: 'Kepala Bagian IT',
-        unit: 'Bagian Teknologi Informasi',
-        role: 'kepala-bagian',
-        phone: '081234567892',
-        status: 'active',
-    },
-    {
-        id: 4,
-        email: 'ahmad.fauzi@company.com',
-        name: 'Ahmad Fauzi',
-        nip: 'OUT-2023-001',
-        rank: 'Outsourcing',
-        position: 'IT Support Specialist',
-        unit: 'Bagian Teknologi Informasi',
-        role: 'outsourcing',
-        phone: '081234567893',
-        status: 'active',
-    },
-    {
-        id: 5,
-        email: 'linda.sari@company.com',
-        name: 'Linda Sari',
-        nip: 'OUT-2023-002',
-        rank: 'Outsourcing',
-        position: 'HR Assistant',
-        unit: 'Biro Sumber Daya Manusia',
-        role: 'outsourcing',
-        phone: '081234567894',
-        status: 'active',
-    },
-];
 
 const roleOptions = [
     { value: 'admin', label: 'Administrator', icon: Shield, color: 'bg-red-100 text-red-800' },
-    { value: 'kepala-biro', label: 'Kepala Biro', icon: Crown, color: 'bg-purple-100 text-purple-800' },
-    { value: 'kepala-bagian', label: 'Kepala Bagian', icon: UserCog, color: 'bg-blue-100 text-blue-800' },
+    { value: 'atasan', label: 'Atasan', icon: Crown, color: 'bg-purple-100 text-purple-800' },
+    { value: 'penerima_layanan', label: 'Penerima Layanan', icon: UserCog, color: 'bg-blue-100 text-blue-800' },
     { value: 'outsourcing', label: 'Outsourcing', icon: Users, color: 'bg-green-100 text-green-800' },
 ];
 
-const unitOptions = ['Bagian Kepegawaian', 'Biro Sumber Daya Manusia', 'Bagian Teknologi Informasi', 'Bagian Keuangan', 'Bagian Pemasaran'];
+const unitOptions = [
+    'Bagian Kepegawaian',
+    'Biro Pers, Media, dan Informasi',
+    'ex Bagian Teknologi Informasi',
+    'Biro Sumber Daya Manusia',
+    'Bagian Teknologi Informasi',
+    'Bagian Keuangan',
+    'Bagian Pemasaran',
+];
 
-export default function UserManagement() {
+export default function UserManagement({ initialUsers }: any) {
     const [users, setUsers] = useState(initialUsers);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<any>(null);
     const [filterRole, setFilterRole] = useState('all');
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
-        email: '',
         name: '',
-        nip: '',
-        position: '',
-        unit: '',
+        email: '',
+        jabatan: '',
+        lokasi_kerja: '',
+        unit_kerja: '',
+        perusahaan: '',
         role: '',
         phone: '',
-        rank: '',
+        status: 'active',
+        image: '',
+        password: '',
     });
 
-    const filteredUsers = users.filter((user) => {
+    const filteredUsers = users.filter((user: any) => {
         const matchesSearch =
             user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.unit.toLowerCase().includes(searchTerm.toLowerCase());
+            user.unit_kerja.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.jabatan.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesRole = filterRole === 'all' || user.role === filterRole;
         return matchesSearch && matchesRole;
     });
@@ -111,14 +65,17 @@ export default function UserManagement() {
     const handleAdd = () => {
         setEditingUser(null);
         setFormData({
-            email: '',
             name: '',
-            nip: '',
-            position: '',
-            unit: '',
+            email: '',
+            jabatan: '',
+            lokasi_kerja: '',
+            unit_kerja: '',
+            perusahaan: '',
             role: '',
             phone: '',
-            rank: '',
+            status: 'active',
+            image: '',
+            password: '',
         });
         setIsDialogOpen(true);
     };
@@ -126,98 +83,45 @@ export default function UserManagement() {
     const handleEdit = (user: any) => {
         setEditingUser(user);
         setFormData({
-            email: user.email,
             name: user.name,
-            nip: user.nip,
-            position: user.position,
-            unit: user.unit,
+            email: user.email,
+            jabatan: user.jabatan,
+            lokasi_kerja: user.lokasi_kerja,
+            unit_kerja: user.unit_kerja,
+            perusahaan: user.perusahaan,
             role: user.role,
             phone: user.phone,
-            rank: user.rank || '',
+            status: user.status,
+            image: user.image,
+            password: '',
         });
         setIsDialogOpen(true);
     };
 
     const handleDelete = (id: number) => {
-        const userToDelete = users.find((user) => user.id === id);
-
-        if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
-            const timestamp = new Date().toISOString();
-
-            console.log('='.repeat(80));
-            console.log('🗑️ USER DELETION OPERATION');
-            console.log('='.repeat(80));
-            console.log('📊 Deletion Overview:', {
-                timestamp,
-                userId: id,
-                userName: userToDelete?.name,
-                userRole: userToDelete?.role,
-                userEmail: userToDelete?.email,
-            });
-            console.log('\n👤 User Being Deleted:', userToDelete);
-            console.log('\n📈 Before Deletion - Total Users:', users.length);
-
-            setUsers(users.filter((user) => user.id !== id));
-
-            console.log('✅ User Deleted Successfully');
-            console.log('📈 After Deletion - Total Users:', users.length - 1);
-            console.log('='.repeat(80));
-        }
+        //
     };
 
     const handleSave = () => {
-        const timestamp = new Date().toISOString();
-
-        const submissionData = {
-            timestamp,
-            action: editingUser ? 'UPDATE' : 'CREATE',
-            editingUser: editingUser,
-            formData: formData,
-            context: {
-                totalUsers: users.length,
-                usersByRole: roleOptions.reduce(
-                    (acc, role) => {
-                        acc[role.value] = users.filter((u) => u.role === role.value).length;
-                        return acc;
-                    },
-                    {} as Record<string, number>,
-                ),
-            },
-        };
-
-        console.log('='.repeat(80));
-        console.log(`👤 USER MANAGEMENT ${submissionData.action}`);
-        console.log('='.repeat(80));
-        console.log('📊 Operation Overview:', {
-            timestamp: submissionData.timestamp,
-            action: submissionData.action,
-            userId: editingUser?.id || 'NEW',
-            userName: submissionData.formData.name,
-            userRole: submissionData.formData.role,
-        });
-        console.log('\n📝 Form Data:', submissionData.formData);
-        console.log('\n🔄 Before Update:', editingUser || 'Creating new user');
-        console.log('\n📈 System Context:', submissionData.context);
-        console.log('\n💾 Complete Submission:', JSON.stringify(submissionData, null, 2));
-
         if (editingUser) {
-            // Update existing user
-            const updatedUser = { ...editingUser, ...formData };
-            setUsers(users.map((user) => (user.id === editingUser.id ? updatedUser : user)));
-            console.log('✏️ User Updated:', updatedUser);
+            router.put(route('user.update', editingUser.id), formData, {
+                onSuccess: () => {
+                    //
+                },
+                onError: (err) => {
+                    console.log(err);
+                },
+            });
         } else {
-            // Add new user
-            const newUser = {
-                id: Math.max(...users.map((u) => u.id)) + 1,
-                ...formData,
-                status: 'active',
-            };
-            setUsers([...users, newUser]);
-            console.log('➕ New User Created:', newUser);
+            router.post(route('user.store'), formData, {
+                onSuccess: () => {
+                    //
+                },
+                onError: (err) => {
+                    console.log(err);
+                },
+            });
         }
-
-        console.log('\n📊 Updated Users List:', users.length + (editingUser ? 0 : 1), 'total users');
-        console.log('='.repeat(80));
 
         setIsDialogOpen(false);
     };
@@ -227,26 +131,20 @@ export default function UserManagement() {
     };
 
     const toggleUserStatus = (id: number) => {
-        const user = users.find((u) => u.id === id);
+        const user = users.find((u: any) => u.id === id);
         const newStatus = user?.status === 'active' ? 'inactive' : 'active';
-        const timestamp = new Date().toISOString();
 
-        console.log('='.repeat(80));
-        console.log('🔄 USER STATUS TOGGLE');
-        console.log('='.repeat(80));
-        console.log('📊 Status Change Overview:', {
-            timestamp,
-            userId: id,
-            userName: user?.name,
-            oldStatus: user?.status,
-            newStatus: newStatus,
-        });
-        console.log('\n👤 User Details:', user);
+        setUsers(users.map((user: any) => (user.id === id ? { ...user, status: newStatus } : user)));
+    };
 
-        setUsers(users.map((user) => (user.id === id ? { ...user, status: newStatus } : user)));
-
-        console.log('✅ Status Updated Successfully');
-        console.log('='.repeat(80));
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // In a real application, you would upload the file to a server
+            // For now, we'll create a placeholder URL
+            const imageUrl = `/placeholder.svg?height=40&width=40&query=${encodeURIComponent(formData.name || 'user')}+avatar`;
+            setFormData({ ...formData, image: imageUrl });
+        }
     };
 
     return (
@@ -259,7 +157,7 @@ export default function UserManagement() {
                         <span>Manajemen User</span>
                     </CardTitle>
                     <CardDescription className="text-purple-100">
-                        Kelola user sistem: Administrator, Kepala Biro, Kepala Bagian, dan Outsourcing
+                        Kelola user sistem: Administrator, Atasan, Penerima Layanan dan Outsourcing.
                     </CardDescription>
                 </CardHeader>
             </Card>
@@ -267,10 +165,10 @@ export default function UserManagement() {
             {/* Stats Cards */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {roleOptions.map((role) => {
-                    const count = users.filter((u) => u.role === role.value).length;
+                    const count = users.filter((u: any) => u.role === role.value).length;
                     const Icon = role.icon;
                     return (
-                        <Card key={role.value}>
+                        <Card key={role.value} className="py-2">
                             <CardContent className="p-4 text-center">
                                 <div className="mb-2 flex items-center justify-center">
                                     <div className={`rounded-full p-2 ${role.color}`}>
@@ -290,7 +188,7 @@ export default function UserManagement() {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle>Daftar User</CardTitle>
+                            <CardTitle className="text-lg">Daftar User</CardTitle>
                             <CardDescription>Kelola semua user dalam sistem</CardDescription>
                         </div>
                         <Button onClick={handleAdd} className="flex items-center space-x-2">
@@ -323,7 +221,7 @@ export default function UserManagement() {
 
                     {/* Users Grid */}
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {filteredUsers.map((user) => {
+                        {filteredUsers.map((user: any) => {
                             const roleInfo = getRoleInfo(user.role);
                             const Icon = roleInfo.icon;
 
@@ -332,12 +230,25 @@ export default function UserManagement() {
                                     <CardHeader className="pb-3">
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center space-x-3">
-                                                <div className={`rounded-full p-2 ${roleInfo.color}`}>
-                                                    <Icon className="h-5 w-5" />
-                                                </div>
+                                                <Avatar className="h-12 w-12">
+                                                    <AvatarImage src={user.image || '/placeholder.svg'} alt={user.name} />
+                                                    <AvatarFallback>
+                                                        {user.name
+                                                            .split(' ')
+                                                            .map((n: any) => n[0])
+                                                            .join('')
+                                                            .substring(0, 2)
+                                                            .toUpperCase()}
+                                                    </AvatarFallback>
+                                                </Avatar>
                                                 <div>
                                                     <CardTitle className="text-lg">{user.name}</CardTitle>
-                                                    <CardDescription>{user.position}</CardDescription>
+                                                    <CardDescription className="flex items-center space-x-1">
+                                                        <div className={`rounded-full p-1 ${roleInfo.color}`}>
+                                                            <Icon className="h-3 w-3" />
+                                                        </div>
+                                                        <span>{user.jabatan}</span>
+                                                    </CardDescription>
                                                 </div>
                                             </div>
                                             <Badge
@@ -354,26 +265,24 @@ export default function UserManagement() {
                                         <div className="space-y-2 text-sm text-gray-600">
                                             <div className="flex items-center space-x-2">
                                                 <Mail className="h-3 w-3" />
-                                                <span>{user.email}</span>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <span className="font-medium">NIP:</span>
-                                                <span>{user.nip}</span>
+                                                <span className="truncate">{user.email}</span>
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <Building2 className="h-3 w-3" />
-                                                <span className="text-xs">{user.unit}</span>
+                                                <span className="text-xs">{user.unit_kerja}</span>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <MapPin className="h-3 w-3" />
+                                                <span className="text-xs">{user.lokasi_kerja}</span>
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <Phone className="h-3 w-3" />
                                                 <span>{user.phone}</span>
                                             </div>
-                                            {user.rank && (
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="font-medium">Pangkat:</span>
-                                                    <span className="text-xs">{user.rank}</span>
-                                                </div>
-                                            )}
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-xs font-medium">Perusahaan:</span>
+                                                <span className="text-xs">{user.perusahaan}</span>
+                                            </div>
                                         </div>
 
                                         <div className="flex space-x-2 pt-2">
@@ -409,14 +318,55 @@ export default function UserManagement() {
 
             {/* Add/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
+                <DialogContent className="max-h-[80vh] gap-0.5 overflow-y-auto sm:max-w-[700px]">
                     <DialogHeader>
                         <DialogTitle>{editingUser ? 'Edit User' : 'Tambah User Baru'}</DialogTitle>
                         <DialogDescription>{editingUser ? 'Edit informasi user' : 'Tambahkan user baru ke sistem'}</DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-4 py-4">
+                        {/* Image Upload */}
+                        <div className="space-y-2">
+                            <Label htmlFor="image">Foto Profil</Label>
+                            <div className="flex items-center space-x-4">
+                                <Avatar className="h-16 w-16">
+                                    <AvatarImage src={formData.image || '/placeholder.svg'} alt="Preview" />
+                                    <AvatarFallback>
+                                        {formData.name
+                                            ? formData.name
+                                                  .split(' ')
+                                                  .map((n) => n[0])
+                                                  .join('')
+                                                  .substring(0, 2)
+                                                  .toUpperCase()
+                                            : 'U'}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <Input id="image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => document.getElementById('image')?.click()}
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <Upload className="h-4 w-4" />
+                                        <span>Upload Foto</span>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Nama Lengkap</Label>
+                                <Input
+                                    id="name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Masukkan nama lengkap"
+                                />
+                            </div>
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
@@ -427,11 +377,23 @@ export default function UserManagement() {
                                     placeholder="Masukkan email"
                                 />
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="jabatan">Jabatan</Label>
+                                <Input
+                                    id="jabatan"
+                                    value={formData.jabatan}
+                                    onChange={(e) => setFormData({ ...formData, jabatan: e.target.value })}
+                                    placeholder="Masukkan jabatan"
+                                />
+                            </div>
                             <div className="space-y-2">
                                 <Label htmlFor="role">Role</Label>
                                 <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Pilih role" />
+                                        <SelectValue placeholder="Pilih unit kerja" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {roleOptions.map((role) => (
@@ -444,64 +406,43 @@ export default function UserManagement() {
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Nama Lengkap</Label>
-                            <Input
-                                id="name"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="Masukkan nama lengkap"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="lokasi_kerja">Lokasi Kerja</Label>
+                                <Input
+                                    id="lokasi_kerja"
+                                    value={formData.lokasi_kerja}
+                                    onChange={(e) => setFormData({ ...formData, lokasi_kerja: e.target.value })}
+                                    placeholder="Masukkan Lokasi Kerja"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="unit_kerja">Unit Kerja</Label>
+                                <Select value={formData.unit_kerja} onValueChange={(value) => setFormData({ ...formData, unit_kerja: value })}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih unit kerja" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {unitOptions.map((unit) => (
+                                            <SelectItem key={unit} value={unit}>
+                                                {unit}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="nip">NIP</Label>
+                                <Label htmlFor="perusahaan">Perusahaan</Label>
                                 <Input
-                                    id="nip"
-                                    value={formData.nip}
-                                    onChange={(e) => setFormData({ ...formData, nip: e.target.value })}
-                                    placeholder="Masukkan NIP"
+                                    id="perusahaan"
+                                    value={formData.perusahaan}
+                                    onChange={(e) => setFormData({ ...formData, perusahaan: e.target.value })}
+                                    placeholder="Masukkan perusahaan"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="rank">Pangkat/Golongan</Label>
-                                <Input
-                                    id="rank"
-                                    value={formData.rank}
-                                    onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
-                                    placeholder="Masukkan pangkat/golongan"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="position">Jabatan</Label>
-                            <Input
-                                id="position"
-                                value={formData.position}
-                                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                                placeholder="Masukkan jabatan"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="unit">Unit Kerja</Label>
-                            <Select value={formData.unit} onValueChange={(value) => setFormData({ ...formData, unit: value })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Pilih unit kerja" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {unitOptions.map((unit) => (
-                                        <SelectItem key={unit} value={unit}>
-                                            {unit}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="phone">No. Telepon</Label>
                                 <Input
@@ -510,6 +451,42 @@ export default function UserManagement() {
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     placeholder="Masukkan no. telepon"
                                 />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* <div className="space-y-2">
+                                <Label htmlFor="status">Status</Label>
+                                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="active">Aktif</SelectItem>
+                                        <SelectItem value="inactive">Nonaktif</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div> */}
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Password</Label>
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        placeholder={editingUser ? 'Kosongkan jika tidak ingin mengubah' : 'Masukkan password'}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>

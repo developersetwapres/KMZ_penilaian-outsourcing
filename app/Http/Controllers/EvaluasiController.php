@@ -163,6 +163,7 @@ class EvaluasiController extends Controller
         return Inertia::render('penilaian/evaluator/viewscore', $data);
     }
 
+    //admin---------
     public function scoredetail(Request $request): Response
     {
         $idPenugasanPeer = $request->idPenugasanPeer;

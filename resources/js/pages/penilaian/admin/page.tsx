@@ -9,30 +9,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useToast } from '@/hooks/use-toast';
-import { Head, router } from '@inertiajs/react';
+import { SharedData } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
 import { BarChart3, Building2, LogOut, Settings, User, UserCog, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-// Mock user data - in real app this would come from auth context
-const mockAdminUser = {
-    id: 1,
-    email: 'admin@company.com',
-    name: 'Dr. Bambang Sutrisno',
-    nip: '196801011990031001',
-    position: 'Administrator Sistem',
-    unit: 'Bagian Kepegawaian',
-    role: 'admin',
-};
-
-export default function AdminPage({ outsourcing }: any) {
-    const [activeTab, setActiveTab] = useState('master-data');
-    const [user, setUser] = useState(mockAdminUser);
+export default function AdminPage({ outsourcing, masterData, users }: any) {
+    const { auth } = usePage<SharedData>().props;
+    const [activeTab, setActiveTab] = useState('results');
     const { toast } = useToast();
 
-    useEffect(() => {
-        // In real app, check authentication here
-        // If not authenticated, redirect to login
-    }, []);
+    const user = auth.user;
 
     const cleanup = useMobileNavigation();
 
@@ -96,7 +83,7 @@ export default function AdminPage({ outsourcing }: any) {
                                     <div>
                                         <CardTitle className="text-2xl text-white">{user.name}</CardTitle>
                                         <CardDescription className="text-blue-100">
-                                            {user.position} • {user.unit}
+                                            {user.jabatan} • {user.unit_kerja}
                                         </CardDescription>
                                     </div>
                                 </div>
@@ -105,8 +92,8 @@ export default function AdminPage({ outsourcing }: any) {
                                 <div className="grid gap-4 text-sm md:grid-cols-2">
                                     <div className="space-y-2">
                                         <div className="flex items-center space-x-2">
-                                            <span className="font-medium">NIP:</span>
-                                            <span>{user.nip}</span>
+                                            <span className="font-medium">Email:</span>
+                                            <span>{user.email}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <span className="font-medium">Role:</span>
@@ -116,7 +103,7 @@ export default function AdminPage({ outsourcing }: any) {
                                     <div className="space-y-2">
                                         <div className="flex items-center space-x-2">
                                             <Building2 className="h-4 w-4" />
-                                            <span>{user.unit}</span>
+                                            <span>{user.unit_kerja}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <span className="font-medium">Akses:</span>
@@ -130,38 +117,38 @@ export default function AdminPage({ outsourcing }: any) {
                         {/* Main Content */}
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                             <TabsList className="grid h-12 w-full grid-cols-4">
-                                <TabsTrigger value="master-data" className="flex items-center space-x-2 text-sm">
-                                    <Settings className="h-4 w-4" />
-                                    <span>Master Data</span>
-                                </TabsTrigger>
-                                <TabsTrigger value="users" className="flex items-center space-x-2 text-sm">
-                                    <UserCog className="h-4 w-4" />
-                                    <span>Kelola User</span>
+                                <TabsTrigger value="results" className="flex items-center space-x-2 text-sm">
+                                    <BarChart3 className="h-4 w-4" />
+                                    <span>Rekap Hasil</span>
                                 </TabsTrigger>
                                 <TabsTrigger value="assignment" className="flex items-center space-x-2 text-sm">
                                     <Users className="h-4 w-4" />
                                     <span>Penugasan Peer</span>
                                 </TabsTrigger>
-                                <TabsTrigger value="results" className="flex items-center space-x-2 text-sm">
-                                    <BarChart3 className="h-4 w-4" />
-                                    <span>Rekap Hasil</span>
+                                <TabsTrigger value="master-data" className="flex items-center space-x-2 text-sm">
+                                    <Settings className="h-4 w-4" />
+                                    <span>Evaluasi 360</span>
+                                </TabsTrigger>
+                                <TabsTrigger value="users" className="flex items-center space-x-2 text-sm">
+                                    <UserCog className="h-4 w-4" />
+                                    <span>Kelola User</span>
                                 </TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="master-data">
-                                <MasterDataManager />
-                            </TabsContent>
-
-                            <TabsContent value="users">
-                                <UserManagement />
+                            <TabsContent value="results">
+                                <ResultsRecap />
                             </TabsContent>
 
                             <TabsContent value="assignment">
                                 <PeerAssignment outsourcingEmployees={outsourcing} />
                             </TabsContent>
 
-                            <TabsContent value="results">
-                                <ResultsRecap />
+                            <TabsContent value="master-data">
+                                <MasterDataManager masterData={masterData} />
+                            </TabsContent>
+
+                            <TabsContent value="users">
+                                <UserManagement initialUsers={users} />
                             </TabsContent>
                         </Tabs>
                     </div>
