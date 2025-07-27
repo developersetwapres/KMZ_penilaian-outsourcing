@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Aspek;
 use App\Models\Kriteria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

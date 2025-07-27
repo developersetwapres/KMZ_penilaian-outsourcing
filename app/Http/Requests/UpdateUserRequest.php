@@ -30,7 +30,8 @@ class UpdateUserRequest extends FormRequest
             'role' => 'required|string|max:50',
             'phone' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
-            'image' => 'required|string|max:1000',
+            'image' => 'string|max:255',
+            // 'password' => 'string|min:6',
         ];
     }
 
@@ -51,7 +52,6 @@ class UpdateUserRequest extends FormRequest
             'status.in' => 'Status harus bernilai active atau inactive.',
             'image.required' => 'Image wajib diisi.',
             'image.max' => 'Link gambar tidak boleh lebih dari 1000 karakter.',
-            'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
         ];
     }

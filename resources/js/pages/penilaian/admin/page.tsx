@@ -14,7 +14,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { BarChart3, Building2, LogOut, Settings, User, UserCog, Users } from 'lucide-react';
 import { useState } from 'react';
 
-export default function AdminPage({ outsourcing, masterData, users }: any) {
+export default function AdminPage({ outsourcing, masterData, users, path }: any) {
     const { auth } = usePage<SharedData>().props;
     const [activeTab, setActiveTab] = useState('results');
     const { toast } = useToast();
@@ -148,7 +148,7 @@ export default function AdminPage({ outsourcing, masterData, users }: any) {
                             </TabsContent>
 
                             <TabsContent value="users">
-                                <UserManagement initialUsers={users} />
+                                <UserManagement initialUsers={users} imageUrl={path} />
                             </TabsContent>
                         </Tabs>
                     </div>

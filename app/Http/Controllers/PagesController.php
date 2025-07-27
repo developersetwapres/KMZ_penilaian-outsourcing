@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImageUploadRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Aspek;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Models\Kriteria;
+use Illuminate\Support\Str;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 use Inertia\Response;
 
 class PagesController extends Controller
@@ -20,7 +23,7 @@ class PagesController extends Controller
         return Inertia::render('penilaian/page');
     }
 
-    public function dashboard(): Response
+    public function dashboard(Request $request): Response
     {
         $user = new User();
 
@@ -38,13 +41,17 @@ class PagesController extends Controller
                     ->with('getAspek')
                     ->get()
             ],
+            'path' => $request->session()->get('path'),
         ];
 
         return Inertia::render('penilaian/admin/page', $data);
     }
 
-    public function storeUser(StoreUserRequest $request)
+    public function store(StoreUserRequest $request)
     {
+        $finalImagePath = $this->moveImageFromTemp($request->image);
+        dd($finalImagePath);
+
         User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -55,13 +62,15 @@ class PagesController extends Controller
             'role' => $request->role,
             'phone' => $request->phone,
             'status' => $request->status,
-            'image' => $request->image,
+            'image' => $finalImagePath,
             'password' => Hash::make($request->password),
         ]);
     }
 
-    public function updateUser(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
+        $finalImagePath = $this->moveImageFromTemp($request->image);
+
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
@@ -72,8 +81,44 @@ class PagesController extends Controller
             'role' => $request->role,
             'phone' => $request->phone,
             'status' => $request->status,
-            'image' => $request->image,
+            'image' => $finalImagePath,
             'password' => Hash::make($request->password),
         ]);
+    }
+
+    public function uploadTempImage(ImageUploadRequest $request)
+    {
+        $path = $request->file('image')->store('', 'temp');
+
+        return to_route('dashboard')->with('path', __('temp/' . $path));
+    }
+
+    private function moveImageFromTemp(?string $imageUrl): ?string
+    {
+        $imageUrlNew = Str::replace('temp/', '', $imageUrl,);
+
+        $temp = Storage::disk('temp');
+        $sourcePath = $temp->path($imageUrlNew);
+
+        // tentukan folder tujuan di public/image/user
+        $destinationDir = public_path('/image/user');
+
+        // pastikan folder tujuan ada
+        if (! File::exists($destinationDir)) {
+            File::makeDirectory($destinationDir, 0755, true);
+        }
+
+        // pindahkan file dari temp ke tujuan
+        if (File::exists($sourcePath)) {
+            File::move($sourcePath, $destinationDir . DIRECTORY_SEPARATOR . $imageUrlNew);
+        }
+
+        // hapus semua isi folder temp
+        $allTempFiles = $temp->allFiles();
+        if (!empty($allTempFiles)) {
+            $temp->delete($allTempFiles);
+        }
+
+        return 'image/user/' . $imageUrl;
     }
 }

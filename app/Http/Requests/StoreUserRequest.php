@@ -31,7 +31,7 @@ class StoreUserRequest extends FormRequest
             'role' => 'required|string|max:50',
             'phone' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
-            'image' => 'required|string|max:1000',
+            'image' => 'required|string|max:255',
             'password' => 'required|string|min:6',
         ];
     }

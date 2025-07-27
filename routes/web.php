@@ -29,8 +29,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('dashboard/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
     Route::put('dashboard/kriteria/{kriteria}', [KriteriaController::class, 'update'])->name('kriteria.update');
 
-    Route::post('dashboard/user/store', [PagesController::class, 'storeUser'])->name('user.store');
-    Route::put('dashboard/user/update/{user}', [PagesController::class, 'updateUser'])->name('user.update');
+    Route::post('dashboard/user/store', [PagesController::class, 'store'])->name('user.store');
+    Route::put('dashboard/user/update/{user}', [PagesController::class, 'update'])->name('user.update');
+
+    Route::post('/upload-temp-image', [PagesController::class, 'uploadTempImage'])->name('upload.temp');
 });
 
 require __DIR__ . '/settings.php';

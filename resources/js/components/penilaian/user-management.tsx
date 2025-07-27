@@ -31,7 +31,7 @@ const unitOptions = [
     'Bagian Pemasaran',
 ];
 
-export default function UserManagement({ initialUsers }: any) {
+export default function UserManagement({ initialUsers, imageUrl }: any) {
     const [users, setUsers] = useState(initialUsers);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -132,6 +132,7 @@ export default function UserManagement({ initialUsers }: any) {
 
     const toggleUserStatus = (id: number) => {
         const user = users.find((u: any) => u.id === id);
+
         const newStatus = user?.status === 'active' ? 'inactive' : 'active';
 
         setUsers(users.map((user: any) => (user.id === id ? { ...user, status: newStatus } : user)));
@@ -139,11 +140,20 @@ export default function UserManagement({ initialUsers }: any) {
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+
         if (file) {
-            // In a real application, you would upload the file to a server
-            // For now, we'll create a placeholder URL
-            const imageUrl = `/placeholder.svg?height=40&width=40&query=${encodeURIComponent(formData.name || 'user')}+avatar`;
-            setFormData({ ...formData, image: imageUrl });
+            router.post(
+                route('upload.temp'),
+                { image: file },
+                {
+                    onSuccess: () => {
+                        setFormData({ ...formData, image: imageUrl });
+                    },
+                    onError: (err) => {
+                        console.error('Image upload failed:', err);
+                    },
+                },
+            );
         }
     };
 
@@ -231,7 +241,7 @@ export default function UserManagement({ initialUsers }: any) {
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center space-x-3">
                                                 <Avatar className="h-12 w-12">
-                                                    <AvatarImage src={user.image || '/placeholder.svg'} alt={user.name} />
+                                                    <AvatarImage src={`/storage/${user.image}` || '/placeholder.svg'} alt={user.name} />
                                                     <AvatarFallback>
                                                         {user.name
                                                             .split(' ')
@@ -330,7 +340,7 @@ export default function UserManagement({ initialUsers }: any) {
                             <Label htmlFor="image">Foto Profil</Label>
                             <div className="flex items-center space-x-4">
                                 <Avatar className="h-16 w-16">
-                                    <AvatarImage src={formData.image || '/placeholder.svg'} alt="Preview" />
+                                    <AvatarImage src={`/storage/${formData.image}` || '/placeholder.svg'} alt="Preview" />
                                     <AvatarFallback>
                                         {formData.name
                                             ? formData.name
@@ -455,18 +465,6 @@ export default function UserManagement({ initialUsers }: any) {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            {/* <div className="space-y-2">
-                                <Label htmlFor="status">Status</Label>
-                                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="active">Aktif</SelectItem>
-                                        <SelectItem value="inactive">Nonaktif</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div> */}
                             <div className="space-y-2">
                                 <Label htmlFor="password">Password</Label>
                                 <div className="relative">
