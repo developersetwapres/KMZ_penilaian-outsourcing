@@ -10,9 +10,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Building2, Crown, Edit, Eye, EyeOff, Mail, MapPin, Phone, Plus, Search, Shield, Trash2, Upload, User, UserCog, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const roleOptions = [
     { value: 'admin', label: 'Administrator', icon: Shield, color: 'bg-red-100 text-red-800' },
@@ -31,7 +31,10 @@ const unitOptions = [
     'Bagian Pemasaran',
 ];
 
-export default function UserManagement({ initialUsers, imageUrl }: any) {
+export default function UserManagement({ initialUsers }: any) {
+    const { flash } = usePage().props;
+    const imageUrl = flash.pathTemp;
+
     const [users, setUsers] = useState(initialUsers);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,6 +54,19 @@ export default function UserManagement({ initialUsers, imageUrl }: any) {
         image: '',
         password: '',
     });
+
+    useEffect(() => {
+        setUsers(initialUsers);
+    }, [initialUsers]);
+
+    useEffect(() => {
+        if (imageUrl) {
+            setFormData((prev) => ({
+                ...prev,
+                image: imageUrl,
+            }));
+        }
+    }, [imageUrl]);
 
     const filteredUsers = users.filter((user: any) => {
         const matchesSearch =

@@ -13,10 +13,19 @@ Route::get('/', [PagesController::class, 'home'])->name('home');
 Route::middleware(['auth', 'verified', 'role:outsourcing,penerima_layanan,atasan'])->group(function () {
     Route::get('/evaluator', [EvaluasiController::class, 'card'])->name('evaluator.card');
 
-    Route::post('/evaluator', [EvaluasiController::class, 'create'])->name('evaluator.create');
-    Route::post('/evaluator-viewscore', [EvaluasiController::class, 'viewscore'])->name('evaluator.viewscore');
+    Route::post('/evaluator/{penugasan}', [EvaluasiController::class, 'create'])->name('evaluator.create');
+    Route::get('/evaluator/{penugasan}', function () {
+        return to_route('evaluator.card');
+    });
 
-    Route::post('/evaluator/post', [EvaluasiController::class, 'store'])->name('evaluator.store');
+    Route::post('/penilaian-viewscore', [EvaluasiController::class, 'viewscore'])->name('penilaian.viewscore');
+    Route::get('/penilaian-viewscore', function () {
+        return to_route('evaluator.card');
+    });
+
+    Route::post('/penilaian-viewscore', [EvaluasiController::class, 'viewscore'])->name('penilaian.viewscore');
+
+    Route::post('/penilaian-score',  [EvaluasiController::class, 'store'])->name('penilaian.store');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
@@ -24,7 +33,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
     Route::post('penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
 
-    Route::post('dashboard', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
+    Route::get('dashboard-detail/{user}', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
 
     Route::post('dashboard/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
     Route::put('dashboard/kriteria/{kriteria}', [KriteriaController::class, 'update'])->name('kriteria.update');

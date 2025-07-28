@@ -9,13 +9,13 @@ import { ArrowLeft, Award, BarChart3, Calculator, FileText, MessageCircle, Users
 import { useState } from 'react';
 
 // Updated dummy data with 3 evaluators for all employees
-const evaluationResults = [
+const evaluationResult = [
     {
         id: '1',
-        employeeName: 'Ahmad Rizki',
-        unit: 'IT Support',
-        position: 'Technical Support',
-        photo: '/placeholder.svg?height=60&width=60&text=AR',
+        name: 'Ahmad Rizki',
+        unit_kerja: 'IT Support',
+        jabatan: 'Technical Support',
+        image: '/placeholder.svg?height=60&width=60&text=AR',
         evaluatorScores: [
             {
                 evaluatorName: 'Dr. Andi Wijaya',
@@ -36,7 +36,7 @@ const evaluationResults = [
                 evaluationDate: '2024-01-15',
             },
             {
-                evaluatorName: 'PT. Mitra Teknologi',
+                evaluatorName: 'Mirawati',
                 type: 'penerima_layanan',
                 weight: 0.3,
                 criteriaScores: {
@@ -72,22 +72,15 @@ const evaluationResults = [
                 evaluationDate: '2024-01-10',
             },
         ],
-        weightedOverallScore: 81.575, // (80.5*0.5) + (84.0*0.3) + (83.25*0.2)
+        weightedOverallScore: 81.575,
         status: 'completed',
-        completedDate: '2024-01-15',
-        historicalScores: [
-            { period: 'Q1 2023', score: 75.2 },
-            { period: 'Q2 2023', score: 77.8 },
-            { period: 'Q3 2023', score: 79.1 },
-            { period: 'Q4 2023', score: 81.575 },
-        ],
     },
     {
         id: '2',
-        employeeName: 'Siti Nurhaliza',
-        unit: 'Human Resources',
-        position: 'HR Assistant',
-        photo: '/placeholder.svg?height=60&width=60&text=SN',
+        name: 'Siti Nurhaliza',
+        unit_kerja: 'Human Resources',
+        jabatan: 'HR Assistant',
+        image: '/placeholder.svg?height=60&width=60&text=SN',
         evaluatorScores: [
             {
                 evaluatorName: 'Dr. Andi Wijaya',
@@ -146,20 +139,13 @@ const evaluationResults = [
         ],
         weightedOverallScore: 87.625, // (88.75*0.5) + (86.25*0.3) + (87.25*0.2)
         status: 'completed',
-        completedDate: '2024-01-12',
-        historicalScores: [
-            { period: 'Q1 2023', score: 82.1 },
-            { period: 'Q2 2023', score: 84.5 },
-            { period: 'Q3 2023', score: 86.2 },
-            { period: 'Q4 2023', score: 87.625 },
-        ],
     },
     {
         id: '3',
-        employeeName: 'Budi Santoso',
-        unit: 'Finance',
-        position: 'Accounting Staff',
-        photo: '/placeholder.svg?height=60&width=60&text=BS',
+        name: 'Budi Santoso',
+        unit_kerja: 'Finance',
+        jabatan: 'Accounting Staff',
+        image: '/placeholder.svg?height=60&width=60&text=BS',
         evaluatorScores: [
             {
                 evaluatorName: 'Dra. Sari Dewi',
@@ -213,30 +199,18 @@ const evaluationResults = [
                 },
                 overallScore: 75.5,
                 notes: 'Rekan kerja yang baik dan mudah diajak kerjasama. Selalu membantu ketika diminta.',
-                evaluationDate: '2024-01-06',
             },
         ],
         weightedOverallScore: 72.225, // (71.25*0.5) + (72.0*0.3) + (75.5*0.2)
         status: 'completed',
-        completedDate: '2024-01-08',
-        historicalScores: [
-            { period: 'Q1 2023', score: 68.5 },
-            { period: 'Q2 2023', score: 69.2 },
-            { period: 'Q3 2023', score: 70.8 },
-            { period: 'Q4 2023', score: 72.225 },
-        ],
     },
 ];
 
-export default function EmployeeDetailPage() {
-    const params = {
-        id: '2',
-    };
-
-    const employeeId = params.id as string;
+export default function EmployeeDetailPage({ evaluationResults }: any) {
     const [activeTab, setActiveTab] = useState('rekap');
+    console.log(evaluationResults);
 
-    const employee = evaluationResults.find((emp) => emp.id === employeeId);
+    const employee = evaluationResults;
 
     if (!employee) {
         return (
@@ -293,14 +267,14 @@ export default function EmployeeDetailPage() {
                                 <div className="h-6 w-px bg-gray-300"></div>
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={employee.photo || '/placeholder.svg'}
-                                        alt={employee.employeeName}
+                                        src={employee.image || '/placeholder.svg'}
+                                        alt={employee.name}
                                         className="h-10 w-10 rounded-full border-2 border-blue-200"
                                     />
                                     <div>
-                                        <h1 className="text-xl font-bold text-gray-900">{employee.employeeName}</h1>
+                                        <h1 className="text-xl font-bold text-gray-900">{employee.name}</h1>
                                         <p className="text-sm text-gray-600">
-                                            {employee.position} • {employee.unit}
+                                            {employee.jabatan} • {employee.unit_kerja}
                                         </p>
                                     </div>
                                 </div>
@@ -354,14 +328,14 @@ export default function EmployeeDetailPage() {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-6">
                                                 <img
-                                                    src={employee.photo || '/placeholder.svg'}
-                                                    alt={employee.employeeName}
+                                                    src={employee.image || '/placeholder.svg'}
+                                                    alt={employee.name}
                                                     className="h-24 w-24 rounded-full border-4 border-white shadow-lg"
                                                 />
                                                 <div>
-                                                    <CardTitle className="mb-2 text-3xl">{employee.employeeName}</CardTitle>
+                                                    <CardTitle className="mb-2 text-3xl">{employee.name}</CardTitle>
                                                     <CardDescription className="text-lg text-indigo-100">
-                                                        {employee.position} • {employee.unit}
+                                                        {employee.jabatan} • {employee.unit_kerja}
                                                     </CardDescription>
                                                     <div className="mt-4 flex items-center space-x-4">
                                                         <Badge
@@ -539,7 +513,8 @@ export default function EmployeeDetailPage() {
                                         <CardContent>
                                             <div className="space-y-4">
                                                 {employee.evaluatorScores.map((evaluator, index) => {
-                                                    const originalScore = evaluator.aspectScores['aspek-teknis'];
+                                                    const originalScore = evaluator.aspectScores['aspek-teknis-dan-hasil-kerja'];
+
                                                     const weightedScore = originalScore * evaluator.weight;
                                                     const evaluatorType =
                                                         evaluator.type === 'atasan'
@@ -565,7 +540,7 @@ export default function EmployeeDetailPage() {
                                                                 <span className="text-gray-600">Score Inputan:</span>
                                                                 <div className="flex items-center space-x-2">
                                                                     <span className={`text-lg font-bold ${getScoreColor(originalScore)}`}>
-                                                                        {originalScore.toFixed(1)}
+                                                                        {originalScore}
                                                                     </span>
                                                                     <Badge className={`${getScoreBadgeColor(originalScore)} text-xs`}>
                                                                         {getScoreLabel(originalScore)}
@@ -577,7 +552,7 @@ export default function EmployeeDetailPage() {
                                                             <div className="rounded-4xl bg-white p-4 text-center">
                                                                 {/* Formula */}
                                                                 <div className="mb-2 text-center font-mono text-xs text-blue-600">
-                                                                    {originalScore.toFixed(1)} × {(evaluator.weight * 100).toFixed(0)}% =
+                                                                    {originalScore} × {(evaluator.weight * 100).toFixed(0)}% =
                                                                 </div>
 
                                                                 <div className={`text-4xl font-bold text-red-500`}>{weightedScore.toFixed(2)}</div>
@@ -622,6 +597,8 @@ export default function EmployeeDetailPage() {
                                             <div className="space-y-4">
                                                 {employee.evaluatorScores.map((evaluator, index) => {
                                                     const originalScore = evaluator.aspectScores['aspek-perilaku'];
+                                                    console.log(originalScore);
+
                                                     const weightedScore = originalScore * evaluator.weight;
                                                     const evaluatorType =
                                                         evaluator.type === 'atasan'
@@ -647,7 +624,7 @@ export default function EmployeeDetailPage() {
                                                                 <span className="text-gray-600">Score Inputan:</span>
                                                                 <div className="flex items-center space-x-2">
                                                                     <span className={`text-lg font-bold ${getScoreColor(originalScore)}`}>
-                                                                        {originalScore.toFixed(1)}
+                                                                        {originalScore}
                                                                     </span>
                                                                     <Badge className={`${getScoreBadgeColor(originalScore)} text-xs`}>
                                                                         {getScoreLabel(originalScore)}
@@ -659,7 +636,7 @@ export default function EmployeeDetailPage() {
                                                             <div className="rounded-4xl bg-white p-4 text-center">
                                                                 {/* Formula */}
                                                                 <div className="mb-2 text-center font-mono text-xs text-green-600">
-                                                                    {originalScore.toFixed(1)} × {(evaluator.weight * 100).toFixed(0)}% =
+                                                                    {originalScore} × {(evaluator.weight * 100).toFixed(0)}% =
                                                                 </div>
 
                                                                 <div className="text-4xl font-bold text-red-500">{weightedScore.toFixed(2)}</div>
@@ -817,7 +794,7 @@ export default function EmployeeDetailPage() {
                                                                         <span
                                                                             className={`text-lg font-bold ${getScoreColor(evaluator.aspectScores['aspek-teknis'])}`}
                                                                         >
-                                                                            {evaluator.aspectScores['aspek-teknis'].toFixed(1)}
+                                                                            {evaluator.aspectScores['aspek-teknis']}
                                                                         </span>
                                                                         <Badge
                                                                             className={`${getScoreBadgeColor(evaluator.aspectScores['aspek-teknis'])} text-xs`}
@@ -827,8 +804,7 @@ export default function EmployeeDetailPage() {
                                                                     </div>
                                                                 </div>
                                                                 <div className="mt-3 text-center font-mono text-xs text-gray-600">
-                                                                    {evaluator.aspectScores['aspek-teknis'].toFixed(1)} ×{' '}
-                                                                    {evaluator.weight.toFixed(0)}% ={' '}
+                                                                    {evaluator.aspectScores['aspek-teknis']} × {evaluator.weight.toFixed(0)}% ={' '}
                                                                     {(evaluator.aspectScores['aspek-teknis'] * evaluator.weight).toFixed(2)}
                                                                 </div>
                                                             </div>
@@ -842,7 +818,7 @@ export default function EmployeeDetailPage() {
                                                                         <span
                                                                             className={`text-lg font-bold ${getScoreColor(evaluator.aspectScores['aspek-perilaku'])}`}
                                                                         >
-                                                                            {evaluator.aspectScores['aspek-perilaku'].toFixed(1)}
+                                                                            {evaluator.aspectScores['aspek-perilaku']}
                                                                         </span>
                                                                         <Badge
                                                                             className={`${getScoreBadgeColor(evaluator.aspectScores['aspek-perilaku'])} text-xs`}
@@ -852,8 +828,7 @@ export default function EmployeeDetailPage() {
                                                                     </div>
                                                                 </div>
                                                                 <div className="mt-3 text-center font-mono text-xs text-gray-600">
-                                                                    {evaluator.aspectScores['aspek-perilaku'].toFixed(1)} ×{' '}
-                                                                    {evaluator.weight.toFixed(0)}% ={' '}
+                                                                    {evaluator.aspectScores['aspek-perilaku']} × {evaluator.weight.toFixed(0)}% ={' '}
                                                                     {(evaluator.aspectScores['aspek-perilaku'] * evaluator.weight).toFixed(2)}
                                                                 </div>
                                                             </div>

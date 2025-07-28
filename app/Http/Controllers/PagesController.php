@@ -6,9 +6,11 @@ use App\Http\Requests\ImageUploadRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Aspek;
+use App\Models\Evaluasi;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Models\Kriteria;
+use App\Models\PenugasanPeer;
 use Illuminate\Support\Str;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -23,9 +25,59 @@ class PagesController extends Controller
         return Inertia::render('penilaian/page');
     }
 
-    public function dashboard(Request $request): Response
+    public function dashboard(): Response
     {
         $user = new User();
+
+        // Ambil semua penugasan peer dan group berdasarkan outsourcing yang dinilai
+        $assignments = PenugasanPeer::with(['outsourcing', 'penilai'])
+            ->get()
+            ->groupBy('outsourcing_id');
+
+        $results = [];
+
+        foreach ($assignments as $outsourcingId => $group) {
+            $outsourcingUser = $group->first()->outsourcing;
+
+            // Build evaluatorScores
+            $evaluatorScores = [];
+            $weightedSum = 0;
+
+            foreach ($group as $assignment) {
+                $type       = $assignment->type_penilai;
+                $weightStr  = $assignment->weight;              // e.g. '50%'
+                $weight     = floatval(str_replace('%', '', $weightStr)) / 100;
+
+                // Ambil evaluasi berdasarkan penugasan_peer_id
+                $averageScore = Evaluasi::where('penugasan_peer_id', $assignment->id)->avg('skor');
+
+                $weightedSum += $averageScore * $weight;
+
+                $evaluatorScores[] = [
+                    'type'         => $type,
+                    'evaluatorName' => $assignment->penilai->name,
+                    'overallScore' => round($averageScore, 1),
+                    'weight'       => $weightStr,
+                ];
+            }
+
+            // Tentukan status
+            $status = $group->every(function ($assignment) {
+                return Evaluasi::where('penugasan_peer_id', $assignment->id)->exists();
+            }) ? 'completed' : 'in-progress';
+
+
+            $results[] = [
+                'id'                   => $outsourcingUser->id,
+                'name'                 => $outsourcingUser->name,
+                'unit_kerja'           => $outsourcingUser->unit_kerja,
+                'jabatan'              => $outsourcingUser->jabatan,
+                'image'                => $outsourcingUser->image,
+                'evaluatorScores'      => $evaluatorScores,
+                'weightedOverallScore' => round($weightedSum, 1),
+                'status'               => $status,
+            ];
+        }
 
         $data = [
             'outsourcing' => $user->outsourcings(),
@@ -41,7 +93,8 @@ class PagesController extends Controller
                     ->with('getAspek')
                     ->get()
             ],
-            'path' => $request->session()->get('path'),
+
+            'evaluationResults' => $results,
         ];
 
         return Inertia::render('penilaian/admin/page', $data);
@@ -50,8 +103,6 @@ class PagesController extends Controller
     public function store(StoreUserRequest $request)
     {
         $finalImagePath = $this->moveImageFromTemp($request->image);
-        dd($finalImagePath);
-
         User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -89,8 +140,7 @@ class PagesController extends Controller
     public function uploadTempImage(ImageUploadRequest $request)
     {
         $path = $request->file('image')->store('', 'temp');
-
-        return to_route('dashboard')->with('path', __('temp/' . $path));
+        session()->flash('pathTemp', 'temp/' . $path);
     }
 
     private function moveImageFromTemp(?string $imageUrl): ?string
@@ -101,7 +151,7 @@ class PagesController extends Controller
         $sourcePath = $temp->path($imageUrlNew);
 
         // tentukan folder tujuan di public/image/user
-        $destinationDir = public_path('/image/user');
+        $destinationDir = public_path('/storage/image/user');
 
         // pastikan folder tujuan ada
         if (! File::exists($destinationDir)) {
@@ -119,6 +169,6 @@ class PagesController extends Controller
             $temp->delete($allTempFiles);
         }
 
-        return 'image/user/' . $imageUrl;
+        return 'image/user/' . $imageUrlNew;
     }
 }

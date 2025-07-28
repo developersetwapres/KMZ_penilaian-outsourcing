@@ -1,5 +1,6 @@
 'use client';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -134,9 +135,20 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
                                                     <div className="mb-3 flex items-center space-x-3">
-                                                        <div className="rounded-full bg-indigo-100 p-2">
-                                                            <Users className="h-5 w-5 text-indigo-600" />
-                                                        </div>
+                                                        <Avatar className="h-12 w-12">
+                                                            <AvatarImage
+                                                                src={`/storage/${employee.image}` || '/placeholder.svg'}
+                                                                alt={employee.name}
+                                                            />
+                                                            <AvatarFallback>
+                                                                {employee.name
+                                                                    .split(' ')
+                                                                    .map((n: any) => n[0])
+                                                                    .join('')
+                                                                    .substring(0, 2)
+                                                                    .toUpperCase()}
+                                                            </AvatarFallback>
+                                                        </Avatar>
                                                         <div>
                                                             <h3 className="text-lg font-semibold text-gray-900">{employee.name}</h3>
                                                             <p className="mb-1.5 text-sm text-gray-600">{employee.unit_kerja}</p>

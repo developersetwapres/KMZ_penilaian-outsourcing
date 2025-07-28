@@ -34,10 +34,10 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        if (in_array($user->role, ['outsourcing', 'kepala-bagian', 'kepala-biro'])) {
-            return redirect()->intended(route('evaluator.create', absolute: false));
+        if (in_array($user->role, ['outsourcing', 'penerima_layanan', 'atasan'])) {
+            return to_route('evaluator.card');
         } elseif ($user->role == 'admin') {
-            return redirect()->intended(route('dashboard', absolute: false));
+            return to_route('dashboard');
         }
 
         return redirect('/');

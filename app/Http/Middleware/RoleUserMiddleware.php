@@ -23,12 +23,12 @@ class RoleUserMiddleware
 
         switch ($user->role) {
             case 'admin':
-                return redirect()->route('dashboard');
+                return to_route('dashboard');
 
             case 'outsourcing':
             case 'penerima_layanan':
             case 'atasan':
-                return redirect()->route('evaluator.create');
+                return to_route('evaluator.card');
 
             default:
                 return redirect('/');

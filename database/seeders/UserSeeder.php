@@ -22,7 +22,6 @@ class UserSeeder extends Seeder
                 'name' =>
                 'Ferry Ardiyansyah',
                 'jabatan' => 'Teknisi Jaringan',
-
                 'lokasi_kerja' => 'Kediaman Diponegoro - Merdeka Selatan - Merdeka Utara',
                 'unit_kerja' => 'ex Bagian Teknologi Informasi',
                 'phone' => '08123456789',
@@ -181,7 +180,7 @@ class UserSeeder extends Seeder
                 'phone' => $user['phone'],
                 'role' => $user['role'],
                 'status' => 'active',
-                'image' => '/image/user.png',
+                'image' => 'image/user/user.png',
                 'email_verified_at' => now(),
                 'password' => static::$password ??= Hash::make('password'),
                 'remember_token' => Str::random(10),

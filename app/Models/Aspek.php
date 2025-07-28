@@ -9,6 +9,7 @@ class Aspek extends Model
 {
     protected $fillable = [
         'nama',
+        'weight',
         'deskripsi',
     ];
 

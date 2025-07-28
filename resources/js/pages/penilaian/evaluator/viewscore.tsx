@@ -29,9 +29,10 @@ interface EvaluationFormProps {
     evaluator: any;
     evaluationData: any;
     overallNotes: string;
+    averageScore: any;
 }
 
-export default function ViewScore({ employee, evaluator, evaluationData, overallNotes }: EvaluationFormProps) {
+export default function ViewScore({ employee, averageScore, evaluator, evaluationData, overallNotes }: EvaluationFormProps) {
     const aspects = Object.keys(evaluationData);
 
     const calculateAspectScore = (aspectKey: string) => {
@@ -67,7 +68,7 @@ export default function ViewScore({ employee, evaluator, evaluationData, overall
         return (
             <div className="space-y-8">
                 {/* Overall Summary Card */}
-                <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                <Card className="gap-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                     <CardHeader>
                         <CardTitle className="flex items-center space-x-3 text-2xl">
                             <div className="rounded-full bg-white/20 p-3">
@@ -79,7 +80,11 @@ export default function ViewScore({ employee, evaluator, evaluationData, overall
                     <CardContent>
                         <div className="grid gap-6 md:grid-cols-3">
                             <div className="text-center">
-                                <div className="mb-2 text-4xl font-bold">{overallScore.toFixed(1)}</div>
+                                <div className="mb-2 text-4xl font-bold">
+                                    {/* Jika dihitung per Aspek */}
+                                    {/* {overallScore.toFixed(1)}  */}
+                                    {averageScore}
+                                </div>
                                 <div className="text-blue-100">Nilai Keseluruhan</div>
                                 <div className="mt-1 text-sm text-blue-200">{getScoreLabel(overallScore)}</div>
                             </div>
@@ -105,7 +110,7 @@ export default function ViewScore({ employee, evaluator, evaluationData, overall
                     const aspectScore = calculateAspectScore(aspectKey);
 
                     return (
-                        <Card key={aspectKey} className="border-l-4 border-l-blue-500">
+                        <Card key={aspectKey} className="gap-4 border-l-4 border-l-blue-500">
                             <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-4">
@@ -124,7 +129,7 @@ export default function ViewScore({ employee, evaluator, evaluationData, overall
                                 </div>
                             </CardHeader>
 
-                            <CardContent className="p-6">
+                            <CardContent className="p-6 pt-3">
                                 <div className="space-y-6">
                                     {aspect.criteria.map((criterion: any, criterionIndex: any) => {
                                         const score = criterion.score || 0;
@@ -175,8 +180,8 @@ export default function ViewScore({ employee, evaluator, evaluationData, overall
 
                 {/* Overall Notes */}
                 {overallNotes && (
-                    <Card className="border-l-4 border-l-yellow-500">
-                        <CardHeader className="bg-yellow-50">
+                    <Card className="gap-0 border-l-4 border-l-yellow-500 py-4">
+                        <CardHeader className="bg-yellow-50 py-2">
                             <CardTitle className="flex items-center space-x-2 text-xl text-yellow-800">
                                 <FileText className="h-6 w-6" />
                                 <span>Catatan Keseluruhan</span>

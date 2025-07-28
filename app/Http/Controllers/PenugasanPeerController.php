@@ -21,12 +21,19 @@ class PenugasanPeerController extends Controller
             'teman' => 'teman',
         ];
 
+        $mapWeight = [
+            'atasan' => 0.5,
+            'penerima_layanan' => 0.3,
+            'teman' => 0.2,
+        ];
+
         foreach ($penilai as $tipe => $info) {
             PenugasanPeer::updateOrCreate(
                 [
                     'outsourcing_id' => $outsourcingId,
                     'penilai_id' => $info['id'],
                     'type_penilai' => $mapTipe[$tipe] ?? $tipe,
+                    'weight' =>  $mapWeight[$tipe],
                     'catatan' => '',
                     'status' => 'incomplete'
                 ],

@@ -14,24 +14,14 @@ export default function EvaluatorPage({ penugasanPeer }: any) {
 
     const { toast } = useToast();
 
-    const setSelectedEmployee = (idPenugasanPeer: number, idOutsourching: number, nameOutsourching: string) => {
-        router.post(
-            route('evaluator.create'),
-            {
-                idPenugasanPeer: idPenugasanPeer,
-                idOutsourching: idOutsourching,
-                nameOutsourching: nameOutsourching,
-            },
-            {
-                onError: (err) => {
-                    console.log(err);
-                },
-            },
-        );
+    const setSelectedEmployee = (idPenugasanPeer: number, nameOutsourching: string) => {
+        router.post(route('evaluator.create', idPenugasanPeer), {
+            nameOut: nameOutsourching,
+        });
     };
 
     const viewScores = (idPenugasanPeer: number) => {
-        router.post(route('evaluator.viewscore'), {
+        router.post(route('penilaian.viewscore'), {
             idPenugasanPeer: idPenugasanPeer,
         });
     };
@@ -183,7 +173,7 @@ export default function EvaluatorPage({ penugasanPeer }: any) {
                                             onClick={() =>
                                                 employee.status === 'completed'
                                                     ? viewScores(employee.id)
-                                                    : setSelectedEmployee(employee.id, employee.outsourcing.id, employee.outsourcing.name)
+                                                    : setSelectedEmployee(employee.id, employee.outsourcing.name)
                                             }
                                             className={`w-full transform py-3 font-semibold text-white shadow-lg transition-all duration-300 group-hover:scale-105 ${
                                                 employee.status === 'completed'

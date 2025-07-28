@@ -105,7 +105,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
             })),
         };
 
-        router.post(route('evaluator.store'), submissionData, {
+        router.post(route('penilaian.store'), submissionData, {
             onSuccess: () => {
                 toast({
                     title: 'Penilaian Berhasil Disimpan!',
@@ -262,8 +262,8 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
 
                 {/* Overall Notes */}
                 {overallNotes && (
-                    <Card className="border-l-4 border-l-yellow-500">
-                        <CardHeader className="bg-yellow-50">
+                    <Card className="gap-0 border-l-4 border-l-yellow-500 py-4">
+                        <CardHeader className="bg-yellow-50 py-2">
                             <CardTitle className="flex items-center space-x-2 text-xl text-yellow-800">
                                 <FileText className="h-6 w-6" />
                                 <span>Catatan Keseluruhan</span>

@@ -30,29 +30,37 @@ class EvaluasiController extends Controller
         return Inertia::render('penilaian/evaluator/page', $data);
     }
 
-    public function create(Request $request): Response | RedirectResponse
+    public function create(PenugasanPeer $penugasan, Request $request): Response | RedirectResponse
     {
-        $idPenugasanPeer = $request->idPenugasanPeer;
-        $employee = User::select(['id', 'name', 'jabatan', 'image', 'unit_kerja'])->findOrFail($request->idOutsourching);
+        $penugasan->load(['penilai', 'outsourcing']);
 
+        $employee = User::select(['id', 'name', 'jabatan', 'image', 'unit_kerja'])->findOrFail($penugasan->outsourcing->id);
+
+        //---------------POLICE-----------------POLICE-------------------------------------
         //Kalau nama tidak sama dengan nama hasil query berdasarkan id
-        if ($employee->name !== $request->nameOutsourching) {
+        if ($employee->name !== $request->nameOut) {
             return redirect()->intended(route('evaluator.card', absolute: false));
         }
 
         //kalau evalator bukan untuk outcourching
-        //if ()
+        if ($penugasan->penilai->id !== Auth::id()) {
+            return redirect()->intended(route('evaluator.card', absolute: false));
+        }
+        //---------------POLICE END-----------------POLICE END-------------------------------
 
-        $kriterias = Kriteria::all();
+        $kriterias = Kriteria::where('jenis', 'umum')
+            ->orWhere('jenis',  $employee->jabatan)
+            ->with('getAspek')
+            ->get();
 
         $evaluationData = [];
 
         foreach ($kriterias as $kriteria) {
-            $groupKey = Str::slug($kriteria->aspek);
+            $groupKey = Str::slug($kriteria->getAspek->nama);
 
             if (!isset($evaluationData[$groupKey])) {
                 $evaluationData[$groupKey] = [
-                    'title' => $kriteria->aspek,
+                    'title' => $kriteria->getAspek->nama,
                     'criteria' => [],
                 ];
             }
@@ -68,7 +76,7 @@ class EvaluasiController extends Controller
             'evaluationData' => $evaluationData,
             'evaluator' => Auth::user(),
             'employee' => $employee,
-            'idPenugasanPeer' => $idPenugasanPeer,
+            'idPenugasanPeer' =>  $penugasan->id,
         ];
 
         return Inertia::render('penilaian/evaluator/evaluation-form', $data);
@@ -126,6 +134,8 @@ class EvaluasiController extends Controller
             ->with('kriteria')
             ->get();
 
+        $totalScore = 0;
+        $totalCount = 0;
         $evaluationData = [];
 
         foreach ($evaluations as $evaluation) {
@@ -134,14 +144,18 @@ class EvaluasiController extends Controller
             // Lewati jika tidak ada relasi kriteria
             if (!$kriteria) continue;
 
-            $groupKey = Str::slug($kriteria->aspek);
+            $groupKey = Str::slug($kriteria->getAspek->nama);
 
             if (!isset($evaluationData[$groupKey])) {
                 $evaluationData[$groupKey] = [
-                    'title' => $kriteria->aspek,
+                    'title' => $kriteria->getAspek->nama,
                     'criteria' => [],
                 ];
             }
+
+            // Tambah skor dan counter
+            $totalScore += $evaluation->skor;
+            $totalCount++;
 
             $evaluationData[$groupKey]['criteria'][] = [
                 'id' => $kriteria->id,
@@ -150,6 +164,10 @@ class EvaluasiController extends Controller
                 'score' => $evaluation->skor,
             ];
         }
+
+        // Hitung rata-rata
+        $averageScore = $totalCount > 0 ? round($totalScore / $totalCount, 2) : 0;
+
 
         $employee = User::select(['id', 'name', 'jabatan', 'image', 'unit_kerja'])->findOrFail($penugasanPeer->outsourcing_id);
 
@@ -157,47 +175,78 @@ class EvaluasiController extends Controller
             'evaluationData' => $evaluationData,
             'evaluator' => Auth::user(),
             'employee' => $employee,
-            'idPenugasanPeer' => $idPenugasanPeer,
+            'overallNotes' => $penugasanPeer->catatan,
+            'averageScore' => $averageScore
         ];
 
         return Inertia::render('penilaian/evaluator/viewscore', $data);
     }
 
     //admin---------
-    public function scoredetail(Request $request): Response
+    public function scoredetail(User $user): Response
     {
-        $idPenugasanPeer = $request->idPenugasanPeer;
-        $evaluations = Evaluasi::where('penugasan_peer_id', $idPenugasanPeer)
-            ->with('kriteria')
-            ->get();
+        // Ambil semua penugasan evaluator untuk outsourcing ini
+        $assignments = $user->evaluators()->with(['penilai', 'penilai'])->get();
 
-        $evaluationData = [];
+        $evaluatorScores = [];
+        $weightedTotal = 0;
 
-        foreach ($evaluations as $evaluation) {
-            $kriteria = $evaluation->kriteria;
+        foreach ($assignments as $assignment) {
+            $evaluations = Evaluasi::with(['kriteria.getAspek'])
+                ->where('penugasan_peer_id', $assignment->id)
+                ->get();
 
-            // Lewati jika tidak ada relasi kriteria
-            if (!$kriteria) continue;
+            $criteriaScores = [];
+            $aspectTemp = [];
 
-            $groupKey = Str::slug($kriteria->aspek);
+            foreach ($evaluations as $evaluation) {
+                $kriteria = $evaluation->kriteria;
+                $aspek = $kriteria->getAspek;
+                $criteriaScores[$kriteria->slug] = $evaluation->skor;
 
-            if (!isset($evaluationData[$groupKey])) {
-                $evaluationData[$groupKey] = [
-                    'title' => $kriteria->aspek,
-                    'criteria' => [],
-                ];
+                $aspectTemp[Str::slug($aspek->nama, "-")][] = $evaluation->skor;
             }
 
-            $evaluationData[$groupKey]['criteria'][] = [
-                'id' => $kriteria->id,
-                'name' => $kriteria->nama,
-                'indicators' => $kriteria->indikator,
-                'score' => $evaluation->skor,
+            //Rata-Rata Per Aspek
+            $aspectScores = [];
+            foreach ($aspectTemp as $aspekName => $scores) {
+                $aspectScores[$aspekName] = round(array_sum($scores) / count($scores), 2);
+            }
+
+            // Hitung overall score evaluator
+            $overallScore = round($evaluations->avg('skor'), 2);
+
+            $weightedTotal += $overallScore * $assignment->weight;
+
+            $evaluatorScores[] = [
+                'evaluatorName'   => $assignment->penilai->name,
+                'type'            => $assignment->type_penilai,
+                'weight'          => $assignment->weight,
+                'criteriaScores'  => $criteriaScores,
+                'aspectScores'    => $aspectScores,
+                'overallScore'    => $overallScore,
+                'notes'           => $assignment->catatan,
             ];
         }
 
+        // Cek status
+        $status = collect($assignments)->every(function ($assign) {
+            return Evaluasi::where('penugasan_peer_id', $assign->id)->exists();
+        }) ? 'completed' : 'in-progress';
+
+        $evaluationData = [
+            'id'                   => $user->id,
+            'name'                 => $user->name,
+            'unit_kerja'           => $user->unit_kerja,
+            'jabatan'              => $user->jabatan,
+            'image'                => $user->image,
+            'evaluatorScores'      => $evaluatorScores,
+            'weightedOverallScore' => round($weightedTotal, 3),
+            'status'               => $status,
+        ];
+
         return Inertia::render('penilaian/admin/employee-detail-page', [
-            'evaluationData' => $evaluationData,
+            'evaluationResults' => $evaluationData,
         ]);
     }
 }

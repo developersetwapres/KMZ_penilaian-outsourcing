@@ -16,10 +16,12 @@ class AspekSeeder extends Seeder
         $datas = [
             [
                 'name' => 'Aspek teknis dan hasil kerja',
+                'weight' => 0.6,
                 'deskripsi' => 'Penilaian terhadap kemampuan teknis dan profesional dalam menjalankan tugas.',
             ],
             [
                 'name' => 'Aspek Perilaku',
+                'weight' => 0.4,
                 'deskripsi' => 'Penilaian terhadap sikap, disiplin, dan perilaku kerja sehari-hari.',
             ],
         ];
@@ -27,6 +29,7 @@ class AspekSeeder extends Seeder
         foreach ($datas as $key => $value) {
             Aspek::create([
                 'nama' => $value['name'],
+                'weight' => $value['weight'],
                 'deskripsi' => $value['deskripsi'],
             ]);
         }
