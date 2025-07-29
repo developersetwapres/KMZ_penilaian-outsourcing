@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEvaluasiRequest;
+use App\Models\Aspek;
 use App\Models\Evaluasi;
 use App\Models\Kriteria;
 use App\Models\PenugasanPeer;
@@ -30,8 +31,9 @@ class EvaluasiController extends Controller
         return Inertia::render('penilaian/evaluator/page', $data);
     }
 
-    public function create(PenugasanPeer $penugasan, Request $request): Response | RedirectResponse
+    public function create(Request $request): Response | RedirectResponse
     {
+        $penugasan = PenugasanPeer::findOrFail($request->idOut);
         $penugasan->load(['penilai', 'outsourcing']);
 
         $employee = User::select(['id', 'name', 'jabatan', 'image', 'unit_kerja'])->findOrFail($penugasan->outsourcing->id);
@@ -84,27 +86,19 @@ class EvaluasiController extends Controller
 
     public function store(StoreEvaluasiRequest $request)
     {
-        $validated = $request->validate([
-            'penugasan_peer_id' => ['required', 'exists:penugasan_peers,id'],
-            'catatan'           => ['nullable', 'string'],
-            'nilai'             => ['required', 'array'],
-            'nilai.*.kriteria_id' => ['required', 'exists:kriterias,id'],
-            'nilai.*.skor'        => ['required', 'integer', 'between:0,100'],
-        ]);
-
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($request) {
             // 1. Update catatan umum di penugasan_peer
-            PenugasanPeer::where('id', $validated['penugasan_peer_id'])
+            PenugasanPeer::where('id', $request['penugasan_peer_id'])
                 ->update([
-                    'catatan' => $validated['catatan'] ?? '',
+                    'catatan' => $request['catatan'] ?? '',
                     'status' => 'completed',
                 ]);
 
             // 2. Simpan atau update skor per kriteria
-            foreach ($validated['nilai'] as $item) {
+            foreach ($request['nilai'] as $item) {
                 Evaluasi::updateOrCreate(
                     [
-                        'penugasan_peer_id' => $validated['penugasan_peer_id'],
+                        'penugasan_peer_id' => $request['penugasan_peer_id'],
                         'kriteria_id'       => $item['kriteria_id'],
                     ],
                     [
@@ -113,6 +107,8 @@ class EvaluasiController extends Controller
                 );
             }
         });
+
+        return to_route('evaluator.card');
     }
 
     public function show(): Response
@@ -185,11 +181,11 @@ class EvaluasiController extends Controller
     //admin---------
     public function scoredetail(User $user): Response
     {
-        // Ambil semua penugasan evaluator untuk outsourcing ini
-        $assignments = $user->evaluators()->with(['penilai', 'penilai'])->get();
+        $assignments = $user->evaluators()->with(['penilai'])->get();
+        $aspekList = Aspek::all()->keyBy(fn($a) => Str::slug($a->nama, "-"));
 
         $evaluatorScores = [];
-        $weightedTotal = 0;
+        $weightedAspectTotals = []; // aspekSlug => total skor berbobot
 
         foreach ($assignments as $assignment) {
             $evaluations = Evaluasi::with(['kriteria.getAspek'])
@@ -202,21 +198,30 @@ class EvaluasiController extends Controller
             foreach ($evaluations as $evaluation) {
                 $kriteria = $evaluation->kriteria;
                 $aspek = $kriteria->getAspek;
+                $aspekSlug = Str::slug($aspek->nama, "-");
+
                 $criteriaScores[$kriteria->slug] = $evaluation->skor;
-
-                $aspectTemp[Str::slug($aspek->nama, "-")][] = $evaluation->skor;
+                $aspectTemp[$aspekSlug][] = $evaluation->skor;
             }
 
-            //Rata-Rata Per Aspek
+            // Hitung rata-rata per aspek oleh evaluator ini
             $aspectScores = [];
-            foreach ($aspectTemp as $aspekName => $scores) {
-                $aspectScores[$aspekName] = round(array_sum($scores) / count($scores), 2);
+            foreach ($aspekList as $slug => $aspek) {
+                if (isset($aspectTemp[$slug])) {
+                    $avg = round(array_sum($aspectTemp[$slug]) / count($aspectTemp[$slug]), 2);
+                } else {
+                    $avg = 0;
+                }
+
+                $aspectScores[$slug] = $avg;
+
+                // Tambahkan ke total aspek berbobot
+                $weightedAspectTotals[$slug] = ($weightedAspectTotals[$slug] ?? 0) + ($avg * $assignment->weight);
             }
 
-            // Hitung overall score evaluator
-            $overallScore = round($evaluations->avg('skor'), 2);
-
-            $weightedTotal += $overallScore * $assignment->weight;
+            // Hitung total skor evaluator ini (semua aspek / rata-rata per aspek * bobot)
+            $overallScore = round(array_sum($aspectScores) / max(count($aspectScores), 1), 2);
+            $weightedScore = round($overallScore * $assignment->weight, 3);
 
             $evaluatorScores[] = [
                 'evaluatorName'   => $assignment->penilai->name,
@@ -225,25 +230,45 @@ class EvaluasiController extends Controller
                 'criteriaScores'  => $criteriaScores,
                 'aspectScores'    => $aspectScores,
                 'overallScore'    => $overallScore,
+                'weightedScore'   => $weightedScore,
                 'notes'           => $assignment->catatan,
             ];
         }
 
-        // Cek status
-        $status = collect($assignments)->every(function ($assign) {
-            return Evaluasi::where('penugasan_peer_id', $assign->id)->exists();
-        }) ? 'completed' : 'in-progress';
+        // Final nilai aspek (total skor berbobot per aspek evaluator)
+        $finalAspectWithWeight = [];
+        $overallFinalScore = 0;
+
+        foreach ($aspekList as $slug => $aspek) {
+            $average = round($weightedAspectTotals[$slug] ?? 0, 2);
+            $score = round($average * $aspek->weight, 2); // Kalkulasi dengan bobot aspek
+
+            $finalAspectWithWeight[$slug] = [
+                'average' => $average,
+                'score'   => $score,
+                'weight'   => $aspek->weight,
+            ];
+
+            $overallFinalScore += $score;
+        }
+
+        $status = collect($assignments)->every(
+            fn($assign) =>
+            Evaluasi::where('penugasan_peer_id', $assign->id)->exists()
+        ) ? 'completed' : 'in-progress';
 
         $evaluationData = [
-            'id'                   => $user->id,
-            'name'                 => $user->name,
-            'unit_kerja'           => $user->unit_kerja,
-            'jabatan'              => $user->jabatan,
-            'image'                => $user->image,
-            'evaluatorScores'      => $evaluatorScores,
-            'weightedOverallScore' => round($weightedTotal, 3),
-            'status'               => $status,
+            'id'                    => $user->id,
+            'name'                  => $user->name,
+            'unit_kerja'            => $user->unit_kerja,
+            'jabatan'               => $user->jabatan,
+            'image'                 => $user->image,
+            'evaluatorScores'       => $evaluatorScores,
+            'weightedOverallScore'  => $overallFinalScore,
+            'weightedAspek'         => $finalAspectWithWeight,
+            'status'                => $status,
         ];
+
 
         return Inertia::render('penilaian/admin/employee-detail-page', [
             'evaluationResults' => $evaluationData,

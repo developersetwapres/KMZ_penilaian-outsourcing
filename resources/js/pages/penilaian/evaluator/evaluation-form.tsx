@@ -166,7 +166,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                     <CardContent>
                         <div className="grid gap-6 md:grid-cols-3">
                             <div className="text-center">
-                                <div className="mb-2 text-4xl font-bold">{overallScore.toFixed(1)}</div>
+                                <div className="mb-2 text-4xl font-bold">{overallScore.toFixed(2)}</div>
                                 <div className="text-blue-100">Nilai Keseluruhan</div>
                                 <div className="mt-1 text-sm text-blue-200">{getScoreLabel(overallScore)}</div>
                             </div>
@@ -205,7 +205,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                         </div>
                                     </div>
                                     <div className={`rounded-xl px-6 py-3 ${getScoreColor(aspectScore)}`}>
-                                        <div className="text-3xl font-bold">{aspectScore.toFixed(1)}</div>
+                                        <div className="text-3xl font-bold">{aspectScore.toFixed(2)}</div>
                                         <div className="text-sm font-medium">{getScoreLabel(aspectScore)}</div>
                                     </div>
                                 </div>
@@ -263,7 +263,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                 {/* Overall Notes */}
                 {overallNotes && (
                     <Card className="gap-0 border-l-4 border-l-yellow-500 py-4">
-                        <CardHeader className="bg-yellow-50 py-2">
+                        <CardHeader className="bg-yellow-50 py-1">
                             <CardTitle className="flex items-center space-x-2 text-xl text-yellow-800">
                                 <FileText className="h-6 w-6" />
                                 <span>Catatan Keseluruhan</span>
@@ -593,7 +593,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
 
                             {/* Overall Notes - Show only on last step */}
                             {currentStep === aspects.length - 1 && (
-                                <Card className="border-yellow-200 bg-yellow-50">
+                                <Card className="gap-1 border-yellow-200 bg-yellow-50">
                                     <CardHeader>
                                         <CardTitle className="text-lg text-yellow-800">Catatan Keseluruhan</CardTitle>
                                     </CardHeader>

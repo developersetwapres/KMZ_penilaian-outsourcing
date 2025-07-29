@@ -28,56 +28,7 @@ class PagesController extends Controller
     public function dashboard(): Response
     {
         $user = new User();
-
-        // Ambil semua penugasan peer dan group berdasarkan outsourcing yang dinilai
-        $assignments = PenugasanPeer::with(['outsourcing', 'penilai'])
-            ->get()
-            ->groupBy('outsourcing_id');
-
-        $results = [];
-
-        foreach ($assignments as $outsourcingId => $group) {
-            $outsourcingUser = $group->first()->outsourcing;
-
-            // Build evaluatorScores
-            $evaluatorScores = [];
-            $weightedSum = 0;
-
-            foreach ($group as $assignment) {
-                $type       = $assignment->type_penilai;
-                $weightStr  = $assignment->weight;              // e.g. '50%'
-                $weight     = floatval(str_replace('%', '', $weightStr)) / 100;
-
-                // Ambil evaluasi berdasarkan penugasan_peer_id
-                $averageScore = Evaluasi::where('penugasan_peer_id', $assignment->id)->avg('skor');
-
-                $weightedSum += $averageScore * $weight;
-
-                $evaluatorScores[] = [
-                    'type'         => $type,
-                    'evaluatorName' => $assignment->penilai->name,
-                    'overallScore' => round($averageScore, 1),
-                    'weight'       => $weightStr,
-                ];
-            }
-
-            // Tentukan status
-            $status = $group->every(function ($assignment) {
-                return Evaluasi::where('penugasan_peer_id', $assignment->id)->exists();
-            }) ? 'completed' : 'in-progress';
-
-
-            $results[] = [
-                'id'                   => $outsourcingUser->id,
-                'name'                 => $outsourcingUser->name,
-                'unit_kerja'           => $outsourcingUser->unit_kerja,
-                'jabatan'              => $outsourcingUser->jabatan,
-                'image'                => $outsourcingUser->image,
-                'evaluatorScores'      => $evaluatorScores,
-                'weightedOverallScore' => round($weightedSum, 1),
-                'status'               => $status,
-            ];
-        }
+        $penugasanPeer = new PenugasanPeer();
 
         $data = [
             'outsourcing' => $user->outsourcings(),
@@ -94,7 +45,7 @@ class PagesController extends Controller
                     ->get()
             ],
 
-            'evaluationResults' => $results,
+            'evaluationResults' => $penugasanPeer->EvaluationResults(),
         ];
 
         return Inertia::render('penilaian/admin/page', $data);
@@ -105,6 +56,7 @@ class PagesController extends Controller
         $finalImagePath = $this->moveImageFromTemp($request->image);
         User::create([
             'name' => $request->name,
+            'slug' => Str::slug($request->name . '-' . Str::random(5)),
             'email' => $request->email,
             'jabatan' => $request->jabatan,
             'lokasi_kerja' => $request->lokasi_kerja,

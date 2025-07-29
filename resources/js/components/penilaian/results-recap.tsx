@@ -14,7 +14,7 @@ export default function ResultsRecap({ evaluationResults }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterUnit, setFilterUnit] = useState('all');
 
-    const filteredResults = evaluationResults.filter((result) => {
+    const filteredResults = evaluationResults.filter((result: any) => {
         const matchesSearch =
             result.name.toLowerCase().includes(searchTerm.toLowerCase()) || result.unit_kerja.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesUnit = filterUnit === 'all' || result.unit_kerja === filterUnit;
@@ -37,21 +37,38 @@ export default function ResultsRecap({ evaluationResults }: any) {
 
     const units = [...new Set(evaluationResults.map((r) => r.unit_kerja))];
 
-    const handleViewDetail = (employee: any) => {
-        router.post(route('evaluasi.scoredetail'), employee, {
-            onError: (error) => {
-                console.error('Error fetching employee details:', error);
+    const handleViewDetail = (slug: string) => {
+        router.get(
+            route('evaluasi.scoredetail', slug),
+            {},
+            {
+                onError: (error) => {
+                    console.error('Error fetching employee details:', error);
+                },
             },
-        });
+        );
     };
 
     return (
         <div className="space-y-6">
-            <Card>
+            {/* Header Card */}
+            <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
                 <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-2xl">
+                        <BarChart3 className="h-6 w-6" />
+                        <span>Ringkasan Evaluasi</span>
+                    </CardTitle>
+                    <CardDescription className="text-purple-100">
+                        Lihat hasil akhir evaluasi dari berbagai penilai, termasuk skor total dan grafik performa.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+
+            <Card>
+                {/* <CardHeader>
                     <CardTitle>Rekap Hasil Penilaian</CardTitle>
                     <CardDescription>Lihat dan analisis hasil penilaian kinerja pegawai outsourcing dengan sistem bobot</CardDescription>
-                </CardHeader>
+                </CardHeader> */}
                 <CardContent>
                     {/* Filters */}
                     <div className="mb-6 flex flex-col gap-4 sm:flex-row">
@@ -132,18 +149,27 @@ export default function ResultsRecap({ evaluationResults }: any) {
                                                               ? 'Penerima Layanan'
                                                               : 'Teman Setingkat'}
                                                     </span>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className={`font-medium ${getScoreColor(evaluator.overallScore)}`}>
-                                                            {evaluator.overallScore.toFixed(1)}
+                                                    <div className="flex items-center space-x-2 font-mono">
+                                                        <span className={`font-medium ${getScoreColor(evaluator.averageScore)}`}>
+                                                            {evaluator.averageScore.toFixed(1)}
                                                         </span>
-                                                        <span className="text-gray-400">{evaluator.weight} %</span>
+                                                        <span>
+                                                            {' × '} {evaluator.weight * 100 + '%'}
+                                                        </span>
+                                                        <span>
+                                                            {' = '} {evaluator.weightedScore}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <Button onClick={() => handleViewDetail(result)} className="flex w-full items-center space-x-2" variant="outline">
+                                    <Button
+                                        onClick={() => handleViewDetail(result.slug)}
+                                        className="flex w-full items-center space-x-2"
+                                        variant="outline"
+                                    >
                                         <Eye className="h-4 w-4" />
                                         <span>Lihat Detail</span>
                                     </Button>

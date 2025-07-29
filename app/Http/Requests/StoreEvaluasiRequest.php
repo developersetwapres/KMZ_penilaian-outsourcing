@@ -22,7 +22,11 @@ class StoreEvaluasiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'penugasan_peer_id' => ['required', 'exists:penugasan_peers,id'],
+            'catatan'           => ['nullable', 'string'],
+            'nilai'             => ['required', 'array'],
+            'nilai.*.kriteria_id' => ['required', 'exists:kriterias,id'],
+            'nilai.*.skor'        => ['required', 'integer', 'between:0,100'],
         ];
     }
 }

@@ -78,10 +78,9 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
             {/* Header Card */}
             <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                 <CardHeader>
-                    <CardTitle className="text-2xl">Penugasan Evaluator Teman Setingkat</CardTitle>
+                    <CardTitle className="text-2xl">Penugasan Evaluator </CardTitle>
                     <CardDescription className="text-indigo-100">
-                        Kelola penugasan evaluator peer-to-peer untuk pegawai outsourcing. Kepala Biro dan Kepala Bagian ditugaskan secara otomatis
-                        berdasarkan unit kerja.
+                        Tetapkan rekan kerja sebagai evaluator peer untuk setiap karyawan yang dievaluasi.
                     </CardDescription>
                 </CardHeader>
             </Card>
@@ -90,10 +89,16 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
             <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
-                        <div>
-                            <CardTitle className="text-lg">Manajemen Penugasan Teman Setingkat</CardTitle>
-                            <CardDescription>Atur siapa yang menilai siapa di antara pegawai outsourcing dalam unit yang sama</CardDescription>
+                        <div className="relative w-full sm:w-80">
+                            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                            <Input
+                                placeholder="Cari pegawai, unit, atau perusahaan..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10"
+                            />
                         </div>
+
                         <div className="flex items-center space-x-4">
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-green-600">
@@ -110,18 +115,8 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent>
-                    {/* Search */}
-                    <div className="relative mb-6 w-full sm:w-80">
-                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                        <Input
-                            placeholder="Cari pegawai, unit, atau perusahaan..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10"
-                        />
-                    </div>
 
+                <CardContent>
                     {/* Employee Cards */}
                     <div className="space-y-4">
                         <div className="grid gap-3 lg:grid-cols-2">
@@ -178,14 +173,17 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                                                         <div className="mb-3 flex items-center justify-between">
                                                             <h4 className="font-medium text-gray-900">Status Penugasan Evaluator</h4>
                                                             <Button
-                                                                size="sm"
                                                                 onClick={() => {
-                                                                    setSelectedEvaluators({ atasan: {}, penerima_layanan: {}, teman: {} });
                                                                     setSelectedEmployee({
                                                                         id: employee.id,
                                                                         name: employee.name,
                                                                         unit_kerja: employee.unit_kerja,
                                                                         jabatan: employee.jabatan,
+                                                                    });
+                                                                    setSelectedEvaluators({
+                                                                        atasan: employee.evaluators.atasan || {},
+                                                                        penerima_layanan: employee.evaluators.penerima_layanan || {},
+                                                                        teman: employee.evaluators.teman || {},
                                                                     });
                                                                     setIsDialogOpen(true);
                                                                 }}

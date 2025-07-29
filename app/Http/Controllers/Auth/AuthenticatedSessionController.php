@@ -27,7 +27,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $request->authenticate();
         $request->session()->regenerate();
@@ -39,8 +39,6 @@ class AuthenticatedSessionController extends Controller
         } elseif ($user->role == 'admin') {
             return to_route('dashboard');
         }
-
-        return redirect('/');
     }
 
     /**

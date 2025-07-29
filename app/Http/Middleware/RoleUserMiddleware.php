@@ -13,7 +13,7 @@ class RoleUserMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$role): Response
+    public function handle(Request $request, Closure $next, ...$role)
     {
         $user = $request->user();
 
@@ -29,10 +29,6 @@ class RoleUserMiddleware
             case 'penerima_layanan':
             case 'atasan':
                 return to_route('evaluator.card');
-
-            default:
-                return redirect('/');
-                break;
         }
     }
 }

@@ -171,6 +171,7 @@ class UserSeeder extends Seeder
 
             User::create([
                 'name' => $user['name'],
+                'slug' => Str::slug($user['name'] . '-' . Str::random(5)),
                 'email' => "{$firstTwoNames}@setwapres.go.id",
                 'jabatan' => $user['jabatan'],
 

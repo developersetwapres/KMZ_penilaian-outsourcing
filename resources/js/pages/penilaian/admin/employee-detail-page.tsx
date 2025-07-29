@@ -4,207 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Award, BarChart3, Calculator, FileText, MessageCircle, Users } from 'lucide-react';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { useToast } from '@/hooks/use-toast';
+import { Head, Link, router } from '@inertiajs/react';
+import { ArrowLeft, Award, BarChart3, Calculator, FileText, LogOut, MessageCircle, Settings, Users } from 'lucide-react';
 import { useState } from 'react';
 
 // Updated dummy data with 3 evaluators for all employees
-const evaluationResult = [
-    {
-        id: '1',
-        name: 'Ahmad Rizki',
-        unit_kerja: 'IT Support',
-        jabatan: 'Technical Support',
-        image: '/placeholder.svg?height=60&width=60&text=AR',
-        evaluatorScores: [
-            {
-                evaluatorName: 'Dr. Andi Wijaya',
-                type: 'atasan',
-                weight: 0.5,
-                criteriaScores: {
-                    'teknis-1': 85,
-                    'teknis-2': 80,
-                    'perilaku-1': 75,
-                    'perilaku-2': 82,
-                },
-                aspectScores: {
-                    'aspek-teknis': 82.5,
-                    'aspek-perilaku': 78.5,
-                },
-                overallScore: 80.5,
-                notes: 'Kinerja yang konsisten dengan kemampuan teknis yang baik. Perlu peningkatan dalam aspek komunikasi tim.',
-                evaluationDate: '2024-01-15',
-            },
-            {
-                evaluatorName: 'Mirawati',
-                type: 'penerima_layanan',
-                weight: 0.3,
-                criteriaScores: {
-                    'teknis-1': 88,
-                    'teknis-2': 85,
-                    'perilaku-1': 80,
-                    'perilaku-2': 83,
-                },
-                aspectScores: {
-                    'aspek-teknis': 86.5,
-                    'aspek-perilaku': 81.5,
-                },
-                overallScore: 84.0,
-                notes: 'Layanan teknis yang memuaskan, responsif terhadap kebutuhan klien. Komunikasi bisa lebih proaktif.',
-                evaluationDate: '2024-01-12',
-            },
-            {
-                evaluatorName: 'Budi Santoso',
-                type: 'outsourcing',
-                weight: 0.2,
-                criteriaScores: {
-                    'teknis-1': 78,
-                    'teknis-2': 82,
-                    'perilaku-1': 85,
-                    'perilaku-2': 88,
-                },
-                aspectScores: {
-                    'aspek-teknis': 80.0,
-                    'aspek-perilaku': 86.5,
-                },
-                overallScore: 83.25,
-                notes: 'Rekan kerja yang sangat kooperatif dan mudah diajak bekerja sama. Selalu siap membantu tim.',
-                evaluationDate: '2024-01-10',
-            },
-        ],
-        weightedOverallScore: 81.575,
-        status: 'completed',
-    },
-    {
-        id: '2',
-        name: 'Siti Nurhaliza',
-        unit_kerja: 'Human Resources',
-        jabatan: 'HR Assistant',
-        image: '/placeholder.svg?height=60&width=60&text=SN',
-        evaluatorScores: [
-            {
-                evaluatorName: 'Dr. Andi Wijaya',
-                type: 'atasan',
-                weight: 0.5,
-                criteriaScores: {
-                    'teknis-1': 88,
-                    'teknis-2': 85,
-                    'perilaku-1': 90,
-                    'perilaku-2': 92,
-                },
-                aspectScores: {
-                    'aspek-teknis': 86.5,
-                    'aspek-perilaku': 91.0,
-                },
-                overallScore: 88.75,
-                notes: 'Kinerja yang sangat memuaskan dengan kemampuan interpersonal yang excellent. Role model untuk tim.',
-                evaluationDate: '2024-01-12',
-            },
-            {
-                evaluatorName: 'Divisi Operasional',
-                type: 'penerima_layanan',
-                weight: 0.3,
-                criteriaScores: {
-                    'teknis-1': 82,
-                    'teknis-2': 85,
-                    'perilaku-1': 88,
-                    'perilaku-2': 90,
-                },
-                aspectScores: {
-                    'aspek-teknis': 83.5,
-                    'aspek-perilaku': 89.0,
-                },
-                overallScore: 86.25,
-                notes: 'Pelayanan HR yang sangat baik, selalu responsif dan membantu menyelesaikan masalah karyawan.',
-                evaluationDate: '2024-01-11',
-            },
-            {
-                evaluatorName: 'Linda Sari',
-                type: 'outsourcing',
-                weight: 0.2,
-                criteriaScores: {
-                    'teknis-1': 85,
-                    'teknis-2': 88,
-                    'perilaku-1': 87,
-                    'perilaku-2': 89,
-                },
-                aspectScores: {
-                    'aspek-teknis': 86.5,
-                    'aspek-perilaku': 88.0,
-                },
-                overallScore: 87.25,
-                notes: 'Sangat profesional dan detail dalam bekerja. Komunikasi yang efektif dengan semua level.',
-                evaluationDate: '2024-01-10',
-            },
-        ],
-        weightedOverallScore: 87.625, // (88.75*0.5) + (86.25*0.3) + (87.25*0.2)
-        status: 'completed',
-    },
-    {
-        id: '3',
-        name: 'Budi Santoso',
-        unit_kerja: 'Finance',
-        jabatan: 'Accounting Staff',
-        image: '/placeholder.svg?height=60&width=60&text=BS',
-        evaluatorScores: [
-            {
-                evaluatorName: 'Dra. Sari Dewi',
-                type: 'atasan',
-                weight: 0.5,
-                criteriaScores: {
-                    'teknis-1': 70,
-                    'teknis-2': 68,
-                    'perilaku-1': 72,
-                    'perilaku-2': 75,
-                },
-                aspectScores: {
-                    'aspek-teknis': 69.0,
-                    'aspek-perilaku': 73.5,
-                },
-                overallScore: 71.25,
-                notes: 'Perlu peningkatan dalam penguasaan teknologi dan inisiatif. Namun menunjukkan komitmen yang baik.',
-                evaluationDate: '2024-01-08',
-            },
-            {
-                evaluatorName: 'Divisi Keuangan Internal',
-                type: 'penerima_layanan',
-                weight: 0.3,
-                criteriaScores: {
-                    'teknis-1': 65,
-                    'teknis-2': 70,
-                    'perilaku-1': 75,
-                    'perilaku-2': 78,
-                },
-                aspectScores: {
-                    'aspek-teknis': 67.5,
-                    'aspek-perilaku': 76.5,
-                },
-                overallScore: 72.0,
-                notes: 'Pelayanan akuntansi cukup baik, namun perlu peningkatan kecepatan dalam penyelesaian laporan.',
-                evaluationDate: '2024-01-07',
-            },
-            {
-                evaluatorName: 'Ahmad Rizki',
-                type: 'outsourcing',
-                weight: 0.2,
-                criteriaScores: {
-                    'teknis-1': 68,
-                    'teknis-2': 72,
-                    'perilaku-1': 80,
-                    'perilaku-2': 82,
-                },
-                aspectScores: {
-                    'aspek-teknis': 70.0,
-                    'aspek-perilaku': 81.0,
-                },
-                overallScore: 75.5,
-                notes: 'Rekan kerja yang baik dan mudah diajak kerjasama. Selalu membantu ketika diminta.',
-            },
-        ],
-        weightedOverallScore: 72.225, // (71.25*0.5) + (72.0*0.3) + (75.5*0.2)
-        status: 'completed',
-    },
-];
 
 export default function EmployeeDetailPage({ evaluationResults }: any) {
     const [activeTab, setActiveTab] = useState('rekap');
@@ -236,6 +42,28 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
         return 'text-red-600';
     };
 
+    const cleanup = useMobileNavigation();
+
+    const { toast } = useToast();
+
+    const handleLogout = () => {
+        cleanup();
+        router.flushAll();
+
+        router.post(
+            route('logout'),
+            {},
+            {
+                onSuccess: () => {
+                    toast({
+                        title: 'Logout Berhasil',
+                        description: 'Anda telah keluar dari sistem',
+                    });
+                },
+            },
+        );
+    };
+
     const getScoreLabel = (score: number) => {
         if (score >= 91) return 'Sangat Baik';
         if (score >= 76) return 'Baik';
@@ -254,37 +82,41 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
         <>
             <Head title="Sistem Penilaian Kinerja Outsourcing" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-                <header className="sticky top-0 z-10 border-b bg-white shadow-sm">
+                {/* Header */}
+                <header className="border-b bg-white shadow-sm">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between py-4">
-                            <div className="flex items-center space-x-4">
-                                <Link href={route('dashboard')}>
-                                    <Button variant="ghost" className="flex items-center space-x-2">
-                                        <ArrowLeft className="h-4 w-4" />
-                                        <span>Kembali ke Hasil</span>
-                                    </Button>
-                                </Link>
-                                <div className="h-6 w-px bg-gray-300"></div>
-                                <div className="flex items-center space-x-3">
-                                    <img
-                                        src={employee.image || '/placeholder.svg'}
-                                        alt={employee.name}
-                                        className="h-10 w-10 rounded-full border-2 border-blue-200"
-                                    />
-                                    <div>
-                                        <h1 className="text-xl font-bold text-gray-900">{employee.name}</h1>
-                                        <p className="text-sm text-gray-600">
-                                            {employee.jabatan} • {employee.unit_kerja}
-                                        </p>
-                                    </div>
+                            <div className="flex items-center space-x-3">
+                                <div className="rounded-lg bg-blue-600 p-2">
+                                    <Settings className="h-6 w-6 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-bold text-gray-900">Dashboard Administrator</h1>
+                                    <p className="text-sm text-gray-500">Sistem Penilaian Kinerja Outsourcing</p>
                                 </div>
                             </div>
+
+                            <Button
+                                variant="outline"
+                                onClick={handleLogout}
+                                className="flex items-center space-x-2 bg-transparent hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                            >
+                                <LogOut className="h-4 w-4" />
+                                <span>Logout</span>
+                            </Button>
                         </div>
                     </div>
                 </header>
 
-                <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                <main className="mx-auto max-w-7xl px-4 pt-6 pb-8 sm:px-6 lg:px-8">
                     <div className="space-y-8">
+                        <Link href={route('dashboard')}>
+                            <Button variant="ghost" className="mb-4 flex items-center space-x-2 border">
+                                <ArrowLeft className="h-4 w-4" />
+                                <span>Kembali</span>
+                            </Button>
+                        </Link>
+
                         {/* Navigation Tabs */}
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                             <TabsList className="mb-5 grid w-full grid-cols-4 rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
@@ -328,7 +160,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-6">
                                                 <img
-                                                    src={employee.image || '/placeholder.svg'}
+                                                    src={`/storage/${employee.image}` || '/placeholder.svg'}
                                                     alt={employee.name}
                                                     className="h-24 w-24 rounded-full border-4 border-white shadow-lg"
                                                 />
@@ -355,7 +187,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                 <Badge className={`${getScoreBadgeColor(employee.weightedOverallScore)} border-2 px-4 py-2 text-lg`}>
                                                     {getScoreLabel(employee.weightedOverallScore)}
                                                 </Badge>
-                                                <p className="mt-2 text-indigo-100">Nilai Akhir Berbobot</p>
+                                                <p className="mt-2 text-indigo-100">Nilai Akhir Penilaian</p>
                                             </div>
                                         </div>
                                     </CardHeader>
@@ -378,16 +210,17 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                     <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
                                                         <Calculator className="h-8 w-8" />
                                                     </div>
-                                                    <h3 className="mb-2 text-xl font-bold">Aspek Teknis</h3>
+                                                    <h3 className="mb-2 text-xl font-bold">Aspek Teknis dan Kualitas Kerja</h3>
                                                     <div className="mb-4 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium backdrop-blur-sm">
-                                                        Penguasaan & Kualitas Kerja
+                                                        Nilai Akhir
                                                     </div>
                                                     <div className="mb-4 rounded-4xl bg-white/10 p-4 backdrop-blur-sm">
-                                                        <div className="mb-1 text-sm opacity-90">Nilai Akhir</div>
+                                                        <div className="mb-1 font-mono text-sm opacity-90">
+                                                            {employee?.weightedAspek?.['aspek-teknis-dan-hasil-kerja']?.average} ×{' '}
+                                                            {(employee?.weightedAspek?.['aspek-teknis-dan-hasil-kerja']?.weight * 100).toFixed(0)}% =
+                                                        </div>
                                                         <div className="text-4xl font-bold">
-                                                            {employee.evaluatorScores
-                                                                .reduce((sum, e) => sum + e.aspectScores['aspek-teknis'] * e.weight, 0)
-                                                                .toFixed(2)}
+                                                            {employee?.weightedAspek?.['aspek-teknis-dan-hasil-kerja']?.score.toFixed(2)}
                                                         </div>
                                                         <div className="mt-1 text-xs opacity-75">Dari semua evaluator</div>
                                                     </div>
@@ -402,14 +235,15 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                     </div>
                                                     <h3 className="mb-2 text-xl font-bold">Aspek Perilaku</h3>
                                                     <div className="mb-4 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium backdrop-blur-sm">
-                                                        Disiplin & Kerjasama
+                                                        Nilai Akhir
                                                     </div>
                                                     <div className="mb-4 rounded-4xl bg-white/10 p-4 backdrop-blur-sm">
-                                                        <div className="mb-1 text-sm opacity-90">Nilai Akhir</div>
+                                                        <div className="mb-1 font-mono text-sm opacity-90">
+                                                            {employee?.weightedAspek?.['aspek-perilaku']?.average} ×{' '}
+                                                            {(employee?.weightedAspek?.['aspek-perilaku']?.weight * 100).toFixed(0)}% =
+                                                        </div>{' '}
                                                         <div className="text-4xl font-bold">
-                                                            {employee.evaluatorScores
-                                                                .reduce((sum, e) => sum + e.aspectScores['aspek-perilaku'] * e.weight, 0)
-                                                                .toFixed(2)}
+                                                            {employee?.weightedAspek?.['aspek-perilaku']?.score.toFixed(2)}
                                                         </div>
                                                         <div className="mt-1 text-xs opacity-75">Dari semua evaluator</div>
                                                     </div>
@@ -437,7 +271,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                         ? 'Atasan'
                                                         : evaluator.type === 'penerima_layanan'
                                                           ? 'Penerima Layanan'
-                                                          : 'Outsourcing';
+                                                          : 'Rekan Kerja';
 
                                                 const weightedScore = evaluator.overallScore * evaluator.weight;
 
@@ -455,7 +289,6 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                                 {evaluatorType}
                                                             </div>
                                                             <div className="mb-4 rounded-4xl bg-white p-4 backdrop-blur-sm">
-                                                                <div className="mb-1 text-sm text-blue-600 opacity-90">Nilai Berbobot</div>
                                                                 <div className="text-4xl font-bold text-blue-800">{weightedScore.toFixed(2)}</div>
                                                                 <div className="mt-1 text-xs text-blue-500">
                                                                     {evaluator.overallScore.toFixed(1)} × {(evaluator.weight * 100).toFixed(0)}%
@@ -486,17 +319,17 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                             <div className="rounded-lg border border-blue-300 bg-blue-100 p-4 text-center">
                                                 <div className="text-2xl font-bold text-blue-800">50%</div>
                                                 <div className="font-medium text-blue-700">Atasan</div>
-                                                <div className="text-sm text-blue-600">Bobot Tertinggi</div>
+                                                {/* <div className="text-sm text-blue-600">Bobot Tertinggi</div> */}
                                             </div>
                                             <div className="rounded-lg border border-blue-300 bg-blue-100 p-4 text-center">
                                                 <div className="text-2xl font-bold text-blue-800">30%</div>
                                                 <div className="font-medium text-blue-700">Penerima Layanan</div>
-                                                <div className="text-sm text-blue-600">Bobot Menengah</div>
+                                                {/* <div className="text-sm text-blue-600">Bobot Menengah</div> */}
                                             </div>
                                             <div className="rounded-lg border border-blue-300 bg-blue-100 p-4 text-center">
                                                 <div className="text-2xl font-bold text-blue-800">20%</div>
                                                 <div className="font-medium text-blue-700">Outsourcing</div>
-                                                <div className="text-sm text-blue-600">Bobot Terendah</div>
+                                                {/* <div className="text-sm text-blue-600">Bobot Terendah</div> */}
                                             </div>
                                         </div>
                                     </CardContent>
@@ -513,9 +346,14 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                         <CardContent>
                                             <div className="space-y-4">
                                                 {employee.evaluatorScores.map((evaluator, index) => {
-                                                    const originalScore = evaluator.aspectScores['aspek-teknis-dan-hasil-kerja'];
+                                                    let originalScore = evaluator.aspectScores['aspek-teknis-dan-hasil-kerja'];
 
-                                                    const weightedScore = originalScore * evaluator.weight;
+                                                    if (!originalScore) {
+                                                        originalScore = 0;
+                                                    }
+
+                                                    const weightedScore = (originalScore || 0) * evaluator.weight;
+
                                                     const evaluatorType =
                                                         evaluator.type === 'atasan'
                                                             ? 'Atasan'
@@ -566,20 +404,19 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                 <div className="rounded-lg border border-blue-400 bg-gradient-to-r from-blue-100 to-blue-200 p-6">
                                                     <div className="text-center">
                                                         <h4 className="mb-2 text-xl font-bold text-blue-800">Total Aspek Teknis</h4>
-                                                        <div className="mb-2 text-5xl font-bold text-blue-900">
+                                                        <div className="mt-2 mb-3 text-xs text-blue-600">
                                                             {employee.evaluatorScores
-                                                                .reduce((sum, e) => sum + e.aspectScores['aspek-teknis'] * e.weight, 0)
-                                                                .toFixed(2)}
+                                                                .map((e, i) => {
+                                                                    const score = e?.aspectScores?.['aspek-teknis-dan-hasil-kerja'] ?? 0;
+                                                                    const weight = e?.weight ?? 0;
+
+                                                                    return `${(score * weight).toFixed(2)}`;
+                                                                })
+                                                                .join(' + ')}
+                                                            {' ='}
                                                         </div>
-                                                        <p className="text-blue-700">Hasil Penjumlahan Berbobot</p>
-                                                        <div className="mt-2 text-xs text-blue-600">
-                                                            {employee.evaluatorScores
-                                                                .map((e, i) => `${(e.aspectScores['aspek-teknis'] * e.weight).toFixed(2)}`)
-                                                                .join(' + ')}{' '}
-                                                            ={' '}
-                                                            {employee.evaluatorScores
-                                                                .reduce((sum, e) => sum + e.aspectScores['aspek-teknis'] * e.weight, 0)
-                                                                .toFixed(2)}
+                                                        <div className="text-5xl font-bold text-blue-900">
+                                                            {employee.weightedAspek['aspek-teknis-dan-hasil-kerja'].average.toFixed(2)}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -596,10 +433,14 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                         <CardContent>
                                             <div className="space-y-4">
                                                 {employee.evaluatorScores.map((evaluator, index) => {
-                                                    const originalScore = evaluator.aspectScores['aspek-perilaku'];
-                                                    console.log(originalScore);
+                                                    let originalScore = evaluator.aspectScores['aspek-perilaku'];
 
-                                                    const weightedScore = originalScore * evaluator.weight;
+                                                    if (!originalScore) {
+                                                        originalScore = 0;
+                                                    }
+
+                                                    const weightedScore = (originalScore || 0) * evaluator.weight;
+
                                                     const evaluatorType =
                                                         evaluator.type === 'atasan'
                                                             ? 'Atasan'
@@ -650,20 +491,21 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                 <div className="rounded-lg border border-green-400 bg-gradient-to-r from-green-100 to-green-200 p-6">
                                                     <div className="text-center">
                                                         <h4 className="mb-2 text-xl font-bold text-green-800">Total Aspek Perilaku</h4>
-                                                        <div className="mb-2 text-5xl font-bold text-green-900">
+                                                        <div className="mt-2 mb-3 text-xs text-green-600">
                                                             {employee.evaluatorScores
-                                                                .reduce((sum, e) => sum + e.aspectScores['aspek-perilaku'] * e.weight, 0)
-                                                                .toFixed(2)}
+                                                                .map((e, i) => {
+                                                                    // Pastikan e dan e.aspectScores serta e.weight ada sebelum mengaksesnya.
+                                                                    // Jika salah satu tidak ada, gunakan 0 sebagai pengganti.
+                                                                    const score = e?.aspectScores?.['aspek-perilaku'] ?? 0;
+                                                                    const weight = e?.weight ?? 0;
+
+                                                                    return `${(score * weight).toFixed(2)}`;
+                                                                })
+                                                                .join(' + ')}
+                                                            {' ='}
                                                         </div>
-                                                        <p className="text-green-700">Hasil Penjumlahan Berbobot</p>
-                                                        <div className="mt-2 text-xs text-green-600">
-                                                            {employee.evaluatorScores
-                                                                .map((e, i) => `${(e.aspectScores['aspek-perilaku'] * e.weight).toFixed(2)}`)
-                                                                .join(' + ')}{' '}
-                                                            ={' '}
-                                                            {employee.evaluatorScores
-                                                                .reduce((sum, e) => sum + e.aspectScores['aspek-perilaku'] * e.weight, 0)
-                                                                .toFixed(2)}
+                                                        <div className="text-5xl font-bold text-blue-900">
+                                                            {employee.weightedAspek['aspek-perilaku'].average.toFixed(2)}
                                                         </div>
                                                     </div>
                                                 </div>

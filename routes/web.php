@@ -6,15 +6,11 @@ use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PenugasanPeerController;
 use Illuminate\Support\Facades\Route;
 
-
-Route::get('/', [PagesController::class, 'home'])->name('home');
-
-
 Route::middleware(['auth', 'verified', 'role:outsourcing,penerima_layanan,atasan'])->group(function () {
-    Route::get('/evaluator', [EvaluasiController::class, 'card'])->name('evaluator.card');
+    Route::get('/', [EvaluasiController::class, 'card'])->name('evaluator.card');
 
-    Route::post('/evaluator/{penugasan}', [EvaluasiController::class, 'create'])->name('evaluator.create');
-    Route::get('/evaluator/{penugasan}', function () {
+    Route::post('/evaluator', [EvaluasiController::class, 'create'])->name('evaluator.create');
+    Route::get('/evaluator', function () {
         return to_route('evaluator.card');
     });
 
@@ -33,7 +29,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
     Route::post('penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
 
-    Route::get('dashboard-detail/{user}', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
+    Route::get('dashboard-detail/{user:slug}', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
 
     Route::post('dashboard/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
     Route::put('dashboard/kriteria/{kriteria}', [KriteriaController::class, 'update'])->name('kriteria.update');

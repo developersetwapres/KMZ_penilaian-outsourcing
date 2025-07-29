@@ -15,7 +15,8 @@ export default function EvaluatorPage({ penugasanPeer }: any) {
     const { toast } = useToast();
 
     const setSelectedEmployee = (idPenugasanPeer: number, nameOutsourching: string) => {
-        router.post(route('evaluator.create', idPenugasanPeer), {
+        router.post(route('evaluator.create'), {
+            idOut: idPenugasanPeer,
             nameOut: nameOutsourching,
         });
     };
@@ -158,8 +159,7 @@ export default function EvaluatorPage({ penugasanPeer }: any) {
                                             />
                                         </div>
 
-                                        {/* Name with Gradient Text */}
-                                        <h3 className="mb-1 bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-xl font-bold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-indigo-600">
+                                        <h3 className="mb-1 overflow-hidden bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-xl font-bold text-ellipsis whitespace-nowrap text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-indigo-600">
                                             {employee.outsourcing.name}
                                         </h3>
 

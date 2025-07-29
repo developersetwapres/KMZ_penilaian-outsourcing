@@ -31,13 +31,14 @@ class PenugasanPeerController extends Controller
             PenugasanPeer::updateOrCreate(
                 [
                     'outsourcing_id' => $outsourcingId,
-                    'penilai_id' => $info['id'],
                     'type_penilai' => $mapTipe[$tipe] ?? $tipe,
+                ],
+                [
+                    'penilai_id' => $info['id'],
                     'weight' =>  $mapWeight[$tipe],
                     'catatan' => '',
                     'status' => 'incomplete'
-                ],
-                []
+                ]
             );
         }
     }

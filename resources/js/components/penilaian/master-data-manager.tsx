@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { router } from '@inertiajs/react';
-import { ClipboardList, Edit, FileText, Plus, Trash2, X } from 'lucide-react';
+import { ClipboardList, Edit, FileText, Plus, Settings, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 
 const jabatan = [
@@ -292,11 +292,24 @@ export default function MasterDataManager({ masterData }: any) {
 
     return (
         <div className="space-y-6">
-            <Card>
+            {/* Header Card */}
+            <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
                 <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-2xl">
+                        <Settings className="h-6 w-6" />
+                        <span>Kelola Master Data Penilaian Outsourcing</span>
+                    </CardTitle>
+                    <CardDescription className="text-purple-100">
+                        Kelola aspek dan kriteria penilaian kinerja outsourcing beserta indikatornya
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+
+            <Card>
+                {/* <CardHeader>
                     <CardTitle>Kelola Master Data Penilaian Outsourcing</CardTitle>
                     <CardDescription>Kelola aspek dan kriteria penilaian kinerja outsourcing beserta indikatornya</CardDescription>
-                </CardHeader>
+                </CardHeader> */}
                 <CardContent>
                     <div className="mb-6 flex space-x-2">
                         <Button
