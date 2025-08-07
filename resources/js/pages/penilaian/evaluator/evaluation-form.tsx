@@ -55,7 +55,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
     const [scores, setScores] = useState<Record<string, number>>({}); // Now stores criteria scores
     const [overallNotes, setOverallNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [showReview, setShowReview] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
     const { toast } = useToast();
 
     const aspects = Object.keys(evaluationData);
@@ -68,9 +68,34 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentStep]);
 
-    const handleScoreChange = (criteriaId: string, value: string) => {
+    const handleScoreChangeX = (criteriaId: string, value: string) => {
         const numValue = value === '' ? 0 : Math.min(100, Math.max(0, Number.parseInt(value) || 0));
         setScores((prev) => ({ ...prev, [criteriaId]: numValue }));
+    };
+
+    const handleScoreChange = (criteriaId: string, value: string) => {
+        // Hapus karakter non-digit
+        const cleaned = value.replace(/\D/g, '');
+
+        let finalValue = 0;
+
+        if (cleaned === '') {
+            finalValue = 0;
+        } else if (cleaned === '100') {
+            finalValue = 100;
+        } else if (cleaned.length > 2) {
+            // Ambil hanya dua digit pertama jika lebih dari 2 digit dan bukan 100
+            finalValue = parseInt(cleaned.slice(0, 2), 10);
+        } else {
+            finalValue = parseInt(cleaned, 10);
+        }
+
+        // Validasi minimal 50 (kecuali jika kosong = 0)
+        if (finalValue !== 0 && finalValue < 50) {
+            finalValue = 50;
+        }
+
+        setScores((prev) => ({ ...prev, [criteriaId]: finalValue }));
     };
 
     const canProceed = () => {
@@ -82,7 +107,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
         if (currentStep < aspects.length - 1) {
             setCurrentStep((prev) => prev + 1);
         } else {
-            setShowReview(true);
+            setShowPreview(true);
         }
     };
 
@@ -131,7 +156,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
         return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
     };
 
-    const renderReview = () => {
+    const renderPreview = () => {
         const overallScore =
             aspects.reduce((total, aspectKey) => {
                 return total + calculateAspectScore(aspectKey);
@@ -160,7 +185,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                             <div className="rounded-full bg-white/20 p-3">
                                 <CheckCircle className="h-8 w-8" />
                             </div>
-                            <span>Review Penilaian Keseluruhan</span>
+                            <span>Preview Penilaian Keseluruhan</span>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -186,7 +211,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                     </CardContent>
                 </Card>
 
-                {/* Detailed Review by Aspect */}
+                {/* Detailed Preview by Aspect */}
                 {aspects.map((aspectKey, aspectIndex) => {
                     const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
                     const aspectScore = calculateAspectScore(aspectKey);
@@ -266,7 +291,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                         <CardHeader className="bg-yellow-50 py-1">
                             <CardTitle className="flex items-center space-x-2 text-xl text-yellow-800">
                                 <FileText className="h-6 w-6" />
-                                <span>Catatan Keseluruhan</span>
+                                <span>Saran Perbaikan</span>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -313,13 +338,13 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
         );
     };
 
-    if (showReview) {
+    if (showPreview) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
                 <header className="sticky top-0 z-10 border-b bg-white shadow-sm">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between py-4">
-                            <Button variant="ghost" onClick={() => setShowReview(false)} className="flex items-center space-x-2">
+                            <Button variant="ghost" onClick={() => setShowPreview(false)} className="flex items-center space-x-2">
                                 <ArrowLeft className="h-4 w-4" />
                                 <span>Kembali</span>
                             </Button>
@@ -327,7 +352,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                     </div>
                 </header>
                 <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                    <div className="space-y-8">{renderReview()}</div>
+                    <div className="space-y-8">{renderPreview()}</div>
                 </main>
             </div>
         );
@@ -540,20 +565,20 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                     <div className="flex items-center space-x-4">
                                                         <div className="flex-1">
                                                             <Label htmlFor={criterion.id} className="mb-2 block text-sm font-medium text-gray-700">
-                                                                Nilai untuk kriteria ini (0-100):
+                                                                Nilai untuk kriteria ini (50-100):
                                                             </Label>
                                                             <Input
                                                                 id={criterion.id}
                                                                 type="number"
-                                                                min="0"
-                                                                max="100"
-                                                                value={currentScore || ''}
+                                                                min={50}
+                                                                max={100}
+                                                                // value={currentScore}
                                                                 onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
                                                                 className="w-32 text-center text-lg font-bold"
-                                                                placeholder="0"
+                                                                placeholder="50"
                                                             />
                                                         </div>
-                                                        {currentScore > 0 && (
+                                                        {currentScore > 49 && (
                                                             <div className="flex-1">
                                                                 <div className="mb-2 text-sm text-gray-600">Klasifikasi:</div>
                                                                 <Badge
@@ -595,11 +620,11 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                             {currentStep === aspects.length - 1 && (
                                 <Card className="gap-1 border-yellow-200 bg-yellow-50">
                                     <CardHeader>
-                                        <CardTitle className="text-lg text-yellow-800">Catatan Keseluruhan</CardTitle>
+                                        <CardTitle className="text-lg text-yellow-800">Saran Perbaikan</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <Textarea
-                                            placeholder="Berikan catatan keseluruhan untuk penilaian ini (opsional)..."
+                                            placeholder="Berikan saran perbaikan untuk penilaian ini (opsional)..."
                                             value={overallNotes}
                                             onChange={(e) => setOverallNotes(e.target.value)}
                                             className="min-h-[120px] bg-white"
@@ -639,7 +664,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                         disabled={!canProceed()}
                                         className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
                                     >
-                                        <span>Lihat Review</span>
+                                        <span>Lihat Preview</span>
                                         <ArrowRight className="h-4 w-4" />
                                     </Button>
                                 )}

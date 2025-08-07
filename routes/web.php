@@ -4,6 +4,7 @@ use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PenugasanPeerController;
+use App\Models\PenugasanPeer;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'role:outsourcing,penerima_layanan,atasan'])->group(function () {
@@ -38,6 +39,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::put('dashboard/user/update/{user}', [PagesController::class, 'update'])->name('user.update');
 
     Route::post('/upload-temp-image', [PagesController::class, 'uploadTempImage'])->name('upload.temp');
+
+
+    Route::get('dashboard/import-user-evaluator', [PenugasanPeerController::class, 'import'])->name('user.import');
 });
 
 require __DIR__ . '/settings.php';

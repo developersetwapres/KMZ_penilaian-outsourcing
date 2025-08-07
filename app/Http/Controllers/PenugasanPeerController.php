@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePenugasanPeerRequest;
 use App\Models\PenugasanPeer;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PenugasanPeerController extends Controller
 {
@@ -41,5 +42,10 @@ class PenugasanPeerController extends Controller
                 ]
             );
         }
+    }
+
+    public function import()
+    {
+        return Inertia::render('penilaian/admin/import-user-evaluator');
     }
 }
