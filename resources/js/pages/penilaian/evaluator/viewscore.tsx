@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, CheckCircle, ClipboardCheck, FileText, Info, UserCheck } from 'lucide-react';
 
-// Classification function
+// Classification function (untouched)
 const getScoreClassification = (score: number) => {
     if (score <= 50) return { label: 'SK (Sangat Kurang)', color: 'bg-red-100 text-red-800 border-red-200', range: '≤50' };
     if (score <= 75) return { label: 'K (Kurang)', color: 'bg-orange-100 text-orange-800 border-orange-200', range: '51-75' };
@@ -14,7 +14,7 @@ const getScoreClassification = (score: number) => {
     return { label: 'SB (Sangat Baik)', color: 'bg-green-100 text-green-800 border-green-200', range: '91-100' };
 };
 
-interface EvaluationFormProps {
+interface ViewScoreProps {
     employee: {
         id: number;
         name: string;
@@ -32,35 +32,47 @@ interface EvaluationFormProps {
     averageScore: any;
 }
 
-export default function ViewScore({ employee, averageScore, evaluator, evaluationData, overallNotes }: EvaluationFormProps) {
+export default function ViewScore({ employee, averageScore, evaluator, evaluationData, overallNotes }: ViewScoreProps) {
     const aspects = Object.keys(evaluationData);
 
+    // Average per aspect (kept for compatibility if needed elsewhere)
     const calculateAspectScore = (aspectKey: string) => {
         const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
         if (!aspect) return 0;
-
         const criteriaScores = aspect.criteria.map((criterion: any) => criterion.score || 0);
-        const totalScore = criteriaScores.reduce((sum: any, score: any) => sum + score, 0);
-
+        const totalScore = criteriaScores.reduce((sum: number, s: number) => sum + s, 0);
         return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
     };
+
+    // Helper stats for each aspect: total, count, avg (same konsep as evaluation-form.tsx)
+    function getAspectStats(aspectKey: string) {
+        const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+        if (!aspect) return { total: 0, count: 0, avg: 0 };
+        const scoresList = aspect.criteria.map((c: any) => c.score || 0);
+        const total = scoresList.reduce((a: number, b: number) => a + b, 0);
+        const count = aspect.criteria.length;
+        const avg = count ? parseFloat((total / count).toFixed(2)) : 0;
+        return { total, count, avg };
+    }
 
     const overallScore =
         aspects.reduce((total, aspectKey) => {
             return total + calculateAspectScore(aspectKey);
-        }, 0) / aspects.length;
+        }, 0) / (aspects.length || 1);
 
     const getScoreColor = (score: number) => {
-        if (score > 90) return 'text-green-600 bg-green-50';
-        if (score > 75) return 'text-blue-600 bg-blue-50';
-        if (score > 50) return 'text-orange-600 bg-orange-50';
+        if (score >= 91) return 'text-green-600 bg-green-50';
+        if (score >= 81) return 'text-blue-600 bg-blue-50';
+        if (score >= 71) return 'text-yellow-600 bg-yellow-50';
+        if (score >= 61) return 'text-orange-600 bg-orange-50';
         return 'text-red-600 bg-red-50';
     };
 
     const getScoreLabel = (score: number) => {
-        if (score > 90) return 'Sangat Baik';
-        if (score > 75) return 'Baik';
-        if (score > 50) return 'Kurang';
+        if (score >= 91) return 'Sangat Baik';
+        if (score >= 81) return 'Baik';
+        if (score >= 71) return 'Butuh Perbaikan';
+        if (score >= 61) return 'Kurang';
         return 'Sangat Kurang';
     };
 
@@ -78,12 +90,12 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                     </div>
                 </div>
             </header>
+
             <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="space-y-8">
                     <div className="grid gap-8 md:grid-cols-2">
-                        {/* Evaluator Card - Enhanced with Clear Label */}
+                        {/* Evaluator Card */}
                         <Card className="relative gap-1 overflow-hidden border-0 bg-gradient-to-br from-green-500 to-emerald-600 pb-0 text-white shadow-2xl">
-                            {/* Decorative Elements */}
                             <div className="absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full bg-white/10"></div>
                             <div className="absolute bottom-0 left-0 h-24 w-24 -translate-x-12 translate-y-12 rounded-full bg-white/10"></div>
 
@@ -100,7 +112,6 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                             </CardHeader>
 
                             <CardContent className="relative pb-8 text-center">
-                                {/* Photo with Enhanced Styling */}
                                 <div className="relative mx-2 mb-6">
                                     <div className="absolute inset-0 scale-110 animate-pulse rounded-full bg-white/20"></div>
                                     <img
@@ -110,11 +121,9 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                                     />
                                 </div>
 
-                                {/* Name and Position */}
                                 <h3 className="mb-1 text-2xl font-bold text-white">{evaluator.name}</h3>
                                 <p className="text-lg font-medium text-green-100">{evaluator.jabatan}</p>
 
-                                {/* Role Badge */}
                                 <div className="mt-3">
                                     <Badge className="border-white/30 bg-white/20 px-4 py-2 text-sm font-semibold text-white">
                                         {evaluator.role === 'atasan'
@@ -127,9 +136,8 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                             </CardContent>
                         </Card>
 
-                        {/* Employee Card - Enhanced with Clear Label */}
+                        {/* Employee Card */}
                         <Card className="relative gap-1 overflow-hidden border-0 bg-gradient-to-br from-blue-500 to-indigo-600 pb-0 text-white shadow-2xl">
-                            {/* Decorative Elements */}
                             <div className="absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full bg-white/10"></div>
                             <div className="absolute bottom-0 left-0 h-24 w-24 -translate-x-12 translate-y-12 rounded-full bg-white/10"></div>
 
@@ -146,7 +154,6 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                             </CardHeader>
 
                             <CardContent className="relative pb-8 text-center">
-                                {/* Photo with Enhanced Styling */}
                                 <div className="relative mx-2 mb-6">
                                     <div className="absolute inset-0 scale-110 animate-pulse rounded-full bg-white/20"></div>
                                     <img
@@ -156,11 +163,9 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                                     />
                                 </div>
 
-                                {/* Name and Position */}
                                 <h3 className="mb-1 text-2xl font-bold text-white">{employee.name}</h3>
                                 <p className="text-lg font-medium text-blue-100">{employee.jabatan}</p>
 
-                                {/* Unit Badge */}
                                 <div className="mt-3">
                                     <Badge className="border-white/30 bg-white/20 px-4 py-2 text-sm font-semibold text-white">
                                         {employee.unit_kerja}
@@ -171,7 +176,7 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                     </div>
 
                     <div className="space-y-8">
-                        {/* Overall Summary Card */}
+                        {/* Overall Summary Card - UPDATED to match evaluation-form.tsx concept */}
                         <Card className="gap-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                             <CardHeader>
                                 <CardTitle className="flex items-center space-x-3 text-2xl">
@@ -182,36 +187,52 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="grid gap-6 md:grid-cols-3">
-                                    <div className="text-center">
-                                        <div className="mb-2 text-4xl font-bold">
-                                            {/* Jika dihitung per Aspek */}
-                                            {overallScore.toFixed(2)}
-                                            {/* {averageScore} */}
+                                {(() => {
+                                    const aspectAKey = aspects[0];
+                                    const aspectBKey = aspects[1];
+
+                                    const weightA = 60;
+                                    const weightB = 40;
+
+                                    const a = aspectAKey ? getAspectStats(aspectAKey) : { total: 0, count: 0, avg: 0 };
+                                    const b = aspectBKey ? getAspectStats(aspectBKey) : { total: 0, count: 0, avg: 0 };
+
+                                    const aContribution = parseFloat(((a.avg * weightA) / 100).toFixed(2));
+                                    const bContribution = parseFloat(((b.avg * weightB) / 100).toFixed(2));
+                                    const combinedContribution = parseFloat((aContribution + bContribution).toFixed(2));
+
+                                    return (
+                                        <div className="grid gap-6 md:grid-cols-3">
+                                            <div className="text-center">
+                                                <div className="text-sm text-blue-100">
+                                                    {aspectAKey ? evaluationData[aspectAKey as keyof typeof evaluationData].title : 'Aspek 1'}
+                                                </div>
+                                                <div className="text-xs text-blue-100">{`${a.avg} x ${weightA}%`}</div>
+                                                <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${aContribution}`}</div>
+                                            </div>
+
+                                            <div className="text-center">
+                                                <div className="text-sm text-blue-100">
+                                                    {aspectBKey ? evaluationData[aspectBKey as keyof typeof evaluationData].title : 'Aspek 2'}
+                                                </div>
+                                                <div className="text-xs text-blue-100">{`${b.avg} x ${weightB}%`}</div>
+                                                <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${bContribution}`}</div>
+                                            </div>
+
+                                            <div className="text-center">
+                                                <div className="text-sm text-blue-100">Skor Akhir</div>
+                                                <div className="text-xs text-blue-100">{`${aContribution} + ${bContribution}`}</div>
+                                                <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${combinedContribution}`}</div>
+                                            </div>
                                         </div>
-                                        <div className="text-blue-100">Nilai Keseluruhan</div>
-                                        <div className="mt-1 text-sm text-blue-200">{getScoreLabel(overallScore)}</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="mb-2 text-4xl font-bold">{aspects.length}</div>
-                                        <div className="text-blue-100">Aspek Dinilai</div>
-                                        <div className="mt-1 text-sm text-blue-200">Aspek Penilaian</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="mb-2 text-4xl font-bold">
-                                            {Object.values(evaluationData).reduce((total, aspect) => total + aspect.criteria.length, 0)}
-                                        </div>
-                                        <div className="text-blue-100">Total Kriteria</div>
-                                        <div className="mt-1 text-sm text-blue-200">Yang Dinilai</div>
-                                    </div>
-                                </div>
+                                    );
+                                })()}
                             </CardContent>
                         </Card>
 
-                        {/* Detailed Review by Aspect */}
+                        {/* Detailed Review by Aspect - UPDATED to show Total, Count, and emphasize Avg */}
                         {aspects.map((aspectKey, aspectIndex) => {
                             const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
-                            const aspectScore = calculateAspectScore(aspectKey);
 
                             return (
                                 <Card key={aspectKey} className="gap-4 border-l-4 border-l-blue-500">
@@ -226,16 +247,22 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                                                     <CardDescription className="text-blue-600">{aspect.criteria.length} Kriteria</CardDescription>
                                                 </div>
                                             </div>
-                                            <div className={`rounded-xl px-6 py-3 ${getScoreColor(aspectScore)}`}>
-                                                <div className="text-3xl font-bold">{aspectScore.toFixed(2)}</div>
-                                                <div className="text-sm font-medium">{getScoreLabel(aspectScore)}</div>
-                                            </div>
+
+                                            {(() => {
+                                                const { total, avg } = getAspectStats(aspectKey);
+                                                return (
+                                                    <div className={`rounded-xl px-6 py-3 ${getScoreColor(avg)}`}>
+                                                        <div className="">Total Skor: {total}</div>
+                                                        <div className="font-semibold">Rata-Rata : {avg}</div>
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     </CardHeader>
 
                                     <CardContent className="p-6 pt-3">
                                         <div className="space-y-6">
-                                            {aspect.criteria.map((criterion: any, criterionIndex: any) => {
+                                            {aspect.criteria.map((criterion: any, criterionIndex: number) => {
                                                 const score = criterion.score || 0;
                                                 const classification = getScoreClassification(score);
 
@@ -258,14 +285,13 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                                                             </div>
                                                         </div>
 
-                                                        {/* Indicators as information */}
                                                         <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
                                                             <h5 className="mb-2 flex items-center space-x-2 font-medium text-gray-700">
                                                                 <Info className="h-4 w-4" />
                                                                 <span>Indikator Penilaian:</span>
                                                             </h5>
                                                             <ul className="space-y-1 text-sm text-gray-600">
-                                                                {criterion.indicators.map((indicator: any, idx: any) => (
+                                                                {criterion.indicators.map((indicator: any, idx: number) => (
                                                                     <li key={idx} className="flex items-start space-x-2">
                                                                         <span className="mt-1 text-blue-500">•</span>
                                                                         <span>{indicator}</span>

@@ -7,16 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Award, BarChart3, Calculator, FileText, LogOut, MessageCircle, Settings, Users } from 'lucide-react';
+import { ArrowLeft, Award, BarChart3, Calculator, CheckCircle, FileText, Info, LogOut, MessageCircle, Settings, Users } from 'lucide-react';
 import { useState } from 'react';
 
 // Updated dummy data with 3 evaluators for all employees
 
 export default function EmployeeDetailPage({ evaluationResults }: any) {
     const [activeTab, setActiveTab] = useState('rekap');
-    console.log(evaluationResults);
-
     const employee = evaluationResults;
+
+    console.log(evaluationResults);
 
     if (!employee) {
         return (
@@ -35,11 +35,55 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
         );
     }
 
+    const aspects = Object.keys(evaluationData);
+
+    // Average per aspect (kept for compatibility if needed elsewhere)
+    const calculateAspectScore = (aspectKey: string) => {
+        const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+        if (!aspect) return 0;
+        const criteriaScores = aspect.criteria.map((criterion: any) => criterion.score || 0);
+        const totalScore = criteriaScores.reduce((sum: number, s: number) => sum + s, 0);
+        return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
+    };
+
+    // Helper stats for each aspect: total, count, avg (same konsep as evaluation-form.tsx)
+    function getAspectStats(aspectKey: string) {
+        const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+        if (!aspect) return { total: 0, count: 0, avg: 0 };
+        const scoresList = aspect.criteria.map((c: any) => c.score || 0);
+        const total = scoresList.reduce((a: number, b: number) => a + b, 0);
+        const count = aspect.criteria.length;
+        const avg = count ? parseFloat((total / count).toFixed(2)) : 0;
+        return { total, count, avg };
+    }
+
+    const overallScore =
+        aspects.reduce((total, aspectKey) => {
+            return total + calculateAspectScore(aspectKey);
+        }, 0) / (aspects.length || 1);
+
     const getScoreColor = (score: number) => {
-        if (score >= 91) return 'text-green-600';
-        if (score >= 76) return 'text-blue-600';
-        if (score >= 51) return 'text-orange-600';
-        return 'text-red-600';
+        if (score >= 91) return 'text-green-600'; // Sangat Baik
+        if (score >= 81) return 'text-blue-600'; // Baik
+        if (score >= 71) return 'text-yellow-600'; // Butuh Perbaikan
+        if (score >= 61) return 'text-orange-600'; // Kurang
+        return 'text-red-600'; // Sangat Kurang
+    };
+
+    const getScoreLabel = (score: number) => {
+        if (score >= 91) return 'Sangat Baik';
+        if (score >= 81) return 'Baik';
+        if (score >= 71) return 'Butuh Perbaikan';
+        if (score >= 61) return 'Kurang';
+        return 'Sangat Kurang';
+    };
+
+    const getScoreBadgeColor = (score: number) => {
+        if (score >= 91) return 'bg-green-100 text-green-800 border-green-200'; // SB
+        if (score >= 81) return 'bg-blue-100 text-blue-800 border-blue-200'; // B
+        if (score >= 71) return 'bg-yellow-100 text-yellow-800 border-yellow-200'; // BP
+        if (score >= 61) return 'bg-orange-100 text-orange-800 border-orange-200'; // K
+        return 'bg-red-100 text-red-800 border-red-200'; // SK
     };
 
     const cleanup = useMobileNavigation();
@@ -62,20 +106,6 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                 },
             },
         );
-    };
-
-    const getScoreLabel = (score: number) => {
-        if (score >= 91) return 'Sangat Baik';
-        if (score >= 76) return 'Baik';
-        if (score >= 51) return 'Kurang';
-        return 'Sangat Kurang';
-    };
-
-    const getScoreBadgeColor = (score: number) => {
-        if (score >= 91) return 'bg-green-100 text-green-800 border-green-200';
-        if (score >= 76) return 'bg-blue-100 text-blue-800 border-blue-200';
-        if (score >= 51) return 'bg-orange-100 text-orange-800 border-orange-200';
-        return 'bg-red-100 text-red-800 border-red-200';
     };
 
     return (
@@ -596,95 +626,143 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
 
                             {/* Tab Content: Detail */}
                             <TabsContent value="detail" className="space-y-6">
-                                {/* Detailed Evaluation Scores */}
-                                <Card>
+                                <Card className="gap-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                                     <CardHeader>
-                                        <CardTitle>Detail Penilaian</CardTitle>
-                                        <CardDescription>Detail penilaian dari setiap penilai untuk aspek teknis dan perilaku</CardDescription>
+                                        <CardTitle className="flex items-center space-x-3 text-2xl">
+                                            <div className="rounded-full bg-white/20 p-3">
+                                                <CheckCircle className="h-8 w-8" />
+                                            </div>
+                                            <span>Review Penilaian Keseluruhan</span>
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="space-y-4">
-                                            {employee.evaluatorScores.map((evaluator, index) => {
-                                                const evaluatorType =
-                                                    evaluator.type === 'atasan'
-                                                        ? 'Atasan'
-                                                        : evaluator.type === 'penerima_layanan'
-                                                          ? 'Penerima Layanan'
-                                                          : 'Outsourcing';
+                                        {(() => {
+                                            const aspectAKey = aspects[0];
+                                            const aspectBKey = aspects[1];
 
-                                                return (
-                                                    <div key={index} className="rounded-lg border-2 border-gray-200 bg-white p-6">
-                                                        <div className="mb-4 flex items-center justify-between">
-                                                            <div>
-                                                                <h4 className="text-lg font-bold text-gray-800">{evaluator.evaluatorName}</h4>
-                                                                <p className="text-sm text-gray-600">{evaluatorType}</p>
-                                                            </div>
-                                                            <div className="text-center">
-                                                                <div className="mb-1 text-sm text-gray-600">Bobot</div>
-                                                                <div className="text-2xl font-bold text-gray-800">
-                                                                    {(evaluator.weight * 100).toFixed(0)}%
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-6">
-                                                            {/* Aspek Teknis */}
-                                                            <div>
-                                                                <h5 className="text-md font-bold text-gray-800">Aspek Teknis</h5>
-                                                                <div className="mt-2 flex items-center justify-between rounded border bg-gray-100 p-3 text-sm">
-                                                                    <span className="text-gray-600">Score Inputan:</span>
-                                                                    <div className="flex items-center space-x-2">
-                                                                        <span
-                                                                            className={`text-lg font-bold ${getScoreColor(evaluator.aspectScores['aspek-teknis'])}`}
-                                                                        >
-                                                                            {evaluator.aspectScores['aspek-teknis']}
-                                                                        </span>
-                                                                        <Badge
-                                                                            className={`${getScoreBadgeColor(evaluator.aspectScores['aspek-teknis'])} text-xs`}
-                                                                        >
-                                                                            {getScoreLabel(evaluator.aspectScores['aspek-teknis'])}
-                                                                        </Badge>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="mt-3 text-center font-mono text-xs text-gray-600">
-                                                                    {evaluator.aspectScores['aspek-teknis']} × {evaluator.weight.toFixed(0)}% ={' '}
-                                                                    {(evaluator.aspectScores['aspek-teknis'] * evaluator.weight).toFixed(2)}
-                                                                </div>
-                                                            </div>
+                                            const weightA = 60;
+                                            const weightB = 40;
 
-                                                            {/* Aspek Perilaku */}
-                                                            <div>
-                                                                <h5 className="text-md font-bold text-gray-800">Aspek Perilaku</h5>
-                                                                <div className="mt-2 flex items-center justify-between rounded border bg-gray-100 p-3 text-sm">
-                                                                    <span className="text-gray-600">Score Inputan:</span>
-                                                                    <div className="flex items-center space-x-2">
-                                                                        <span
-                                                                            className={`text-lg font-bold ${getScoreColor(evaluator.aspectScores['aspek-perilaku'])}`}
-                                                                        >
-                                                                            {evaluator.aspectScores['aspek-perilaku']}
-                                                                        </span>
-                                                                        <Badge
-                                                                            className={`${getScoreBadgeColor(evaluator.aspectScores['aspek-perilaku'])} text-xs`}
-                                                                        >
-                                                                            {getScoreLabel(evaluator.aspectScores['aspek-perilaku'])}
-                                                                        </Badge>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="mt-3 text-center font-mono text-xs text-gray-600">
-                                                                    {evaluator.aspectScores['aspek-perilaku']} × {evaluator.weight.toFixed(0)}% ={' '}
-                                                                    {(evaluator.aspectScores['aspek-perilaku'] * evaluator.weight).toFixed(2)}
-                                                                </div>
-                                                            </div>
+                                            const a = aspectAKey ? getAspectStats(aspectAKey) : { total: 0, count: 0, avg: 0 };
+                                            const b = aspectBKey ? getAspectStats(aspectBKey) : { total: 0, count: 0, avg: 0 };
+
+                                            const aContribution = parseFloat(((a.avg * weightA) / 100).toFixed(2));
+                                            const bContribution = parseFloat(((b.avg * weightB) / 100).toFixed(2));
+                                            const combinedContribution = parseFloat((aContribution + bContribution).toFixed(2));
+
+                                            return (
+                                                <div className="grid gap-6 md:grid-cols-3">
+                                                    <div className="text-center">
+                                                        <div className="text-sm text-blue-100">
+                                                            {aspectAKey ? evaluationData[aspectAKey as keyof typeof evaluationData].title : 'Aspek 1'}
                                                         </div>
-                                                        <div className="mt-6">
-                                                            <h5 className="text-md font-bold text-gray-800">Catatan:</h5>
-                                                            <p className="mt-2 text-gray-600">{evaluator.notes}</p>
-                                                        </div>
+                                                        <div className="text-xs text-blue-100">{`${a.avg} x ${weightA}%`}</div>
+                                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${aContribution}`}</div>
                                                     </div>
-                                                );
-                                            })}
-                                        </div>
+
+                                                    <div className="text-center">
+                                                        <div className="text-sm text-blue-100">
+                                                            {aspectBKey ? evaluationData[aspectBKey as keyof typeof evaluationData].title : 'Aspek 2'}
+                                                        </div>
+                                                        <div className="text-xs text-blue-100">{`${b.avg} x ${weightB}%`}</div>
+                                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${bContribution}`}</div>
+                                                    </div>
+
+                                                    <div className="text-center">
+                                                        <div className="text-sm text-blue-100">Skor Akhir</div>
+                                                        <div className="text-xs text-blue-100">{`${aContribution} + ${bContribution}`}</div>
+                                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${combinedContribution}`}</div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
                                     </CardContent>
                                 </Card>
+
+                                {/* Detailed Review by Aspect - UPDATED to show Total, Count, and emphasize Avg */}
+                                {aspects.map((aspectKey, aspectIndex) => {
+                                    const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+
+                                    return (
+                                        <Card key={aspectKey} className="gap-4 border-l-4 border-l-blue-500">
+                                            <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white">
+                                                            {aspectIndex + 1}
+                                                        </div>
+                                                        <div>
+                                                            <CardTitle className="text-2xl text-blue-800">{aspect.title}</CardTitle>
+                                                            <CardDescription className="text-blue-600">
+                                                                {aspect.criteria.length} Kriteria
+                                                            </CardDescription>
+                                                        </div>
+                                                    </div>
+
+                                                    {(() => {
+                                                        const { total, avg } = getAspectStats(aspectKey);
+                                                        return (
+                                                            <div className={`rounded-xl px-6 py-3 ${getScoreColor(avg)}`}>
+                                                                <div className="">Total Skor: {total}</div>
+                                                                <div className="font-semibold">Rata-Rata : {avg}</div>
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+                                            </CardHeader>
+
+                                            <CardContent className="p-6 pt-3">
+                                                <div className="space-y-6">
+                                                    {aspect.criteria.map((criterion: any, criterionIndex: number) => {
+                                                        const score = criterion.score || 0;
+                                                        const classification = getScoreClassification(score);
+
+                                                        return (
+                                                            <div
+                                                                key={criterion.id}
+                                                                className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-5"
+                                                            >
+                                                                <div className="mb-4 flex items-start justify-between">
+                                                                    <div className="flex flex-1 items-start space-x-3">
+                                                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-600 text-sm font-bold text-white">
+                                                                            {aspectIndex + 1}.{criterionIndex + 1}
+                                                                        </div>
+                                                                        <div className="flex-1">
+                                                                            <h4 className="text-xl font-semibold text-gray-800">{criterion.name}</h4>
+                                                                            <div className="mt-2 text-lg font-bold text-gray-900">Nilai: {score}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="ml-4">
+                                                                        <Badge
+                                                                            className={`${classification.color} border px-3 py-1 text-sm font-semibold`}
+                                                                        >
+                                                                            {classification.label}
+                                                                        </Badge>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+                                                                    <h5 className="mb-2 flex items-center space-x-2 font-medium text-gray-700">
+                                                                        <Info className="h-4 w-4" />
+                                                                        <span>Indikator Penilaian:</span>
+                                                                    </h5>
+                                                                    <ul className="space-y-1 text-sm text-gray-600">
+                                                                        {criterion.indicators.map((indicator: any, idx: number) => (
+                                                                            <li key={idx} className="flex items-start space-x-2">
+                                                                                <span className="mt-1 text-blue-500">•</span>
+                                                                                <span>{indicator}</span>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })}
                             </TabsContent>
                         </Tabs>
                     </div>

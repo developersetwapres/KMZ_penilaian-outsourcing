@@ -20,16 +20,18 @@ const evaluationSchema = z.object({
 
 // Classification function
 const getScoreClassification = (score: number) => {
-    if (score <= 50) return { label: 'SK (Sangat Kurang)', color: 'bg-red-100 text-red-800 border-red-200', range: '≤50' };
-    if (score <= 75) return { label: 'K (Kurang)', color: 'bg-orange-100 text-orange-800 border-orange-200', range: '51-75' };
-    if (score <= 90) return { label: 'B (Baik)', color: 'bg-blue-100 text-blue-800 border-blue-200', range: '76-90' };
+    if (score <= 60) return { label: 'SK (Sangat Kurang)', color: 'bg-red-100 text-red-800 border-red-200', range: '51-60' };
+    if (score <= 70) return { label: 'K (Kurang)', color: 'bg-orange-100 text-orange-800 border-orange-200', range: '61-70' };
+    if (score <= 80) return { label: 'BP (Butuh Perbaikan)', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', range: '71-80' };
+    if (score <= 90) return { label: 'B (Baik)', color: 'bg-blue-100 text-blue-800 border-blue-200', range: '81-90' };
     return { label: 'SB (Sangat Baik)', color: 'bg-green-100 text-green-800 border-green-200', range: '91-100' };
 };
 
 const scoreRanges = [
-    { label: 'SK (Sangat Kurang)', range: '≤50', color: 'bg-red-100 text-red-800' },
-    { label: 'K (Kurang)', range: '51-75', color: 'bg-orange-100 text-orange-800' },
-    { label: 'B (Baik)', range: '76-90', color: 'bg-blue-100 text-blue-800' },
+    { label: 'SK (Sangat Kurang)', range: '51-60', color: 'bg-red-100 text-red-800' },
+    { label: 'K (Kurang)', range: '61-70', color: 'bg-orange-100 text-orange-800' },
+    { label: 'BP (Butuh Perbaikan)', range: '71-80', color: 'bg-yellow-100 text-yellow-800' },
+    { label: 'B (Baik)', range: '81-90', color: 'bg-blue-100 text-blue-800' },
     { label: 'SB (Sangat Baik)', range: '91-100', color: 'bg-green-100 text-green-800' },
 ];
 
@@ -52,7 +54,7 @@ interface EvaluationFormProps {
 
 export default function EvaluationForm({ employee, evaluator, evaluationData, idPenugasanPeer }: EvaluationFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
-    const [scores, setScores] = useState<Record<string, number>>({}); // Now stores criteria scores
+    const [scores, setScores] = useState<Record<string, number>>({});
     const [overallNotes, setOverallNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
@@ -68,13 +70,8 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentStep]);
 
-    const handleScoreChangeX = (criteriaId: string, value: string) => {
-        const numValue = value === '' ? 0 : Math.min(100, Math.max(0, Number.parseInt(value) || 0));
-        setScores((prev) => ({ ...prev, [criteriaId]: numValue }));
-    };
-
     const handleScoreChange = (criteriaId: string, value: string) => {
-        // Hapus karakter non-digit
+        // Ambil digit saja
         const cleaned = value.replace(/\D/g, '');
 
         let finalValue = 0;
@@ -84,15 +81,14 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
         } else if (cleaned === '100') {
             finalValue = 100;
         } else if (cleaned.length > 2) {
-            // Ambil hanya dua digit pertama jika lebih dari 2 digit dan bukan 100
             finalValue = parseInt(cleaned.slice(0, 2), 10);
         } else {
             finalValue = parseInt(cleaned, 10);
         }
 
         // Validasi minimal 50 (kecuali jika kosong = 0)
-        if (finalValue !== 0 && finalValue < 50) {
-            finalValue = 50;
+        if (finalValue !== 0 && finalValue < 51) {
+            finalValue = 51;
         }
 
         setScores((prev) => ({ ...prev, [criteriaId]: finalValue }));
@@ -100,7 +96,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
 
     const canProceed = () => {
         const currentCriteria = aspectData.criteria.map((c: any) => c.id);
-        return currentCriteria.every((id: any) => scores[id] !== undefined && scores[id] > 0);
+        return currentCriteria.every((id: any) => scores[id] !== undefined && scores[id] > 49);
     };
 
     const handleNext = () => {
@@ -156,6 +152,18 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
         return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
     };
 
+    function getAspectStats(aspectKey: string) {
+        const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+        if (!aspect) return { total: 0, count: 0, avg: 0, percent: 0 };
+        const scoresList = aspect.criteria.map((c: any) => scores[c.id] || 0);
+        const total = scoresList.reduce((a: number, b: number) => a + b, 0);
+        const count = aspect.criteria.length;
+        const avg = count ? parseFloat((total / count).toFixed(2)) : 0;
+        // percent setara dengan avg (skala 0-100)
+        const percent = avg;
+        return { total, count, avg, percent };
+    }
+
     const renderPreview = () => {
         const overallScore =
             aspects.reduce((total, aspectKey) => {
@@ -164,15 +172,17 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
 
         const getScoreColor = (score: number) => {
             if (score > 90) return 'text-green-600 bg-green-50';
-            if (score > 75) return 'text-blue-600 bg-blue-50';
-            if (score > 50) return 'text-orange-600 bg-orange-50';
+            if (score > 80) return 'text-blue-600 bg-blue-50';
+            if (score > 70) return 'text-yellow-600 bg-yellow-50';
+            if (score > 60) return 'text-orange-600 bg-orange-50';
             return 'text-red-600 bg-red-50';
         };
 
         const getScoreLabel = (score: number) => {
             if (score > 90) return 'Sangat Baik';
-            if (score > 75) return 'Baik';
-            if (score > 50) return 'Kurang';
+            if (score > 80) return 'Baik';
+            if (score > 70) return 'Butuh Perbaikan';
+            if (score > 60) return 'Kurang';
             return 'Sangat Kurang';
         };
 
@@ -189,32 +199,56 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid gap-6 md:grid-cols-3">
-                            <div className="text-center">
-                                <div className="mb-2 text-4xl font-bold">{overallScore.toFixed(2)}</div>
-                                <div className="text-blue-100">Nilai Keseluruhan</div>
-                                <div className="mt-1 text-sm text-blue-200">{getScoreLabel(overallScore)}</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="mb-2 text-4xl font-bold">{aspects.length}</div>
-                                <div className="text-blue-100">Aspek Dinilai</div>
-                                <div className="mt-1 text-sm text-blue-200">Aspek Penilaian</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="mb-2 text-4xl font-bold">
-                                    {Object.values(evaluationData).reduce((total, aspect) => total + aspect.criteria.length, 0)}
+                        {(() => {
+                            const aspectAKey = aspects[0];
+                            const aspectBKey = aspects[1];
+
+                            const weightA = 60;
+                            const weightB = 40;
+
+                            const a = aspectAKey ? getAspectStats(aspectAKey) : { total: 0, count: 0, avg: 0, percent: 0 };
+                            const b = aspectBKey ? getAspectStats(aspectBKey) : { total: 0, count: 0, avg: 0, percent: 0 };
+
+                            // kontribusi berbobot = rata-rata (0-100) * bobot / 100
+                            const aContribution = parseFloat(((a.avg * weightA) / 100).toFixed(2));
+                            const bContribution = parseFloat(((b.avg * weightB) / 100).toFixed(2));
+                            const combinedContribution = parseFloat((aContribution + bContribution).toFixed(2));
+
+                            return (
+                                <div className="grid gap-6 md:grid-cols-3">
+                                    <div className="text-center">
+                                        <div className="text-sm text-blue-100">
+                                            {aspectAKey ? evaluationData[aspectAKey as keyof typeof evaluationData].title : 'Aspek 1'}
+                                        </div>
+                                        <div className="text-xs text-blue-100">{`${a.avg} x ${weightA}%`}</div>
+                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${aContribution}`}</div>
+                                    </div>
+
+                                    <div className="text-center">
+                                        <div className="text-sm text-blue-100">
+                                            {aspectBKey ? evaluationData[aspectBKey as keyof typeof evaluationData].title : 'Aspek 2'}
+                                        </div>
+                                        <div className="text-xs text-blue-100">{`${b.avg} x ${weightB}%`}</div>
+                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${bContribution}`}</div>
+                                    </div>
+
+                                    <div className="text-center">
+                                        <div className="text-sm text-blue-100">Skor Akhir</div>
+                                        <div className="text-xs text-blue-100">{`${aContribution} + ${bContribution}`}</div>
+                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${combinedContribution}`}</div>
+                                    </div>
                                 </div>
-                                <div className="text-blue-100">Total Kriteria</div>
-                                <div className="mt-1 text-sm text-blue-200">Yang Dinilai</div>
-                            </div>
-                        </div>
+                            );
+                        })()}
                     </CardContent>
                 </Card>
 
                 {/* Detailed Preview by Aspect */}
                 {aspects.map((aspectKey, aspectIndex) => {
                     const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
-                    const aspectScore = calculateAspectScore(aspectKey);
+                    {
+                        /*const aspectScore = calculateAspectScore(aspectKey);*/
+                    }
 
                     return (
                         <Card key={aspectKey} className="border-l-4 border-l-blue-500">
@@ -229,17 +263,22 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                             <CardDescription className="text-blue-600">{aspect.criteria.length} Kriteria</CardDescription>
                                         </div>
                                     </div>
-                                    <div className={`rounded-xl px-6 py-3 ${getScoreColor(aspectScore)}`}>
-                                        <div className="text-3xl font-bold">{aspectScore.toFixed(2)}</div>
-                                        <div className="text-sm font-medium">{getScoreLabel(aspectScore)}</div>
-                                    </div>
+                                    {(() => {
+                                        const { total, avg } = getAspectStats(aspectKey);
+                                        return (
+                                            <div className={`rounded-xl px-6 py-3 ${getScoreColor(avg)}`}>
+                                                <div className="">Total Skor: {total}</div>
+                                                <div className="font-semibold">Rata-Rata : {avg}</div>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             </CardHeader>
 
                             <CardContent className="p-6">
                                 <div className="space-y-6">
                                     {aspect.criteria.map((criterion: any, criterionIndex: any) => {
-                                        const score = scores[criterion.id] || 0;
+                                        const score = scores[criterion.id] || 50;
                                         const classification = getScoreClassification(score);
 
                                         return (
@@ -476,23 +515,23 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
 
                     {/* Progress */}
                     {/* <Card>
-                        <CardContent className="pt-6">
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Progress Penilaian</span>
-                                    <span>{Math.round(progress)}%</span>
-                                </div>
-                                <Progress value={progress} className="h-3" />
-                                <div className="flex justify-between text-xs text-gray-500">
-                                    {aspects.map((aspect, index) => (
-                                        <span key={aspect} className={index <= currentStep ? 'font-medium text-blue-600' : ''}>
-                                            {evaluationData[aspect as keyof typeof evaluationData].title}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card> */}
+                  <CardContent className="pt-6">
+                      <div className="space-y-2">
+                          <div className="flex justify-between text-sm text-gray-600">
+                              <span>Progress Penilaian</span>
+                              <span>{Math.round(progress)}%</span>
+                          </div>
+                          <Progress value={progress} className="h-3" />
+                          <div className="flex justify-between text-xs text-gray-500">
+                              {aspects.map((aspect, index) => (
+                                  <span key={aspect} className={index <= currentStep ? 'font-medium text-blue-600' : ''}>
+                                      {evaluationData[aspect as keyof typeof evaluationData].title}
+                                  </span>
+                              ))}
+                          </div>
+                      </div>
+                  </CardContent>
+              </Card> */}
 
                     {/* Score Classification Reference */}
                     <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50">
@@ -503,7 +542,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                            <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
                                 {scoreRanges.map((range, index) => (
                                     <div key={index} className={`rounded-lg border-2 p-3 ${range.color} border-opacity-50`}>
                                         <div className="text-center">
@@ -531,7 +570,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                         </CardHeader>
                         <CardContent className="space-y-8">
                             {aspectData.criteria.map((criterion: any, index: any) => {
-                                const currentScore = scores[criterion.id] || 0;
+                                let currentScore = scores[criterion.id] || 0;
                                 const classification = getScoreClassification(currentScore);
 
                                 return (
@@ -565,17 +604,17 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                     <div className="flex items-center space-x-4">
                                                         <div className="flex-1">
                                                             <Label htmlFor={criterion.id} className="mb-2 block text-sm font-medium text-gray-700">
-                                                                Nilai untuk kriteria ini (50-100):
+                                                                Nilai untuk kriteria ini (51-100):
                                                             </Label>
                                                             <Input
                                                                 id={criterion.id}
                                                                 type="number"
-                                                                min={50}
+                                                                min={51}
                                                                 max={100}
-                                                                // value={currentScore}
+                                                                // value={scores[criterion.id] ?? ''}
                                                                 onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
                                                                 className="w-32 text-center text-lg font-bold"
-                                                                placeholder="50"
+                                                                placeholder="51"
                                                             />
                                                         </div>
                                                         {currentScore > 49 && (
@@ -624,7 +663,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                     </CardHeader>
                                     <CardContent>
                                         <Textarea
-                                            placeholder="Berikan saran perbaikan untuk penilaian ini (opsional)..."
+                                            placeholder="Berikan saran perbaikan untuk outsourcing yang dinilai ..."
                                             value={overallNotes}
                                             onChange={(e) => setOverallNotes(e.target.value)}
                                             className="min-h-[120px] bg-white"
