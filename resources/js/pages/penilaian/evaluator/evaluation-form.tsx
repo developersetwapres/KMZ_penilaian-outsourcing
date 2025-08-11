@@ -430,7 +430,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                             <div className="absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full bg-white/10"></div>
                             <div className="absolute bottom-0 left-0 h-24 w-24 -translate-x-12 translate-y-12 rounded-full bg-white/10"></div>
 
-                            <CardHeader className="relative z-10">
+                            <CardHeader className="relative">
                                 <div className="mb-4 flex items-center space-x-3">
                                     <div className="rounded-full bg-white/20 p-2">
                                         <UserCheck className="h-6 w-6 text-white" />
@@ -476,7 +476,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                             <div className="absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full bg-white/10"></div>
                             <div className="absolute bottom-0 left-0 h-24 w-24 -translate-x-12 translate-y-12 rounded-full bg-white/10"></div>
 
-                            <CardHeader className="relative z-10">
+                            <CardHeader className="relative">
                                 <div className="mb-4 flex items-center space-x-3">
                                     <div className="rounded-full bg-white/20 p-2">
                                         <ClipboardCheck className="h-6 w-6 text-white" />
@@ -574,14 +574,13 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                 const classification = getScoreClassification(currentScore);
 
                                 return (
-                                    <div key={criterion.id} className="space-y-6 rounded-xl border-l-4 border-l-blue-400 bg-gray-50 p-6">
+                                    <div key={criterion.id} className="space-y-6 rounded-xl border-l-4 border-l-blue-400 bg-gray-50 p-6 px-3 md:px-6">
                                         <div className="flex items-start space-x-3">
-                                            <div className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
+                                            <div className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 p-2 text-sm font-bold text-white">
                                                 {index + 1}
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="mb-2 text-xl font-semibold text-gray-900">{criterion.name}</h3>
-                                                {/* <p className="mb-4 text-gray-600">{criterion.description}</p> */}
 
                                                 {/* Indicators as information */}
                                                 <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
@@ -617,8 +616,8 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                                 placeholder="51"
                                                             />
                                                         </div>
-                                                        {currentScore > 49 && (
-                                                            <div className="flex-1">
+                                                        {currentScore > 0 && (
+                                                            <div className="hidden flex-1 md:block">
                                                                 <div className="mb-2 text-sm text-gray-600">Klasifikasi:</div>
                                                                 <Badge
                                                                     className={`${classification.color} animate-pulse border-2 px-4 py-2 text-sm font-semibold`}

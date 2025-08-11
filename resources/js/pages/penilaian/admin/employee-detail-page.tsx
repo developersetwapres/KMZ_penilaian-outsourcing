@@ -7,16 +7,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Award, BarChart3, Calculator, CheckCircle, FileText, Info, LogOut, MessageCircle, Settings, Users } from 'lucide-react';
+import {
+    ArrowLeft,
+    Award,
+    BarChart3,
+    Calculator,
+    CheckCircle,
+    ClipboardList,
+    FileText,
+    Info,
+    LogOut,
+    MessageCircle,
+    Settings,
+    Users,
+} from 'lucide-react';
 import { useState } from 'react';
 
 // Updated dummy data with 3 evaluators for all employees
 
+// Classification function (untouched)
+const getScoreClassification = (score: number) => {
+    if (score <= 50) return { label: 'SK (Sangat Kurang)', color: 'bg-red-100 text-red-800 border-red-200', range: '≤50' };
+    if (score <= 75) return { label: 'K (Kurang)', color: 'bg-orange-100 text-orange-800 border-orange-200', range: '51-75' };
+    if (score <= 90) return { label: 'B (Baik)', color: 'bg-blue-100 text-blue-800 border-blue-200', range: '76-90' };
+    return { label: 'SB (Sangat Baik)', color: 'bg-green-100 text-green-800 border-green-200', range: '91-100' };
+};
+
 export default function EmployeeDetailPage({ evaluationResults }: any) {
     const [activeTab, setActiveTab] = useState('rekap');
     const employee = evaluationResults;
+    const [selectedLevel, setSelectedLevel] = useState<'atasan' | 'penerima_layanan' | 'teman'>('atasan');
 
-    console.log(evaluationResults);
+    const evaluationData = evaluationResults.evaluatorScores.filter((item: any) => item.type === selectedLevel)[0].criteriaScores;
 
     if (!employee) {
         return (
@@ -37,15 +59,6 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
 
     const aspects = Object.keys(evaluationData);
 
-    // Average per aspect (kept for compatibility if needed elsewhere)
-    const calculateAspectScore = (aspectKey: string) => {
-        const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
-        if (!aspect) return 0;
-        const criteriaScores = aspect.criteria.map((criterion: any) => criterion.score || 0);
-        const totalScore = criteriaScores.reduce((sum: number, s: number) => sum + s, 0);
-        return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
-    };
-
     // Helper stats for each aspect: total, count, avg (same konsep as evaluation-form.tsx)
     function getAspectStats(aspectKey: string) {
         const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
@@ -56,11 +69,6 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
         const avg = count ? parseFloat((total / count).toFixed(2)) : 0;
         return { total, count, avg };
     }
-
-    const overallScore =
-        aspects.reduce((total, aspectKey) => {
-            return total + calculateAspectScore(aspectKey);
-        }, 0) / (aspects.length || 1);
 
     const getScoreColor = (score: number) => {
         if (score >= 91) return 'text-green-600'; // Sangat Baik
@@ -179,7 +187,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                     className="flex items-center space-x-2 data-[state=active]:bg-indigo-500 data-[state=active]:text-white"
                                 >
                                     <Award className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Quection</span>
+                                    <span className="hidden sm:inline">Per-Pertanyaan</span>
                                 </TabsTrigger>
                             </TabsList>
 
@@ -625,144 +633,182 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                             </TabsContent>
 
                             {/* Tab Content: Detail */}
+
                             <TabsContent value="detail" className="space-y-6">
-                                <Card className="gap-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center space-x-3 text-2xl">
-                                            <div className="rounded-full bg-white/20 p-3">
-                                                <CheckCircle className="h-8 w-8" />
-                                            </div>
-                                            <span>Review Penilaian Keseluruhan</span>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        {(() => {
-                                            const aspectAKey = aspects[0];
-                                            const aspectBKey = aspects[1];
+                                <div className="mb-6 flex space-x-2">
+                                    <Button
+                                        variant={selectedLevel === 'atasan' ? 'default' : 'outline'}
+                                        onClick={() => setSelectedLevel('atasan')}
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <FileText className="h-4 w-4" />
+                                        <span>Atasan</span>
+                                    </Button>
+                                    <Button
+                                        variant={selectedLevel === 'penerima_layanan' ? 'default' : 'outline'}
+                                        onClick={() => setSelectedLevel('penerima_layanan')}
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <ClipboardList className="h-4 w-4" />
+                                        <span>Penerima Layanan</span>
+                                    </Button>
+                                    <Button
+                                        variant={selectedLevel === 'teman' ? 'default' : 'outline'}
+                                        onClick={() => setSelectedLevel('teman')}
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <ClipboardList className="h-4 w-4" />
+                                        <span>Rekan Kerja</span>
+                                    </Button>
+                                </div>
 
-                                            const weightA = 60;
-                                            const weightB = 40;
-
-                                            const a = aspectAKey ? getAspectStats(aspectAKey) : { total: 0, count: 0, avg: 0 };
-                                            const b = aspectBKey ? getAspectStats(aspectBKey) : { total: 0, count: 0, avg: 0 };
-
-                                            const aContribution = parseFloat(((a.avg * weightA) / 100).toFixed(2));
-                                            const bContribution = parseFloat(((b.avg * weightB) / 100).toFixed(2));
-                                            const combinedContribution = parseFloat((aContribution + bContribution).toFixed(2));
-
-                                            return (
-                                                <div className="grid gap-6 md:grid-cols-3">
-                                                    <div className="text-center">
-                                                        <div className="text-sm text-blue-100">
-                                                            {aspectAKey ? evaluationData[aspectAKey as keyof typeof evaluationData].title : 'Aspek 1'}
-                                                        </div>
-                                                        <div className="text-xs text-blue-100">{`${a.avg} x ${weightA}%`}</div>
-                                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${aContribution}`}</div>
-                                                    </div>
-
-                                                    <div className="text-center">
-                                                        <div className="text-sm text-blue-100">
-                                                            {aspectBKey ? evaluationData[aspectBKey as keyof typeof evaluationData].title : 'Aspek 2'}
-                                                        </div>
-                                                        <div className="text-xs text-blue-100">{`${b.avg} x ${weightB}%`}</div>
-                                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${bContribution}`}</div>
-                                                    </div>
-
-                                                    <div className="text-center">
-                                                        <div className="text-sm text-blue-100">Skor Akhir</div>
-                                                        <div className="text-xs text-blue-100">{`${aContribution} + ${bContribution}`}</div>
-                                                        <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${combinedContribution}`}</div>
-                                                    </div>
+                                <>
+                                    <Card className="gap-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center space-x-3 text-2xl">
+                                                <div className="rounded-full bg-white/20 p-3">
+                                                    <CheckCircle className="h-8 w-8" />
                                                 </div>
-                                            );
-                                        })()}
-                                    </CardContent>
-                                </Card>
+                                                <span>Review Penilaian Keseluruhan</span>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            {(() => {
+                                                const aspectAKey = aspects[0];
+                                                const aspectBKey = aspects[1];
 
-                                {/* Detailed Review by Aspect - UPDATED to show Total, Count, and emphasize Avg */}
-                                {aspects.map((aspectKey, aspectIndex) => {
-                                    const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+                                                const weightA = 60;
+                                                const weightB = 40;
 
-                                    return (
-                                        <Card key={aspectKey} className="gap-4 border-l-4 border-l-blue-500">
-                                            <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center space-x-4">
-                                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white">
-                                                            {aspectIndex + 1}
-                                                        </div>
-                                                        <div>
-                                                            <CardTitle className="text-2xl text-blue-800">{aspect.title}</CardTitle>
-                                                            <CardDescription className="text-blue-600">
-                                                                {aspect.criteria.length} Kriteria
-                                                            </CardDescription>
-                                                        </div>
-                                                    </div>
+                                                const a = aspectAKey ? getAspectStats(aspectAKey) : { total: 0, count: 0, avg: 0 };
+                                                const b = aspectBKey ? getAspectStats(aspectBKey) : { total: 0, count: 0, avg: 0 };
 
-                                                    {(() => {
-                                                        const { total, avg } = getAspectStats(aspectKey);
-                                                        return (
-                                                            <div className={`rounded-xl px-6 py-3 ${getScoreColor(avg)}`}>
-                                                                <div className="">Total Skor: {total}</div>
-                                                                <div className="font-semibold">Rata-Rata : {avg}</div>
+                                                const aContribution = parseFloat(((a.avg * weightA) / 100).toFixed(2));
+                                                const bContribution = parseFloat(((b.avg * weightB) / 100).toFixed(2));
+                                                const combinedContribution = parseFloat((aContribution + bContribution).toFixed(2));
+
+                                                return (
+                                                    <div className="grid gap-6 md:grid-cols-3">
+                                                        <div className="text-center">
+                                                            <div className="text-sm text-blue-100">
+                                                                {aspectAKey
+                                                                    ? evaluationData[aspectAKey as keyof typeof evaluationData].title
+                                                                    : 'Aspek 1'}
                                                             </div>
-                                                        );
-                                                    })()}
-                                                </div>
-                                            </CardHeader>
+                                                            <div className="text-xs text-blue-100">{`${a.avg} x ${weightA}% =`}</div>
+                                                            <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${aContribution}`}</div>
+                                                        </div>
 
-                                            <CardContent className="p-6 pt-3">
-                                                <div className="space-y-6">
-                                                    {aspect.criteria.map((criterion: any, criterionIndex: number) => {
-                                                        const score = criterion.score || 0;
-                                                        const classification = getScoreClassification(score);
+                                                        <div className="text-center">
+                                                            <div className="text-sm text-blue-100">
+                                                                {aspectBKey
+                                                                    ? evaluationData[aspectBKey as keyof typeof evaluationData].title
+                                                                    : 'Aspek 2'}
+                                                            </div>
+                                                            <div className="text-xs text-blue-100">{`${b.avg} x ${weightB}% =`}</div>
+                                                            <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${bContribution}`}</div>
+                                                        </div>
 
-                                                        return (
-                                                            <div
-                                                                key={criterion.id}
-                                                                className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-5"
-                                                            >
-                                                                <div className="mb-4 flex items-start justify-between">
-                                                                    <div className="flex flex-1 items-start space-x-3">
-                                                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-600 text-sm font-bold text-white">
-                                                                            {aspectIndex + 1}.{criterionIndex + 1}
+                                                        <div className="text-center">
+                                                            <div className="text-sm text-blue-100">Skor Akhir</div>
+                                                            <div className="text-xs text-blue-100">{`${aContribution} + ${bContribution} =`}</div>
+                                                            <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${combinedContribution}`}</div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </CardContent>
+                                    </Card>
+
+                                    {/* Detailed Review by Aspect - UPDATED to show Total, Count, and emphasize Avg */}
+                                    {aspects.map((aspectKey, aspectIndex) => {
+                                        const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+
+                                        return (
+                                            <Card key={aspectKey} className="gap-4 border-l-4 border-l-blue-500">
+                                                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center space-x-4">
+                                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white">
+                                                                {aspectIndex + 1}
+                                                            </div>
+                                                            <div>
+                                                                <CardTitle className="text-2xl text-blue-800">{aspect.title}</CardTitle>
+                                                                <CardDescription className="text-blue-600">
+                                                                    {aspect.criteria.length} Kriteria
+                                                                </CardDescription>
+                                                            </div>
+                                                        </div>
+
+                                                        {(() => {
+                                                            const { total, avg } = getAspectStats(aspectKey);
+                                                            return (
+                                                                <div className={`rounded-xl px-6 py-3 ${getScoreColor(avg)}`}>
+                                                                    <div className="">Total Skor: {total}</div>
+                                                                    <div className="font-semibold">Rata-Rata : {avg}</div>
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                    </div>
+                                                </CardHeader>
+
+                                                <CardContent className="p-6 pt-3">
+                                                    <div className="space-y-6">
+                                                        {aspect.criteria.map((criterion: any, criterionIndex: number) => {
+                                                            const score = criterion.score || 0;
+                                                            const classification = getScoreClassification(score);
+
+                                                            return (
+                                                                <div
+                                                                    key={criterion.id}
+                                                                    className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-5"
+                                                                >
+                                                                    <div className="mb-4 flex items-start justify-between">
+                                                                        <div className="flex flex-1 items-start space-x-3">
+                                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-600 text-sm font-bold text-white">
+                                                                                {aspectIndex + 1}.{criterionIndex + 1}
+                                                                            </div>
+                                                                            <div className="flex-1">
+                                                                                <h4 className="text-xl font-semibold text-gray-800">
+                                                                                    {criterion.name}
+                                                                                </h4>
+                                                                                <div className="mt-2 text-lg font-bold text-gray-900">
+                                                                                    Nilai: {score}
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
-                                                                        <div className="flex-1">
-                                                                            <h4 className="text-xl font-semibold text-gray-800">{criterion.name}</h4>
-                                                                            <div className="mt-2 text-lg font-bold text-gray-900">Nilai: {score}</div>
+                                                                        <div className="ml-4">
+                                                                            <Badge
+                                                                                className={`${classification.color} border px-3 py-1 text-sm font-semibold`}
+                                                                            >
+                                                                                {classification.label}
+                                                                            </Badge>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="ml-4">
-                                                                        <Badge
-                                                                            className={`${classification.color} border px-3 py-1 text-sm font-semibold`}
-                                                                        >
-                                                                            {classification.label}
-                                                                        </Badge>
+
+                                                                    <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+                                                                        <h5 className="mb-2 flex items-center space-x-2 font-medium text-gray-700">
+                                                                            <Info className="h-4 w-4" />
+                                                                            <span>Indikator Penilaian:</span>
+                                                                        </h5>
+                                                                        <ul className="space-y-1 text-sm text-gray-600">
+                                                                            {criterion.indicators.map((indicator: any, idx: number) => (
+                                                                                <li key={idx} className="flex items-start space-x-2">
+                                                                                    <span className="mt-1 text-blue-500">•</span>
+                                                                                    <span>{indicator}</span>
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
                                                                     </div>
                                                                 </div>
-
-                                                                <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
-                                                                    <h5 className="mb-2 flex items-center space-x-2 font-medium text-gray-700">
-                                                                        <Info className="h-4 w-4" />
-                                                                        <span>Indikator Penilaian:</span>
-                                                                    </h5>
-                                                                    <ul className="space-y-1 text-sm text-gray-600">
-                                                                        {criterion.indicators.map((indicator: any, idx: number) => (
-                                                                            <li key={idx} className="flex items-start space-x-2">
-                                                                                <span className="mt-1 text-blue-500">•</span>
-                                                                                <span>{indicator}</span>
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    );
-                                })}
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        );
+                                    })}
+                                </>
                             </TabsContent>
                         </Tabs>
                     </div>

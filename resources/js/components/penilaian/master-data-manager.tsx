@@ -306,10 +306,6 @@ export default function MasterDataManager({ masterData }: any) {
             </Card>
 
             <Card>
-                {/* <CardHeader>
-                    <CardTitle>Kelola Master Data Penilaian Outsourcing</CardTitle>
-                    <CardDescription>Kelola aspek dan kriteria penilaian kinerja outsourcing beserta indikatornya</CardDescription>
-                </CardHeader> */}
                 <CardContent>
                     <div className="mb-6 flex space-x-2">
                         <Button

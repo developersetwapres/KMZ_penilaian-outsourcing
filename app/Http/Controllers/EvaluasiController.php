@@ -161,10 +161,6 @@ class EvaluasiController extends Controller
             ];
         }
 
-        // Hitung rata-rata
-        $averageScore = $totalCount > 0 ? round($totalScore / $totalCount, 2) : 0;
-
-
         $employee = User::select(['id', 'name', 'jabatan', 'image', 'unit_kerja'])->findOrFail($penugasanPeer->outsourcing_id);
 
         $data = [
@@ -172,7 +168,6 @@ class EvaluasiController extends Controller
             'evaluator' => Auth::user(),
             'employee' => $employee,
             'overallNotes' => $penugasanPeer->catatan,
-            'averageScore' => $averageScore
         ];
 
         return Inertia::render('penilaian/evaluator/viewscore', $data);
@@ -192,19 +187,38 @@ class EvaluasiController extends Controller
                 ->where('penugasan_peer_id', $assignment->id)
                 ->get();
 
+            // criteriaScores dalam format per-aspek
             $criteriaScores = [];
             $aspectTemp = [];
 
             foreach ($evaluations as $evaluation) {
                 $kriteria = $evaluation->kriteria;
+                if (!$kriteria) continue;
+
                 $aspek = $kriteria->getAspek;
                 $aspekSlug = Str::slug($aspek->nama, "-");
 
-                $criteriaScores[$kriteria->slug] = $evaluation->skor;
+                // Siapkan array aspek di criteriaScores jika belum ada
+                if (!isset($criteriaScores[$aspekSlug])) {
+                    $criteriaScores[$aspekSlug] = [
+                        'title'    => $aspek->nama,
+                        'criteria' => [],
+                    ];
+                }
+
+                // Masukkan data kriteria seperti format contoh
+                $criteriaScores[$aspekSlug]['criteria'][] = [
+                    'id'         => $kriteria->id,
+                    'name'       => $kriteria->nama,
+                    'indicators' => $kriteria->indikator,
+                    'score'      => $evaluation->skor,
+                ];
+
+                // Data untuk hitung rata-rata per aspek
                 $aspectTemp[$aspekSlug][] = $evaluation->skor;
             }
 
-            // Hitung rata-rata per aspek oleh evaluator ini
+            // Hitung rata-rata per aspek untuk evaluator ini
             $aspectScores = [];
             foreach ($aspekList as $slug => $aspek) {
                 if (isset($aspectTemp[$slug])) {
@@ -219,7 +233,7 @@ class EvaluasiController extends Controller
                 $weightedAspectTotals[$slug] = ($weightedAspectTotals[$slug] ?? 0) + ($avg * $assignment->weight);
             }
 
-            // Hitung total skor evaluator ini (semua aspek / rata-rata per aspek * bobot)
+            // Hitung total skor evaluator ini
             $overallScore = round(array_sum($aspectScores) / max(count($aspectScores), 1), 2);
             $weightedScore = round($overallScore * $assignment->weight, 3);
 
@@ -246,7 +260,7 @@ class EvaluasiController extends Controller
             $finalAspectWithWeight[$slug] = [
                 'average' => $average,
                 'score'   => $score,
-                'weight'   => $aspek->weight,
+                'weight'  => $aspek->weight,
             ];
 
             $overallFinalScore += $score;

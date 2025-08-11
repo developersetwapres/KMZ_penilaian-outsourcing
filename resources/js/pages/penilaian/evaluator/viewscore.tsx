@@ -29,11 +29,11 @@ interface ViewScoreProps {
     evaluator: any;
     evaluationData: any;
     overallNotes: string;
-    averageScore: any;
 }
 
-export default function ViewScore({ employee, averageScore, evaluator, evaluationData, overallNotes }: ViewScoreProps) {
+export default function ViewScore({ employee, evaluator, evaluationData, overallNotes }: ViewScoreProps) {
     const aspects = Object.keys(evaluationData);
+    console.log(evaluationData);
 
     // Average per aspect (kept for compatibility if needed elsewhere)
     const calculateAspectScore = (aspectKey: string) => {
@@ -207,7 +207,7 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                                                 <div className="text-sm text-blue-100">
                                                     {aspectAKey ? evaluationData[aspectAKey as keyof typeof evaluationData].title : 'Aspek 1'}
                                                 </div>
-                                                <div className="text-xs text-blue-100">{`${a.avg} x ${weightA}%`}</div>
+                                                <div className="text-xs text-blue-100">{`${a.avg} x ${weightA}% =`}</div>
                                                 <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${aContribution}`}</div>
                                             </div>
 
@@ -215,13 +215,13 @@ export default function ViewScore({ employee, averageScore, evaluator, evaluatio
                                                 <div className="text-sm text-blue-100">
                                                     {aspectBKey ? evaluationData[aspectBKey as keyof typeof evaluationData].title : 'Aspek 2'}
                                                 </div>
-                                                <div className="text-xs text-blue-100">{`${b.avg} x ${weightB}%`}</div>
+                                                <div className="text-xs text-blue-100">{`${b.avg} x ${weightB}%`} =</div>
                                                 <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${bContribution}`}</div>
                                             </div>
 
                                             <div className="text-center">
                                                 <div className="text-sm text-blue-100">Skor Akhir</div>
-                                                <div className="text-xs text-blue-100">{`${aContribution} + ${bContribution}`}</div>
+                                                <div className="text-xs text-blue-100">{`${aContribution} + ${bContribution}`} =</div>
                                                 <div className="mt-1 text-3xl font-extrabold tracking-tight">{`${combinedContribution}`}</div>
                                             </div>
                                         </div>
