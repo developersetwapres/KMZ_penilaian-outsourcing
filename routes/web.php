@@ -28,7 +28,8 @@ Route::middleware(['auth', 'verified', 'role:outsourcing,penerima_layanan,atasan
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
 
-    Route::post('penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
+    Route::post('dashboard/penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
+    Route::post('dashboard/penugasan-peer/export', [PenugasanPeerController::class, 'importPenugasan'])->name('penugasan.export');
 
     Route::get('dashboard-detail/{user:slug}', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
 
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::put('dashboard/kriteria/{kriteria}', [KriteriaController::class, 'update'])->name('kriteria.update');
 
     Route::post('dashboard/user/store', [PagesController::class, 'store'])->name('user.store');
+    Route::post('dashboard/user/export-store', [PagesController::class, 'importUsers'])->name('user.export');
     Route::put('dashboard/user/update/{user}', [PagesController::class, 'update'])->name('user.update');
 
     Route::post('/upload-temp-image', [PagesController::class, 'uploadTempImage'])->name('upload.temp');

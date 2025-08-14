@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageUploadRequest;
+use App\Http\Requests\ImportUsersRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Aspek;
@@ -13,9 +14,9 @@ use App\Models\Kriteria;
 use App\Models\PenugasanPeer;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 use Inertia\Response;
 
 class PagesController extends Controller
@@ -68,6 +69,74 @@ class PagesController extends Controller
             'image' => $finalImagePath,
             'password' => Hash::make($request->password),
         ]);
+    }
+
+    public function importUsers(ImportUsersRequest $request)
+    {
+        set_time_limit(0); // hilangkan limit waktu eksekusi
+        $data = $request->validated();
+
+        $users = [];
+        foreach ($data as $value) {
+            $plainPassword = !empty($value['password'])
+                ? $value['password']
+                : Str::random(6);
+
+            $users[] = [
+                'name'         => $value['name'],
+                'slug'         => Str::slug($value['name'] . '-' . Str::random(5)),
+                'email'        => $value['email'],
+                'jabatan'      => $value['jabatan'],
+                'lokasi_kerja' => $value['lokasi_kerja'],
+                'unit_kerja'   => $value['unit_kerja'],
+                'perusahaan'   => $value['perusahaan'],
+                'role'         => $value['role'],
+                'phone'        => $value['phone'] ?? '62123456789',
+                'status'       => $value['status'] ?? 'active',
+                'image'        => $value['image'] ?? '',
+                'password'     => Hash::make($plainPassword),
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ];
+        }
+
+        // Bagi jadi batch 500 user sekali insert
+        foreach (array_chunk($users, 100) as $chunk) {
+            User::insert($chunk);
+        }
+    }
+
+
+    public function importUsersX(ImportUsersRequest $request)
+    {
+        $data = $request->validated();
+        $users = [];
+
+        foreach ($data as $value) {
+            // Kalau password tidak ada → generate random 6 karakter (huruf + angka)
+            $plainPassword = !empty($value['password'])
+                ? $value['password']
+                : Str::random(6);
+
+            $users[] = [
+                'name'         => $value['name'],
+                'slug'         => Str::slug($value['name'] . '-' . Str::random(5)),
+                'email'        => $value['email'],
+                'jabatan'      => $value['jabatan'],
+                'lokasi_kerja' => $value['lokasi_kerja'],
+                'unit_kerja'   => $value['unit_kerja'],
+                'perusahaan'   => $value['perusahaan'],
+                'role'         => $value['role'],
+                'phone'        => $value['phone'] ?? '62123456789',
+                'status'       => $value['status'] ?? 'active',
+                'image'        => $value['image'] ?? '',
+                'password'     => Hash::make('plainPassword'),
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ];
+        }
+
+        User::insert($users);
     }
 
     public function update(UpdateUserRequest $request, User $user)

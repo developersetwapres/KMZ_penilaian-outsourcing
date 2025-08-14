@@ -13,6 +13,15 @@ import { Separator } from '@radix-ui/react-separator';
 import { AlertCircle, CheckCircle, Crown, Edit, Search, Shield, UserCheck, UserPlus, Users, Users2 } from 'lucide-react';
 import { useState } from 'react';
 
+type Employee = {
+    evaluators?: {
+        atasan?: any;
+        penerima_layanan?: any;
+        teman?: any;
+    };
+    [key: string]: any;
+};
+
 export default function PeerAssignment({ outsourcingEmployees }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -25,12 +34,14 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
 
     const { toast } = useToast();
 
-    const filteredEmployees = outsourcingEmployees.filter(
+    const filteredSearchEmployees = outsourcingEmployees.filter(
         (emp: any) =>
             emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             emp.unit_kerja.toLowerCase().includes(searchTerm.toLowerCase()) ||
             emp.perusahaan.toLowerCase().includes(searchTerm.toLowerCase()),
     );
+
+    const filteredEmployees = filteredSearchEmployees.filter((emp: any) => emp.role === 'outsourcing');
 
     const handleAssignEvaluators = () => {
         if (selectedEmployee && (selectedEvaluators.atasan || selectedEvaluators.penerima_layanan || selectedEvaluators.teman)) {
@@ -73,6 +84,24 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
         }
     };
 
+    function hitungEvaluator(employees: Employee[]) {
+        let sudah = 0;
+        let belum = 0;
+
+        for (const emp of employees) {
+            const ev = emp.evaluators || {};
+            if (ev.atasan && ev.penerima_layanan && ev.teman) {
+                sudah++;
+            } else {
+                belum++;
+            }
+        }
+
+        return { sudah, belum };
+    }
+
+    const { sudah, belum } = hitungEvaluator(outsourcingEmployees.filter((emp: any) => emp.role === 'outsourcing'));
+
     return (
         <div className="space-y-6">
             {/* Header Card */}
@@ -103,15 +132,11 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
 
                         <div className="flex items-center space-x-4">
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-green-600">
-                                    {outsourcingEmployees.filter((emp: any) => emp.peerEvaluator).length}
-                                </div>
+                                <div className="text-2xl font-bold text-green-600">{sudah}</div>
                                 <div className="text-sm text-gray-500">Sudah Ditugaskan</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-orange-600">
-                                    {outsourcingEmployees.filter((emp: any) => !emp.peerEvaluator).length}
-                                </div>
+                                <div className="text-2xl font-bold text-orange-600">{belum}</div>
                                 <div className="text-sm text-gray-500">Belum Ditugaskan</div>
                             </div>
                         </div>
@@ -294,14 +319,14 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
                     <div className="space-y-6 pb-4">
                         {selectedEmployee && (
                             <>
-                                <div className="mt-3 mb-8 flex items-center space-x-3 rounded-lg bg-gradient-to-r from-indigo-50 to-green-100 p-4">
+                                <div className="mt-3 mb-8 flex items-center space-x-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-4 text-white">
                                     <div className="rounded-full bg-indigo-100 p-2">
-                                        <Users className="h-5 w-5 text-green-600" />
+                                        <Users className="h-5 w-5 text-blue-600" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-semibold text-gray-900">{selectedEmployee.name}</h3>
-                                        <p className="mb-1.5 text-sm text-gray-600">{selectedEmployee.unit_kerja}</p>
-                                        <Badge className="bg-green-200 text-xs text-green-800">{selectedEmployee.jabatan}</Badge>
+                                        <h3 className="text-lg font-semibold text-white">{selectedEmployee.name}</h3>
+                                        <p className="mb-1.5 text-sm text-gray-50">{selectedEmployee.unit_kerja}</p>
+                                        <Badge className="bg-blue-200 text-xs text-blue-800">{selectedEmployee.jabatan}</Badge>
                                     </div>
                                 </div>
                                 {/* Evaluator Selection */}
