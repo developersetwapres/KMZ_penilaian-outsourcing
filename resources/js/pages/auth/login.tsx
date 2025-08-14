@@ -1,3 +1,4 @@
+import AppLogoIcon from '@/components/app-logo-icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -5,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Head, useForm } from '@inertiajs/react';
-import { ClipboardList, Eye, EyeOff, Shield } from 'lucide-react';
+import { Eye, EyeOff, Shield } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import { z } from 'zod';
 
@@ -58,8 +59,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-4">
                         <div className="flex items-center space-x-3">
-                            <div className="rounded-lg bg-green-600 p-2">
-                                <ClipboardList className="h-6 w-6 text-white" />
+                            <div className="max-w-17 p-2">
+                                <AppLogoIcon />
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold text-gray-900">Sistem Penilaian</h1>
@@ -75,8 +76,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <div className="mb-12 text-center">
                         <div className="mb-11">
                             <div className="mb-6 flex justify-center">
-                                <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 shadow-lg">
-                                    <ClipboardList className="h-12 w-12 text-white" />
+                                <div className="max-w-17">
+                                    <AppLogoIcon />
                                 </div>
                             </div>
                             <h1 className="mb-4 text-4xl font-bold text-gray-900">Sistem Penilaian Kinerja</h1>
