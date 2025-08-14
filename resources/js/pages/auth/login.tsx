@@ -53,7 +53,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <>
-            <Head title="Sistem Penilaian Kinerja Outsourcing" />
+            <Head title="Login" />
             {/* Header */}
             <header className="border-b bg-white shadow-sm">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

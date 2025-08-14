@@ -43,7 +43,7 @@ export default function AdminPage({ outsourcing, masterData, users, evaluationRe
 
     return (
         <>
-            <Head title="Sistem Penilaian Kinerja Outsourcing" />
+            <Head title="Dashboard" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
                 {/* Header */}
                 <header className="border-b bg-white shadow-sm">

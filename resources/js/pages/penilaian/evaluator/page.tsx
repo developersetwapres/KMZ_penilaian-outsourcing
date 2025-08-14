@@ -46,7 +46,7 @@ export default function EvaluatorPage({ penugasanPeer }: any) {
 
     return (
         <>
-            <Head title="Sistem Penilaian Kinerja Outsourcing" />
+            <Head title="Evaluator" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
                 {/* Header */}
                 <header className="border-b bg-white shadow-sm">
