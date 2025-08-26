@@ -92,6 +92,7 @@ function App() {
                     unit_kerja: row[6],
                     perusahaan: row[7],
                     role: row[8],
+                    image: row[9],
                 });
             }
             setDataFile2(transformed);
@@ -106,13 +107,11 @@ function App() {
                     title: 'Import berhasil',
                     description: 'Outsourcing, Penerima Layanan dan Atasan berhasil di idmport',
                 });
+                router.get(route('dashboard'));
+                setDataFile2([]);
             },
             onError: (er) => {
                 console.log(er);
-            },
-            onFinish: () => {
-                router.get(route('dashboard'));
-                setDataFile2([]);
             },
         });
     };
@@ -124,12 +123,10 @@ function App() {
                     title: 'Import berhasil',
                     description: 'Penugasan penilaian berhasil di import',
                 });
+                router.get(route('dashboard'));
             },
             onError: (er) => {
                 console.log(er);
-            },
-            onFinish: () => {
-                router.get(route('dashboard'));
             },
         });
     };

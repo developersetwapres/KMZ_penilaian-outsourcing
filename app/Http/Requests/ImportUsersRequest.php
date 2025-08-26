@@ -30,6 +30,7 @@ class ImportUsersRequest extends FormRequest
             '*.unit_kerja'   => ['required', 'string', 'max:255'],
             '*.perusahaan'   => ['required', 'string', 'max:255'],
             '*.role'         => ['required', 'string', 'max:50'],
+            '*.nip'          => ['nullable', 'string', 'max:50'],
             '*.phone'        => ['nullable', 'string', 'max:255'],
             '*.status'       => ['nullable', 'in:active,inactive'],
             '*.image'        => ['nullable', 'string', 'max:255'],

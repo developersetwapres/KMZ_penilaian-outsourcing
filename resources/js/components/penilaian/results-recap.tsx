@@ -104,7 +104,7 @@ export default function ResultsRecap({ evaluationResults }: any) {
 
                     {/* Results Grid */}
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {filteredResults.map((result) => (
+                        {filteredResults.map((result: any) => (
                             <Card key={result.id} className="gap-0 transition-shadow hover:shadow-lg">
                                 <CardHeader className="pb-3">
                                     <div className="flex items-start justify-between">
@@ -112,8 +112,9 @@ export default function ResultsRecap({ evaluationResults }: any) {
                                             <img
                                                 src={`/storage/${result.image}` || '/placeholder.svg'}
                                                 alt={result.name}
-                                                className="h-12 w-12 rounded-full border-2 border-blue-100"
+                                                className="h-12 w-12 rounded-full border-2 border-blue-100 object-cover"
                                             />
+
                                             <div>
                                                 <CardTitle className="text-lg">{result.name}</CardTitle>
                                                 <CardDescription>

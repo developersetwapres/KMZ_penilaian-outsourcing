@@ -21,9 +21,6 @@ return new class extends Migration
             $table->string('status');
             $table->text('catatan');
             $table->timestamps();
-
-            // untuk mencegah duplikat data yang sama
-            // $table->unique(['outsourcing_id', 'penilai_id', 'type_penilai']);
         });
     }
 

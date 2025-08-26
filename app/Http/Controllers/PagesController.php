@@ -54,7 +54,7 @@ class PagesController extends Controller
 
     public function store(StoreUserRequest $request)
     {
-        $finalImagePath = $this->moveImageFromTemp($request->image);
+        $finalImagePath = $this->moveImageFromTemp($request->image, $request->role);
         User::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name . '-' . Str::random(5)),
@@ -78,10 +78,6 @@ class PagesController extends Controller
 
         $users = [];
         foreach ($data as $value) {
-            $plainPassword = !empty($value['password'])
-                ? $value['password']
-                : Str::random(6);
-
             $users[] = [
                 'name'         => $value['name'],
                 'slug'         => Str::slug($value['name'] . '-' . Str::random(5)),
@@ -93,8 +89,8 @@ class PagesController extends Controller
                 'role'         => $value['role'],
                 'phone'        => $value['phone'] ?? '62123456789',
                 'status'       => $value['status'] ?? 'active',
-                'image'        => $value['image'] ?? '',
-                'password'     => Hash::make($plainPassword),
+                'image'        => $value['image'] ?? 'image/user.png',
+                'password'     => Hash::make($value['nip']),
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
@@ -104,39 +100,6 @@ class PagesController extends Controller
         foreach (array_chunk($users, 100) as $chunk) {
             User::insert($chunk);
         }
-    }
-
-
-    public function importUsersX(ImportUsersRequest $request)
-    {
-        $data = $request->validated();
-        $users = [];
-
-        foreach ($data as $value) {
-            // Kalau password tidak ada → generate random 6 karakter (huruf + angka)
-            $plainPassword = !empty($value['password'])
-                ? $value['password']
-                : Str::random(6);
-
-            $users[] = [
-                'name'         => $value['name'],
-                'slug'         => Str::slug($value['name'] . '-' . Str::random(5)),
-                'email'        => $value['email'],
-                'jabatan'      => $value['jabatan'],
-                'lokasi_kerja' => $value['lokasi_kerja'],
-                'unit_kerja'   => $value['unit_kerja'],
-                'perusahaan'   => $value['perusahaan'],
-                'role'         => $value['role'],
-                'phone'        => $value['phone'] ?? '62123456789',
-                'status'       => $value['status'] ?? 'active',
-                'image'        => $value['image'] ?? '',
-                'password'     => Hash::make('plainPassword'),
-                'created_at'   => now(),
-                'updated_at'   => now(),
-            ];
-        }
-
-        User::insert($users);
     }
 
     public function update(UpdateUserRequest $request, User $user)
@@ -164,15 +127,18 @@ class PagesController extends Controller
         session()->flash('pathTemp', 'temp/' . $path);
     }
 
-    private function moveImageFromTemp(?string $imageUrl): ?string
+    private function moveImageFromTemp(?string $imageUrl, ?string $role): ?string
     {
+
+        $path = $role === 'outsourcing' ? 'os' : 'asn';
+
         $imageUrlNew = Str::replace('temp/', '', $imageUrl,);
 
         $temp = Storage::disk('temp');
         $sourcePath = $temp->path($imageUrlNew);
 
         // tentukan folder tujuan di public/image/user
-        $destinationDir = public_path('/storage/image/user');
+        $destinationDir = public_path('/storage/image/' . $path);
 
         // pastikan folder tujuan ada
         if (! File::exists($destinationDir)) {
@@ -190,6 +156,6 @@ class PagesController extends Controller
             $temp->delete($allTempFiles);
         }
 
-        return 'image/user/' . $imageUrlNew;
+        return 'image/' . $path . "/" . $imageUrlNew;
     }
 }
