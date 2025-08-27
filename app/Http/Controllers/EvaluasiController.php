@@ -53,6 +53,9 @@ class EvaluasiController extends Controller
         $kriterias = Kriteria::where('jenis', 'umum')
             ->orWhere('jenis',  $employee->jabatan)
             ->with('getAspek')
+             ->with(['getIndikators' => function ($query) use ($employee) {
+                $query->where('jabatan', $employee->jabatan);
+            }])
             ->get();
 
         $evaluationData = [];
@@ -70,7 +73,8 @@ class EvaluasiController extends Controller
             $evaluationData[$groupKey]['criteria'][] = [
                 'id' => $kriteria->id,
                 'name' => $kriteria->nama,
-                'indicators' => $kriteria->indikator,
+                'indicators' => $kriteria->getIndikators,
+                // 'getIndikators' => $kriteria->getIndikators,
             ];
         }
 

@@ -246,6 +246,8 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                 {/* Detailed Preview by Aspect */}
                 {aspects.map((aspectKey, aspectIndex) => {
                     const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
+                    console.log(aspect);
+
                     {
                         /*const aspectScore = calculateAspectScore(aspectKey);*/
                     }
@@ -309,8 +311,8 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                     <ul className="space-y-1 text-sm text-gray-600">
                                                         {criterion.indicators.map((indicator: any, idx: any) => (
                                                             <li key={idx} className="flex items-start space-x-2">
-                                                                <span className="mt-1 text-blue-500">•</span>
-                                                                <span>{indicator}</span>
+                                                                {/* <span className="mt-1 text-blue-500">•</span> */}
+                                                                <span>{indicator?.indikator}</span>
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -596,8 +598,8 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                         <ul className="space-y-2 text-sm text-gray-600">
                                                             {criterion.indicators.map((indicator: any, idx: any) => (
                                                                 <li key={idx} className="flex items-start space-x-2">
-                                                                    <span className="mt-1 font-bold text-blue-500">•</span>
-                                                                    <span>{indicator}</span>
+                                                                    {/* <span className="mt-1 font-bold text-blue-500">•</span> */}
+                                                                    <span>{indicator?.indikator}</span>
                                                                 </li>
                                                             ))}
                                                         </ul>

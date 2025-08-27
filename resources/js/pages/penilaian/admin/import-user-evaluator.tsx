@@ -287,7 +287,7 @@ function App() {
                                         onClick={() => exportUsers(dataFile2)}
                                         className="mt-3 rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                                     >
-                                        Export ke DB
+                                        Import ke DB
                                     </Button>
                                 </>
                             )}
@@ -336,7 +336,7 @@ function App() {
                                         onClick={() => exportPenugasan(dataFile1)}
                                         className="mt-3 rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                                     >
-                                        Export ke DB
+                                        Import ke DB
                                     </Button>
                                 </>
                             )}
@@ -383,7 +383,7 @@ function App() {
                                         onClick={() => importIndikator(dataFile3)}
                                         className="mt-3 rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                                     >
-                                        Export ke DB
+                                        Import ke DB
                                     </Button>
                                 </>
                             )}
