@@ -113,55 +113,55 @@ class KriteriaSeeder extends Seeder
                 'nama' => 'Kedisiplinan',
                 'deskripsi' => 'Kepatuhan terhadap aturan, waktu, dan prosedur yang telah ditetapkan dalam organisasi.',
                 'indikator' => [
-                    'Rendahnya frekuensi mangkir dan/atau izin dalam jam kerja untuk urusan non kedinasan.'
+                    "Rendahnya frekuensi mangkir dan/atau izin dalam jam kerja untuk urusan non kedinasan."
                 ]
             ],
             [
-                'aspek' => 2,
-                'jenis' => 'umum',
-                'nama' => 'Komitmen',
-                'deskripsi' => 'Kesungguhan dalam menjalankan tugas dan tanggung jawab secara konsisten.',
-                'indikator' => [
-                    'Menunjukkan komitmen yang tinggi terhadap pengembangan diri dan institusi.'
+                "aspek" => 2,
+                "jenis" => "umum",
+                "nama" => "Komitmen",
+                "deskripsi" => "Kesungguhan dalam menjalankan tugas dan tanggung jawab secara konsisten.",
+                "indikator" => [
+                    "Menunjukkan komitmen yang tinggi terhadap pengembangan diri dan institusi."
                 ]
             ],
             [
-                'aspek' => 2,
-                'jenis' => 'umum',
-                'nama' => 'Penampilan',
-                'deskripsi' => 'Sikap dan tampilan pribadi yang mencerminkan profesionalisme di lingkungan kerja.',
-                'indikator' => [
-                    'Penampilan fisik (cara berpakaian) yang selalu rapi dan sesuai aturan.'
+                "aspek" => 2,
+                "jenis" => "umum",
+                "nama" => "Penampilan",
+                "deskripsi" => "Sikap dan tampilan pribadi yang mencerminkan profesionalisme di lingkungan kerja.",
+                "indikator" => [
+                    "Penampilan fisik (cara berpakaian) yang selalu rapi dan sesuai aturan."
                 ]
             ],
             [
-                'aspek' => 2,
-                'jenis' => 'umum',
-                'nama' => 'Etika dan Kesopanan',
-                'deskripsi' => 'Sikap hormat dan sopan dalam berinteraksi dengan rekan kerja maupun pihak lain.',
-                'indikator' => [
-                    'Kemampuan dalam menerapkan standar perilaku yang sesuai dengan norma adat, agama, dan etika instansi dalam berinteraksi dengan semua pihak.'
+                "aspek" => 2,
+                "jenis" => "umum",
+                "nama" => "Etika dan Kesopanan",
+                "deskripsi" => "Sikap hormat dan sopan dalam berinteraksi dengan rekan kerja maupun pihak lain.",
+                "indikator" => [
+                    "Kemampuan dalam menerapkan standar perilaku yang sesuai dengan norma adat, agama, dan etika instansi dalam berinteraksi dengan semua pihak."
                 ]
             ],
             [
-                'aspek' => 2,
-                'jenis' => 'umum',
-                'nama' => 'Kejujuran',
-                'deskripsi' => 'Perilaku yang mencerminkan integritas dan tidak menyembunyikan kebenaran.',
-                'indikator' => [
-                    'Menyampaikan segala sesuatu dan berperilaku secara apa adanya (truthfully)',
-                    'Konsistensi antara ucapan dan tindakan.'
+                "aspek" => 2,
+                "jenis" => "umum",
+                "nama" => "Kejujuran",
+                "deskripsi" => "Perilaku yang mencerminkan integritas dan tidak menyembunyikan kebenaran.",
+                "indikator" => [
+                    "Menyampaikan segala sesuatu dan berperilaku secara apa adanya (truthfully)",
+                    "Konsistensi antara ucapan dan tindakan."
                 ]
             ],
             [
-                'aspek' => 2,
-                'jenis' => 'umum',
-                'nama' => 'Loyalitas',
-                'deskripsi' => 'Kesetiaan terhadap organisasi serta dukungan terhadap visi dan misi instansi.',
-                'indikator' => [
-                    'Menjalankan perintah atasan dengan segala upaya.',
-                    'Tidak membantah, menolak, atau melakukan pembangkangan terhadap perintah atasan.',
-                    'Bangga dengan pekerjaannya dan bersungguh-sungguh penuh terhadap penyelesaian pekerjaannya.'
+                "aspek" => 2,
+                "jenis" => "umum",
+                "nama" => "Loyalitas",
+                "deskripsi" => "Kesetiaan terhadap organisasi serta dukungan terhadap visi dan misi instansi.",
+                "indikator" => [
+                    "Menjalankan perintah atasan dengan segala upaya.",
+                    "Tidak membantah, menolak, atau melakukan pembangkangan terhadap perintah atasan.",
+                    "Bangga dengan pekerjaannya dan bersungguh-sungguh penuh terhadap penyelesaian pekerjaannya."
                 ]
             ],
         ];
