@@ -9,6 +9,7 @@ import * as XLSX from 'xlsx';
 function App() {
     const [dataFile1, setDataFile1] = useState([]);
     const [dataFile2, setDataFile2] = useState([]);
+    const [dataFile3, setDataFile3] = useState([]);
 
     const handleFileUpload1 = (e) => {
         const file = e.target.files[0];
@@ -100,8 +101,34 @@ function App() {
         reader.readAsArrayBuffer(file);
     };
 
+    const handleFileUpload3 = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const data = new Uint8Array(event.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            const transformed = [];
+            for (let i = 1; i < rawData.length; i++) {
+                const row = rawData[i];
+                transformed.push({
+                    id_kriteria: row[0],
+                    kriteria: row[1],
+                    jabatan: row[2],
+                    indikator: row[3],
+                });
+            }
+            setDataFile3(transformed);
+        };
+        reader.readAsArrayBuffer(file);
+    };
+
     const exportUsers = (data: any) => {
-        router.post(route('user.export'), data, {
+        router.post(route('user.postimport'), data, {
             onSuccess: () => {
                 toast({
                     title: 'Import berhasil',
@@ -117,7 +144,7 @@ function App() {
     };
 
     const exportPenugasan = (data: any) => {
-        router.post(route('penugasan.export'), data, {
+        router.post(route('penugasan.import'), data, {
             onSuccess: () => {
                 toast({
                     title: 'Import berhasil',
@@ -130,6 +157,22 @@ function App() {
             },
         });
     };
+
+    const importIndikator = (data: any) => {
+        router.post(route('indikator.import'), data, {
+            onSuccess: () => {
+                toast({
+                    title: 'Import berhasil',
+                    description: 'Penugasan penilaian berhasil di import',
+                });
+                router.get(route('dashboard'));
+            },
+            onError: (er) => {
+                console.log(er);
+            },
+        });
+    };
+
     const { toast } = useToast();
 
     const cleanup = useMobileNavigation();
@@ -195,7 +238,7 @@ function App() {
                     <div className="mx-auto max-w-6xl space-y-8 rounded-xl bg-white p-6 shadow-md">
                         <h1 className="text-2xl font-bold text-gray-800">Transform Excel Data</h1>
 
-                        {/* Input Excel 1 */}
+                        {/* Input Excel 2 */}
                         <div>
                             <h2 className="mb-2 text-lg font-semibold">Upload File Users</h2>
                             <input
@@ -241,7 +284,7 @@ function App() {
                                         </table>
                                     </div>
                                     <Button
-                                        onClick={() => exportUsers(dataFile2, 2)}
+                                        onClick={() => exportUsers(dataFile2)}
                                         className="mt-3 rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                                     >
                                         Export ke DB
@@ -250,7 +293,7 @@ function App() {
                             )}
                         </div>
 
-                        {/* Input Excel 3 */}
+                        {/* Input Excel 1 */}
                         <div>
                             <h2 className="mb-2 text-lg font-semibold">Upload File Penugasan</h2>
                             <input
@@ -290,7 +333,54 @@ function App() {
                                         </table>
                                     </div>
                                     <Button
-                                        onClick={() => exportPenugasan(dataFile1, 1)}
+                                        onClick={() => exportPenugasan(dataFile1)}
+                                        className="mt-3 rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                                    >
+                                        Export ke DB
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Input Excel 3 */}
+                        <div>
+                            <h2 className="mb-2 text-lg font-semibold">Upload File Indikator</h2>
+                            <input
+                                type="file"
+                                accept=".xlsx"
+                                onChange={handleFileUpload3}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                            />
+
+                            {dataFile3.length > 0 && (
+                                <>
+                                    <div className="mt-2 text-sm text-gray-700">Showing {dataFile3.length} transformed rows</div>
+                                    <div className="mt-2 max-h-[600px] overflow-auto rounded-md border">
+                                        <table className="min-w-full border-collapse text-left text-sm">
+                                            <thead className="sticky top-0 bg-gray-100 text-gray-700">
+                                                <tr>
+                                                    <th className="border px-2 py-2 text-center">NO</th>
+                                                    <th className="border px-2 py-2 text-center">ID - KRITERIA</th>
+                                                    <th className="border px-2 py-2 text-center">KRITERIA</th>
+                                                    <th className="border px-2 py-2">JABATAN</th>
+                                                    <th className="border px-2 py-2">INDIKATOR</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {dataFile3.map((row, index) => (
+                                                    <tr key={index} className="hover:bg-gray-50">
+                                                        <td className="border px-2 py-2 text-center">{index + 1}</td>
+                                                        <td className="border px-2 py-2 text-center">{row.id_kriteria}</td>
+                                                        <td className="border px-2 py-2">{row.kriteria}</td>
+                                                        <td className="border px-2 py-2">{row.jabatan}</td>
+                                                        <td className="border px-2 py-2">{row.indikator}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <Button
+                                        onClick={() => importIndikator(dataFile3)}
                                         className="mt-3 rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                                     >
                                         Export ke DB

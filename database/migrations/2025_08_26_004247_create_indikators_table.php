@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kriteria_id')->constrained()->cascadeOnDelete();
             $table->string('jabatan');
-            $table->string('indikator');
+            $table->text('indikator');
             $table->timestamps();
         });
     }

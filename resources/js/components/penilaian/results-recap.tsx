@@ -37,7 +37,7 @@ export default function ResultsRecap({ evaluationResults }: any) {
         return 'Sangat Kurang';
     };
 
-    const units = [...new Set(evaluationResults.map((r) => r.unit_kerja))];
+    const units = [...new Set(evaluationResults.map((r: any) => r.unit_kerja))];
 
     const handleViewDetail = (slug: string) => {
         router.get(
@@ -143,7 +143,7 @@ export default function ResultsRecap({ evaluationResults }: any) {
                                     <div className="space-y-2">
                                         <h4 className="text-sm font-medium">Penilai ({result.evaluatorScores.length}):</h4>
                                         <div className="space-y-1">
-                                            {result.evaluatorScores.map((evaluator, index) => (
+                                            {result.evaluatorScores.map((evaluator: any, index: any) => (
                                                 <div key={index} className="flex items-center justify-between text-xs">
                                                     <span className="text-gray-600">
                                                         {evaluator.type === 'atasan'

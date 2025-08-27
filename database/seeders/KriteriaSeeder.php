@@ -83,6 +83,27 @@ class KriteriaSeeder extends Seeder
                     'Memecahkan masalah dan membuat keputusan sesuai dengan wewenangnya tanpa pengawasan langsung/terus-menerus dari atasan.'
                 ]
             ],
+            [
+                'aspek' => 1,
+                'jenis' => 'khusus',
+                'nama' => 'Keahlian 1',
+                'deskripsi' => 'Kemampuan dalam menguasai keterampilan teknis tertentu yang diperlukan untuk mendukung pekerjaan secara efektif.',
+                'indikator' => [
+                    'Mampu mengoperasikan peralatan, aplikasi, atau sistem yang dibutuhkan sesuai bidang kerja.',
+                    'Menghasilkan pekerjaan yang berkualitas tinggi dengan menggunakan keahlian teknis yang dimiliki.',
+                ]
+            ],
+            [
+                'aspek' => 1,
+                'jenis' => 'khusus',
+                'nama' => 'Keahlian 2',
+                'deskripsi' => 'Kemampuan menganalisis, menyelesaikan masalah, dan mengembangkan solusi yang relevan dengan bidang pekerjaannya.',
+                'indikator' => [
+                    'Dapat mengidentifikasi masalah teknis maupun non-teknis dalam pekerjaan dengan tepat.',
+                    'Mampu memberikan alternatif solusi yang efektif dan inovatif sesuai lingkup tanggung jawab.',
+                ]
+            ],
+
 
             //-------------------------------------------------------------------
 

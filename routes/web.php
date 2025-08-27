@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EvaluasiController;
+use App\Http\Controllers\IndikatorController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PenugasanPeerController;
@@ -29,7 +30,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
 
     Route::post('dashboard/penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
-    Route::post('dashboard/penugasan-peer/export', [PenugasanPeerController::class, 'importPenugasan'])->name('penugasan.export');
+    Route::post('dashboard/penugasan-peer/import', [PenugasanPeerController::class, 'importPenugasan'])->name('penugasan.import');
 
     Route::get('dashboard-detail/{user:slug}', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
 
@@ -37,13 +38,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::put('dashboard/kriteria/{kriteria}', [KriteriaController::class, 'update'])->name('kriteria.update');
 
     Route::post('dashboard/user/store', [PagesController::class, 'store'])->name('user.store');
-    Route::post('dashboard/user/export-store', [PagesController::class, 'importUsers'])->name('user.export');
+    Route::post('dashboard/user/import-store', [PagesController::class, 'importUsers'])->name('user.postimport');
     Route::put('dashboard/user/update/{user}', [PagesController::class, 'update'])->name('user.update');
 
     Route::post('/upload-temp-image', [PagesController::class, 'uploadTempImage'])->name('upload.temp');
 
 
     Route::get('dashboard/import-user-evaluator', [PenugasanPeerController::class, 'import'])->name('user.import');
+    Route::post('dashboard/import-indikator-kriteria', [IndikatorController::class, 'importIndikator'])->name('indikator.import');
 });
 
 require __DIR__ . '/settings.php';

@@ -53,7 +53,6 @@ class PenugasanPeerController extends Controller
     public function importPenugasan(Request $request)
     {
         $data = $request->all();
-
         function weight($type)
         {
             switch ($type) {
@@ -73,7 +72,7 @@ class PenugasanPeerController extends Controller
         $penugasan = [];
 
         foreach ($data as $value) {
-            $penugasan[] =   [
+            PenugasanPeer::create([
                 'outsourcing_id' => $value['idPegawai'],
                 'type_penilai' => $value['type'],
                 'penilai_id' => $value['idPenilai'],
@@ -82,10 +81,9 @@ class PenugasanPeerController extends Controller
                 'status' => 'incomplete',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ]);
         }
 
-        PenugasanPeer::insert($penugasan); // sekali query untuk semua data
-
+        // PenugasanPeer::insert($penugasan);
     }
 }
