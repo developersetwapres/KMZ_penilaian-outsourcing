@@ -104,7 +104,7 @@ class PagesController extends Controller
 
     public function update(UpdateUserRequest $request, User $user)
     {
-        $finalImagePath = $this->moveImageFromTemp($request->image);
+        $finalImagePath = $this->moveImageFromTemp($request->image,  $request->role);
 
         $user->update([
             'name' => $request->name,

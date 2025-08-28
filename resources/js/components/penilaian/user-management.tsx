@@ -22,13 +22,31 @@ const roleOptions = [
 ];
 
 const unitOptions = [
-    'Bagian Kepegawaian',
-    'Biro Pers, Media, dan Informasi',
-    'ex Bagian Teknologi Informasi',
-    'Biro Sumber Daya Manusia',
-    'Bagian Teknologi Informasi',
-    'Bagian Keuangan',
-    'Bagian Pemasaran',
+   'Biro Umum',
+'Biro Protokol dan Kerumahtanggaan',
+'Biro TUSDM',
+'Biro Perencanaan dan Keuangan',
+'Deputi Bidang Dukungan KPPP',
+'Deputi Bidang Dukungan KPKPSDM',
+'BPMI',
+'Asdep Tata Kelola Pemerintahan dan Perepatan Pembangunan Daerah',
+'Asdep Pemberdayaan Masyarakat dan Penanggulangan Bencana',
+'Badan Teknologi, Data dan Informasi',
+'Asdep Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan',
+'Deputi Bidang Administrasi',
+'Asdep Ekonomi, Keuangan dan Transformasi Digital',
+'Asdep Politik, Keamanan, Hukum dan Hak Asasi Manusia',
+'Asdep Hubungan Luar Negeri dan Pertahanan ',
+'Asdep Industri, Perdagangan, Pariwisata dan Ekonomi Kreatif',
+'Sekretaris Wakil Presiden',
+'Asdep Pengentasan Kemiskinan dan Pembangunan Desa',
+'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
+'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
+'Kepala BPMI',
+'Asdep Pendidikan, Agama, Kebudayaan, Pemuda dan Olahraga',
+'Asdep Kesehatan, Gizi dan Pembangunan Keluarga',
+'Biro Umum Setneg',
+'Biro Pers, Media, dan Informasi',
 ];
 
 export default function UserManagement({ initialUsers }: any) {
