@@ -63,8 +63,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 <AppLogoIcon />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-gray-900">Sistem Penilaian</h1>
-                                <p className="text-sm text-gray-500">Kinerja Outsourcing Setwapres RI</p>
+                                <h1 className="text-xl font-bold text-gray-900">Sistem Penilaian Kinerja</h1>
+                                <p className="text-sm text-gray-500">Pegawai Outsourcing Setwapres</p>
                             </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 </div>
                             </div>
                             <h1 className="mb-4 text-4xl font-bold text-gray-900">Sistem Penilaian Kinerja</h1>
-                            <p className="mb-2 text-xl text-gray-600">Tenaga Kerja Outsourcing</p>
+                            <p className="mb-2 text-xl text-gray-600">Pegawai Outsourcing Setwapres</p>
                             <p className="mx-auto mb-8 max-w-2xl text-gray-500">
                                 Platform terintegrasi untuk mengelola dan melakukan penilaian kinerja pegawai outsourcing dengan sistem evaluasi yang
                                 komprehensif dan terstruktur.
