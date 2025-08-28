@@ -623,7 +623,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                                     // value={scores[criterion.id] ?? ''}
                                                                     onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
                                                                     className="w-32 text-center text-lg font-bold"
-                                                                    placeholder="51"
+                                                                    placeholder="MIn 51"
                                                                 />
                                                             </div>
                                                             {currentScore > 0 && (
