@@ -4,6 +4,7 @@ use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Settings\ImportController;
 
 Route::middleware('auth')->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -18,4 +19,10 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/appearance');
     })->name('appearance');
+
+
+    Route::get('settings/import-user-evaluator', [ImportController::class, 'import'])->name('data.import');
+    Route::post('settings/import-indikator-kriteria', [ImportController::class, 'importIndikator'])->name('indikator.import');
+    Route::post('settings/user/import-store', [ImportController::class, 'importUsers'])->name('user.postimport');
+    Route::post('settings/penugasan-peer/import', [ImportController::class, 'importPenugasan'])->name('penugasan.import');
 });

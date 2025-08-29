@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePenugasanPeerRequest;
 use App\Models\PenugasanPeer;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
 class PenugasanPeerController extends Controller
@@ -43,47 +41,5 @@ class PenugasanPeerController extends Controller
                 ]
             );
         }
-    }
-
-    public function import()
-    {
-        return Inertia::render('penilaian/admin/import-user-evaluator');
-    }
-
-    public function importPenugasan(Request $request)
-    {
-        $data = $request->all();
-        function weight($type)
-        {
-            switch ($type) {
-                case 'atasan':
-                    return 0.5;
-                    break;
-
-                case 'penerima_layanan':
-                    return 0.3;
-                    break;
-
-                default:
-                    return 0.2;
-            }
-        }
-
-        $penugasan = [];
-
-        foreach ($data as $value) {
-            PenugasanPeer::create([
-                'outsourcing_id' => $value['idPegawai'],
-                'type_penilai' => $value['type'],
-                'penilai_id' => $value['idPenilai'],
-                'weight' =>  weight($value['type']),
-                'catatan' => '',
-                'status' => 'incomplete',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // PenugasanPeer::insert($penugasan);
     }
 }

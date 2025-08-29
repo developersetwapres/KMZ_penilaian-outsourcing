@@ -7,14 +7,12 @@ use App\Http\Requests\ImportUsersRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Aspek;
-use App\Models\Evaluasi;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Models\Kriteria;
 use App\Models\PenugasanPeer;
 use Illuminate\Support\Str;
 use App\Models\User;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -71,36 +69,6 @@ class PagesController extends Controller
         ]);
     }
 
-    public function importUsers(ImportUsersRequest $request)
-    {
-        set_time_limit(0); // hilangkan limit waktu eksekusi
-        $data = $request->validated();
-
-        $users = [];
-        foreach ($data as $value) {
-            $users[] = [
-                'name'         => $value['name'],
-                'slug'         => Str::slug($value['name'] . '-' . Str::random(5)),
-                'email'        => $value['email'],
-                'jabatan'      => $value['jabatan'],
-                'lokasi_kerja' => $value['lokasi_kerja'],
-                'unit_kerja'   => $value['unit_kerja'],
-                'perusahaan'   => $value['perusahaan'],
-                'role'         => $value['role'],
-                'phone'        => $value['phone'] ?? '62123456789',
-                'status'       => $value['status'] ?? 'active',
-                'image'        => $value['image'] ?? 'image/user.png',
-                'password'     => Hash::make($value['nip']),
-                'created_at'   => now(),
-                'updated_at'   => now(),
-            ];
-        }
-
-        // Bagi jadi batch 500 user sekali insert
-        foreach (array_chunk($users, 100) as $chunk) {
-            User::insert($chunk);
-        }
-    }
 
     public function update(UpdateUserRequest $request, User $user)
     {
