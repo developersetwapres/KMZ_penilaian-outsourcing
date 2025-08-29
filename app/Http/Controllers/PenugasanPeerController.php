@@ -42,4 +42,9 @@ class PenugasanPeerController extends Controller
             );
         }
     }
+
+    public function reset()
+    {
+        PenugasanPeer::truncate();
+    }
 }

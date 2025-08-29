@@ -39,92 +39,72 @@ function App() {
     const simulateResetUsers = async () => {
         setLoadingStates((prev) => ({ ...prev, users: true }));
 
-        router.delete(route('zzzz'), {
+        router.delete(route('user.reset'), {
             onSuccess: () => {
                 toast({
                     title: 'Reset Berhasil',
-                    description: 'Data Users berhasil direset. 150 data telah dihapus.',
+                    description: 'Data Users berhasil direset.',
                 });
 
                 setLoadingStates((prev) => ({ ...prev, users: false }));
+                router.get(route('dashboard'));
             },
             onError: (err) => {
                 console.log(err);
+                toast({
+                    title: 'Reset Gagal',
+                    description: 'Terjadi kesalahan saat mereset data Users.',
+                    variant: 'destructive',
+                });
             },
         });
-
-        try {
-            // Simulate API call to backend
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-
-            // Simulate API endpoint: DELETE /api/reset/users
-            console.log('API Call: DELETE /api/reset/users');
-            console.log('Response: { success: true, message: "Users data reset successfully", deletedCount: 150 }');
-
-            toast({
-                title: 'Reset Berhasil',
-                description: 'Data Users berhasil direset. 150 data telah dihapus.',
-            });
-        } catch (error) {
-            toast({
-                title: 'Reset Gagal',
-                description: 'Terjadi kesalahan saat mereset data Users.',
-                variant: 'destructive',
-            });
-        } finally {
-        }
     };
 
     const simulateResetPenugasan = async () => {
         setLoadingStates((prev) => ({ ...prev, penugasan: true }));
 
-        try {
-            // Simulate API call to backend
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+        router.delete(route('penugasan.reset'), {
+            onSuccess: () => {
+                toast({
+                    title: 'Reset Berhasil',
+                    description: 'Data Indikator berhasil direset. 45 data telah dihapus.',
+                });
 
-            // Simulate API endpoint: DELETE /api/reset/penugasan
-            console.log('API Call: DELETE /api/reset/penugasan');
-            console.log('Response: { success: true, message: "Penugasan data reset successfully", deletedCount: 75 }');
-
-            toast({
-                title: 'Reset Berhasil',
-                description: 'Data Penugasan berhasil direset. 75 data telah dihapus.',
-            });
-        } catch (error) {
-            toast({
-                title: 'Reset Gagal',
-                description: 'Terjadi kesalahan saat mereset data Penugasan.',
-                variant: 'destructive',
-            });
-        } finally {
-            setLoadingStates((prev) => ({ ...prev, penugasan: false }));
-        }
+                setLoadingStates((prev) => ({ ...prev, penugasan: false }));
+                router.get(route('dashboard'));
+            },
+            onError: (err) => {
+                console.log(err);
+                toast({
+                    title: 'Reset Gagal',
+                    description: 'Terjadi kesalahan saat mereset data Indikator.',
+                    variant: 'destructive',
+                });
+            },
+        });
     };
 
     const simulateResetIndikator = async () => {
         setLoadingStates((prev) => ({ ...prev, indikator: true }));
 
-        try {
-            // Simulate API call to backend
-            await new Promise((resolve) => setTimeout(resolve, 1800));
-
-            // Simulate API endpoint: DELETE /api/reset/indikator
-            console.log('API Call: DELETE /api/reset/indikator');
-            console.log('Response: { success: true, message: "Indikator data reset successfully", deletedCount: 45 }');
-
-            toast({
-                title: 'Reset Berhasil',
-                description: 'Data Indikator berhasil direset. 45 data telah dihapus.',
-            });
-        } catch (error) {
-            toast({
-                title: 'Reset Gagal',
-                description: 'Terjadi kesalahan saat mereset data Indikator.',
-                variant: 'destructive',
-            });
-        } finally {
-            setLoadingStates((prev) => ({ ...prev, indikator: false }));
-        }
+        router.delete(route('indikator.reset'), {
+            onSuccess: () => {
+                toast({
+                    title: 'Reset Berhasil',
+                    description: 'Data Penugasan berhasil direset.',
+                });
+                setLoadingStates((prev) => ({ ...prev, indikator: false }));
+                router.get(route('dashboard'));
+            },
+            onError: (err) => {
+                console.log(err);
+                toast({
+                    title: 'Reset Gagal',
+                    description: 'Terjadi kesalahan saat mereset data Penugasan.',
+                    variant: 'destructive',
+                });
+            },
+        });
     };
 
     return (

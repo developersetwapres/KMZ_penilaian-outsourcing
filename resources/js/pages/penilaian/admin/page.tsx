@@ -107,7 +107,7 @@ export default function AdminPage({ outsourcing, masterData, users, evaluationRe
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <span className="font-medium">Akses:</span>
-                                            <span>Full System Access</span>
+                                            <a href={route('profile.edit')}>Full System Access</a>
                                         </div>
                                     </div>
                                 </div>
