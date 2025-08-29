@@ -1,4 +1,4 @@
- <?php
+<?php
 
 namespace App\Http\Controllers\Settings;
 
@@ -11,9 +11,17 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Indikator;
 use Inertia\Inertia;
+use Inertia\Response;
+
 
 class ImportController extends Controller
-{ public function importUsers(ImportUsersRequest $request)
+{
+    public function pageImport(): Response
+    {
+        return Inertia::render('settings/import');
+    }
+
+    public function importUsers(ImportUsersRequest $request)
     {
         set_time_limit(0); // hilangkan limit waktu eksekusi
         $data = $request->validated();
@@ -44,7 +52,7 @@ class ImportController extends Controller
         }
     }
 
-        public function importPenugasan(Request $request)
+    public function importPenugasan(Request $request)
     {
         $data = $request->all();
         function weight($type)
@@ -66,7 +74,7 @@ class ImportController extends Controller
         $penugasan = [];
 
         foreach ($data as $value) {
-             $penugasan[] = [
+            $penugasan[] = [
                 'outsourcing_id' => $value['idPegawai'],
                 'type_penilai' => $value['type'],
                 'penilai_id' => $value['idPenilai'],
@@ -81,7 +89,7 @@ class ImportController extends Controller
         PenugasanPeer::insert($penugasan);
     }
 
-     public function importIndikator(Request $request)
+    public function importIndikator(Request $request)
     {
         $data = $request->all();
 
@@ -94,8 +102,8 @@ class ImportController extends Controller
         }
     }
 
-        public function import()
+    public function pageReset()
     {
-        return Inertia::render('penilaian/admin/import-user-evaluator');
+        return Inertia::render('settings/resetdata');
     }
 }

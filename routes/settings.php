@@ -21,8 +21,9 @@ Route::middleware('auth')->group(function () {
     })->name('appearance');
 
 
-    Route::get('settings/import-user-evaluator', [ImportController::class, 'import'])->name('data.import');
+    Route::get('settings/import', [ImportController::class, 'pageImport'])->name('data.import');
     Route::post('settings/import-indikator-kriteria', [ImportController::class, 'importIndikator'])->name('indikator.import');
     Route::post('settings/user/import-store', [ImportController::class, 'importUsers'])->name('user.postimport');
     Route::post('settings/penugasan-peer/import', [ImportController::class, 'importPenugasan'])->name('penugasan.import');
+    Route::get('settings/data-reset', [ImportController::class, 'pageReset'])->name('data.reset');
 });

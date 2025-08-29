@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { Separator } from '@radix-ui/react-separator';
 import { AlertCircle, CheckCircle, Crown, Edit, Search, Shield, UserCheck, UserPlus, Users, Users2 } from 'lucide-react';
 import { useState } from 'react';
@@ -107,9 +107,7 @@ export default function PeerAssignment({ outsourcingEmployees }: any) {
             {/* Header Card */}
             <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
                 <CardHeader>
-                    <CardTitle className="text-2xl">
-                        <Link href={route('user.import')}>Penugasan Evaluator</Link>
-                    </CardTitle>
+                    <CardTitle className="text-2xl">Penugasan Evaluator</CardTitle>
                     <CardDescription className="text-indigo-100">
                         Tetapkan rekan kerja sebagai evaluator peer untuk setiap karyawan yang dievaluasi.
                     </CardDescription>

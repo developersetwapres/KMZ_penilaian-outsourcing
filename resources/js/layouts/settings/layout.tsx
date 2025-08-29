@@ -22,6 +22,16 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/appearance',
         icon: null,
     },
+    {
+        title: 'Import',
+        href: '/settings/import',
+        icon: null,
+    },
+    {
+        title: 'Data Reset',
+        href: '/settings/data-reset',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
