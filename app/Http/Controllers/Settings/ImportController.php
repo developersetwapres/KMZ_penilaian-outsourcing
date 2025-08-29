@@ -70,11 +70,8 @@ class ImportController extends Controller
                     return 0.2;
             }
         }
-
-        $penugasan = [];
-
         foreach ($data as $value) {
-            $penugasan[] = [
+            PenugasanPeer::create([
                 'outsourcing_id' => $value['idPegawai'],
                 'type_penilai' => $value['type'],
                 'penilai_id' => $value['idPenilai'],
@@ -83,10 +80,8 @@ class ImportController extends Controller
                 'status' => 'incomplete',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ]);
         }
-
-        PenugasanPeer::insert($penugasan);
     }
 
     public function importIndikator(Request $request)
