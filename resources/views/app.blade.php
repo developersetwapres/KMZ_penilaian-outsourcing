@@ -31,7 +31,7 @@
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <title inertia>{{ config('app.name', 'Sistem Penilaian Kinerja Outsourcing') }}</title>
 
     <link rel="icon" href="/image/app/logo.png" sizes="any">
     <link rel="icon" href="/image/app/logo.png" type="image/svg+xml">
