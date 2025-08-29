@@ -23,6 +23,7 @@ class ImportUsersRequest extends FormRequest
     public function rules(): array
     {
         return [
+            '*.id' => ['required', 'integer', Rule::exists('penugasan_peers', 'penilai_id')],
             '*.name'         => ['required', 'string', 'max:255'],
             '*.email'        => ['required', 'email', Rule::unique('users', 'email')],
             '*.jabatan'      => ['required', 'string', 'max:255'],
@@ -41,6 +42,10 @@ class ImportUsersRequest extends FormRequest
     public function messages(): array
     {
         return [
+            '*.id.required' => 'ID wajib diisi.',
+            '*.id.integer'  => 'ID harus berupa angka.',
+            '*.id.exists'   => 'ID ":input" tidak ditemukan di tabel penugasan_peers.',
+
             '*.name.required'         => 'Nama wajib diisi.',
             '*.name.string'           => 'Nama harus berupa teks.',
             '*.name.max'              => 'Nama maksimal 255 karakter.',
