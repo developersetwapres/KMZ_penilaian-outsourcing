@@ -29,6 +29,7 @@ class ImportController extends Controller
         $users = [];
         foreach ($data as $value) {
             $users[] = [
+                'id'            => $value['id'],
                 'name'         => $value['name'],
                 'slug'         => Str::slug($value['name'] . '-' . Str::random(5)),
                 'email'        => $value['email'],
@@ -78,8 +79,6 @@ class ImportController extends Controller
                 'weight' =>  weight($value['type']),
                 'catatan' => '',
                 'status' => 'incomplete',
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         }
     }
