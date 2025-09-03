@@ -2,6 +2,7 @@
 
 import MasterDataManager from '@/components/penilaian/master-data-manager';
 import PeerAssignment from '@/components/penilaian/peer-assignment';
+import OutsourcingRankingPage from '@/components/penilaian/rangking';
 import ResultsRecap from '@/components/penilaian/results-recap';
 import UserManagement from '@/components/penilaian/user-management';
 import { Button } from '@/components/ui/button';
@@ -116,10 +117,14 @@ export default function AdminPage({ outsourcing, masterData, users, evaluationRe
 
                         {/* Main Content */}
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                            <TabsList className="grid h-12 w-full grid-cols-4">
+                            <TabsList className="grid h-12 w-full grid-cols-5">
                                 <TabsTrigger value="results" className="flex items-center space-x-2 text-sm">
                                     <BarChart3 className="h-4 w-4" />
                                     <span>Rekap Hasil</span>
+                                </TabsTrigger>
+                                <TabsTrigger value="rangking" className="flex items-center space-x-2 text-sm">
+                                    <BarChart3 className="h-4 w-4" />
+                                    <span>Rangking Skor</span>
                                 </TabsTrigger>
                                 <TabsTrigger value="assignment" className="flex items-center space-x-2 text-sm">
                                     <Users className="h-4 w-4" />
@@ -137,6 +142,10 @@ export default function AdminPage({ outsourcing, masterData, users, evaluationRe
 
                             <TabsContent value="results">
                                 <ResultsRecap evaluationResults={evaluationResults} />
+                            </TabsContent>
+
+                            <TabsContent value="rangking">
+                                <OutsourcingRankingPage />
                             </TabsContent>
 
                             <TabsContent value="assignment">

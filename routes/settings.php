@@ -24,7 +24,6 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('settings/appearance');
     })->name('appearance');
 
-
     Route::get('settings/import', [ImportController::class, 'pageImport'])->name('data.import');
     Route::post('settings/import-indikator-kriteria', [ImportController::class, 'importIndikator'])->name('indikator.import');
     Route::post('settings/user/import-store', [ImportController::class, 'importUsers'])->name('user.postimport');

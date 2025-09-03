@@ -39,8 +39,6 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::put('dashboard/user/update/{user}', [PagesController::class, 'update'])->name('user.update');
 
     Route::post('/upload-temp-image', [PagesController::class, 'uploadTempImage'])->name('upload.temp');
-
-
 });
 
 require __DIR__ . '/settings.php';

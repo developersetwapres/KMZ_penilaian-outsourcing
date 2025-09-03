@@ -13,6 +13,7 @@ use App\Models\Kriteria;
 use App\Models\PenugasanPeer;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -71,7 +72,9 @@ class PagesController extends Controller
 
     public function resetUser()
     {
-        User::whereNot('role', 'admin')->truncate();
+        User::query()->delete();
+        // DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
+        DB::statement("DELETE FROM sqlite_sequence WHERE name='users'");
 
         $name = 'Administrator';
         $names = explode(' ', $name);

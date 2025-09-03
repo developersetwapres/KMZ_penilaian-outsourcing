@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ImportPenugasanRequest;
 use App\Http\Requests\ImportUsersRequest;
 use App\Models\PenugasanPeer;
 use App\Models\User;
@@ -53,7 +54,7 @@ class ImportController extends Controller
         }
     }
 
-    public function importPenugasan(Request $request)
+    public function importPenugasan(ImportPenugasanRequest $request)
     {
         $data = $request->all();
         function weight($type)

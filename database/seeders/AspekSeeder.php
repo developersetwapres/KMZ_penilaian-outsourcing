@@ -15,7 +15,7 @@ class AspekSeeder extends Seeder
     {
         $datas = [
             [
-                'name' => 'Aspek teknis dan hasil kerja',
+                'name' => 'Aspek teknis dan kualitas kerja',
                 'weight' => 0.6,
                 'deskripsi' => 'Penilaian terhadap kemampuan teknis dan profesional dalam menjalankan tugas.',
             ],

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePenugasanPeerRequest;
 use App\Models\PenugasanPeer;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class PenugasanPeerController extends Controller
@@ -45,6 +46,8 @@ class PenugasanPeerController extends Controller
 
     public function reset()
     {
-        PenugasanPeer::truncate();
+        PenugasanPeer::query()->delete();
+        // DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
+        DB::statement("DELETE FROM sqlite_sequence WHERE name='users'");
     }
 }

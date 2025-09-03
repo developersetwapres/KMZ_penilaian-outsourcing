@@ -50,9 +50,7 @@ class EvaluasiController extends Controller
         }
         //---------------POLICE END-----------------POLICE END-------------------------------
 
-        $kriterias = Kriteria::where('jenis', 'umum')
-            ->orWhere('jenis',  $employee->jabatan)
-            ->with('getAspek')
+        $kriterias = Kriteria::with('getAspek')
             ->with(['getIndikators' => function ($query) use ($employee) {
                 $query->where('jabatan', $employee->jabatan)
                     ->orWhere('jabatan', 'Umum');

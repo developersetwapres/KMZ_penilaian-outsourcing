@@ -11,6 +11,8 @@ import { BarChart3, Download, Eye, Search } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ResultsRecap({ evaluationResults }: any) {
+    console.log(evaluationResults);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [filterUnit, setFilterUnit] = useState('all');
 

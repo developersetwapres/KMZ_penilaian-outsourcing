@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('kriterias', function (Blueprint $table) {
             $table->id();
             $table->string('slug');
-            $table->string('jenis');
             $table->foreignId('aspek_id')->constrained()->cascadeOnDelete();
             $table->string('nama');
             $table->json('indikator');

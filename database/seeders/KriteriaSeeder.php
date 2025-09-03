@@ -169,10 +169,9 @@ class KriteriaSeeder extends Seeder
         foreach ($data as $key => $value) {
             Kriteria::create([
                 'slug' => Str::slug($value['aspek'] . '-' . $value['nama'], '-'),
-                'jenis' => $value['jenis'],
                 'aspek_id' => $value['aspek'],
                 'nama' => $value['nama'],
-                'indikator' => $value['indikator'],
+                // 'indikator' => $value['indikator'],
             ]);
         }
     }
