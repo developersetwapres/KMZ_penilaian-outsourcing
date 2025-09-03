@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
             'status' => 'active',
             'image' => 'image/user.png',
             'email_verified_at' => now(),
-            'password' => Hash::make('adm1n02'),
+            'password' => Hash::make('Adm1n@'),
             'remember_token' => Str::random(10),
         ]);
     }

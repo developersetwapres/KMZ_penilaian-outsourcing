@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('outsourcing_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('penilai_id')->constrained('users')->cascadeOnDelete();
             $table->enum('type_penilai', ['teman', 'penerima_layanan', 'atasan']);
-            $table->integer('weight');
+            $table->decimal('weight');
             $table->string('status');
             $table->text('catatan');
             $table->timestamps();
