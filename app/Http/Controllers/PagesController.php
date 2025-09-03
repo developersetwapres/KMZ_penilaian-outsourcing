@@ -35,7 +35,7 @@ class PagesController extends Controller
             'users' => User::all(),
             'masterData' => [
                 'aspects' => Aspek::select(['id', 'nama', 'deskripsi'])->withCount('countKriteria')->get(),
-                'criteria' => Kriteria::select(['id', 'nama', 'aspek_id', 'jenis'])
+                'criteria' => Kriteria::select(['id', 'nama', 'aspek_id'])
                     ->with(['getIndikators'])
                     ->with('getAspek')
                     ->get(),
