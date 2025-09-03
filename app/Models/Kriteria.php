@@ -13,7 +13,7 @@ class Kriteria extends Model
         'jenis',
         'aspek_id',
         'nama',
-        'indikator',
+        // 'indikator',
     ];
 
     protected $casts = [

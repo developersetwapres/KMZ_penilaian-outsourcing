@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('slug');
             $table->foreignId('aspek_id')->constrained()->cascadeOnDelete();
             $table->string('nama');
-            $table->json('indikator');
+            // $table->json('indikator');
             $table->timestamps();
         });
     }
