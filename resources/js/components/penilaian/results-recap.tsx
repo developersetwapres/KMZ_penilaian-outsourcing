@@ -11,8 +11,6 @@ import { BarChart3, Download, Eye, Search } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ResultsRecap({ evaluationResults }: any) {
-    console.log(evaluationResults);
-
     const [searchTerm, setSearchTerm] = useState('');
     const [filterUnit, setFilterUnit] = useState('all');
 
@@ -134,7 +132,7 @@ export default function ResultsRecap({ evaluationResults }: any) {
                                     {/* Weighted Overall Score */}
                                     <div className="rounded-lg bg-gray-50 p-4 text-center">
                                         <div className={`text-3xl font-bold ${getScoreColor(result.weightedOverallScore)}`}>
-                                            {result.weightedOverallScore.toFixed(1)}
+                                            {result.weightedOverallScore.toFixed(2)}
                                         </div>
                                         <p className="mt-1 text-sm text-gray-600">Nilai Akhir</p>
                                         <p className="text-xs text-gray-500">{getScoreLabel(result.weightedOverallScore)}</p>

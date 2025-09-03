@@ -24,6 +24,8 @@ const jabatan = [
 ];
 
 export default function MasterDataManager({ masterData }: any) {
+    console.log(masterData);
+
     const [selectedLevel, setSelectedLevel] = useState<'aspects' | 'criteria'>('aspects');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
@@ -205,7 +207,7 @@ export default function MasterDataManager({ masterData }: any) {
                                                 <CardTitle className="text-base">{criteria?.nama}</CardTitle>
                                             </div>
                                             <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                                                {criteria.indikator.length} indikator
+                                                {criteria?.get_indikators.length} indikator
                                             </Badge>
                                         </div>
                                     </CardHeader>
@@ -213,10 +215,10 @@ export default function MasterDataManager({ masterData }: any) {
                                         <div className="mb-3">
                                             <p className="mb-2 text-sm font-medium text-gray-700">Indikator Penilaian:</p>
                                             <ul className="max-h-24 space-y-1 overflow-y-auto text-xs text-gray-600">
-                                                {criteria.indikator.map((indicator: any, idx: number) => (
+                                                {criteria?.get_indikators.map((indicator: any, idx: number) => (
                                                     <li key={idx} className="flex items-start space-x-1">
                                                         <span className="font-bold text-blue-400">•</span>
-                                                        <span className="leading-relaxed">{indicator}</span>
+                                                        <span className="leading-relaxed">{indicator?.indikator}</span>
                                                     </li>
                                                 ))}
                                             </ul>
@@ -237,7 +239,7 @@ export default function MasterDataManager({ masterData }: any) {
                 );
             })}
 
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
                 <div className="flex items-center space-x-3 rounded-lg border-b-2 border-blue-200 bg-gradient-to-r from-blue-50 to-transparent p-3 pb-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
                         {masterData.aspects.length + 1}
@@ -286,7 +288,7 @@ export default function MasterDataManager({ masterData }: any) {
                         </Card>
                     ))}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 

@@ -286,7 +286,6 @@ class EvaluasiController extends Controller
             'status'                => $status,
         ];
 
-
         return Inertia::render('penilaian/admin/employee-detail-page', [
             'evaluationResults' => $evaluationData,
         ]);

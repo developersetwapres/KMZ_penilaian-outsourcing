@@ -254,11 +254,12 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                     </div>
                                                     <div className="mb-4 rounded-4xl bg-white/10 p-4 backdrop-blur-sm">
                                                         <div className="mb-1 font-mono text-sm opacity-90">
-                                                            {employee?.weightedAspek?.['aspek-teknis-dan-hasil-kerja']?.average} ×{' '}
-                                                            {(employee?.weightedAspek?.['aspek-teknis-dan-hasil-kerja']?.weight * 100).toFixed(0)}% =
+                                                            {employee?.weightedAspek?.['aspek-teknis-dan-kualitas-kerja']?.average} ×{' '}
+                                                            {(employee?.weightedAspek?.['aspek-teknis-dan-kualitas-kerja']?.weight * 100).toFixed(0)}%
+                                                            =
                                                         </div>
                                                         <div className="text-4xl font-bold">
-                                                            {employee?.weightedAspek?.['aspek-teknis-dan-hasil-kerja']?.score.toFixed(2)}
+                                                            {employee?.weightedAspek?.['aspek-teknis-dan-kualitas-kerja']?.score.toFixed(2)}
                                                         </div>
                                                         <div className="mt-1 text-xs opacity-75">Dari semua evaluator</div>
                                                     </div>
@@ -384,7 +385,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                         <CardContent>
                                             <div className="space-y-4">
                                                 {employee.evaluatorScores.map((evaluator, index) => {
-                                                    let originalScore = evaluator.aspectScores['aspek-teknis-dan-hasil-kerja'];
+                                                    let originalScore = evaluator.aspectScores['aspek-teknis-dan-kualitas-kerja'];
 
                                                     if (!originalScore) {
                                                         originalScore = 0;
@@ -445,7 +446,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                         <div className="mt-2 mb-3 text-xs text-blue-600">
                                                             {employee.evaluatorScores
                                                                 .map((e, i) => {
-                                                                    const score = e?.aspectScores?.['aspek-teknis-dan-hasil-kerja'] ?? 0;
+                                                                    const score = e?.aspectScores?.['aspek-teknis-dan-kualitas-kerja'] ?? 0;
                                                                     const weight = e?.weight ?? 0;
 
                                                                     return `${(score * weight).toFixed(2)}`;
@@ -454,7 +455,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                             {' ='}
                                                         </div>
                                                         <div className="text-5xl font-bold text-blue-900">
-                                                            {employee.weightedAspek['aspek-teknis-dan-hasil-kerja'].average.toFixed(2)}
+                                                            {employee.weightedAspek['aspek-teknis-dan-kualitas-kerja'].average.toFixed(2)}
                                                         </div>
                                                     </div>
                                                 </div>

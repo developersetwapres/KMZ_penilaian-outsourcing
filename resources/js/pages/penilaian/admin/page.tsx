@@ -2,7 +2,7 @@
 
 import MasterDataManager from '@/components/penilaian/master-data-manager';
 import PeerAssignment from '@/components/penilaian/peer-assignment';
-import OutsourcingRankingPage from '@/components/penilaian/rangking';
+import RankingPage from '@/components/penilaian/rangking';
 import ResultsRecap from '@/components/penilaian/results-recap';
 import UserManagement from '@/components/penilaian/user-management';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { BarChart3, Building2, LogOut, Settings, User, UserCog, Users } from 'lucide-react';
 import { useState } from 'react';
 
-export default function AdminPage({ outsourcing, masterData, users, evaluationResults }: any) {
+export default function AdminPage({ outsourcing, masterData, users, evaluationResults, rankingskor }: any) {
     const { auth } = usePage<SharedData>().props;
     const [activeTab, setActiveTab] = useState('results');
     const { toast } = useToast();
@@ -124,7 +124,7 @@ export default function AdminPage({ outsourcing, masterData, users, evaluationRe
                                 </TabsTrigger>
                                 <TabsTrigger value="rangking" className="flex items-center space-x-2 text-sm">
                                     <BarChart3 className="h-4 w-4" />
-                                    <span>Rangking Skor</span>
+                                    <span>Ranking Skor</span>
                                 </TabsTrigger>
                                 <TabsTrigger value="assignment" className="flex items-center space-x-2 text-sm">
                                     <Users className="h-4 w-4" />
@@ -145,7 +145,7 @@ export default function AdminPage({ outsourcing, masterData, users, evaluationRe
                             </TabsContent>
 
                             <TabsContent value="rangking">
-                                <OutsourcingRankingPage />
+                                <RankingPage outsourcingData={rankingskor} />
                             </TabsContent>
 
                             <TabsContent value="assignment">

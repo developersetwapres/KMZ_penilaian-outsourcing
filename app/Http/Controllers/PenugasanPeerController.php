@@ -47,7 +47,7 @@ class PenugasanPeerController extends Controller
     public function reset()
     {
         PenugasanPeer::query()->delete();
-        // DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
-        DB::statement("DELETE FROM sqlite_sequence WHERE name='users'");
+        DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
+        // DB::statement("DELETE FROM sqlite_sequence WHERE name='users'");
     }
 }

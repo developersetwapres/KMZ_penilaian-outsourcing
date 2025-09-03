@@ -36,16 +36,13 @@ class PagesController extends Controller
             'masterData' => [
                 'aspects' => Aspek::select(['id', 'nama', 'deskripsi'])->withCount('countKriteria')->get(),
                 'criteria' => Kriteria::select(['id', 'nama', 'indikator', 'aspek_id', 'jenis'])
-                    ->where('jenis', 'umum')
+                    ->with(['getIndikators'])
                     ->with('getAspek')
                     ->get(),
-                'criteriaKhusus' => Kriteria::select(['id', 'nama', 'indikator', 'aspek_id', 'jenis'])
-                    ->whereNot('jenis', 'umum')
-                    ->with('getAspek')
-                    ->get()
             ],
 
             'evaluationResults' => $penugasanPeer->EvaluationResults(),
+            'rankingskor' => $penugasanPeer->RankingSkor(),
         ];
 
         return Inertia::render('penilaian/admin/page', $data);
@@ -73,8 +70,8 @@ class PagesController extends Controller
     public function resetUser()
     {
         User::query()->delete();
-        // DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
-        DB::statement("DELETE FROM sqlite_sequence WHERE name='users'");
+        DB::statement('ALTER TABLE users AUTO_INCREMENT = 1');
+        // DB::statement("DELETE FROM sqlite_sequence WHERE name='users'");
 
         $name = 'Administrator';
         $names = explode(' ', $name);
