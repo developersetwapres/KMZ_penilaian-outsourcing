@@ -15,8 +15,6 @@ class KriteriaController extends Controller
                 'slug' => Str::slug($request->aspek_id . '-' . $request->name, '-'),
                 'nama' => $request->name,
                 'aspek_id' => $request->aspek_id,
-                'jenis' => $request->jenis,
-                'indikator' => $request->indicators,
             ]
         );
     }
@@ -28,8 +26,6 @@ class KriteriaController extends Controller
                 'slug' => Str::slug($request->aspek_id . '-' . $request->name, '-'),
                 'nama' => $request->name,
                 'aspek_id' => $request->aspek_id,
-                'jenis' => $request->jenis,
-                'indikator' => $request->indicators,
             ]
         );
     }
