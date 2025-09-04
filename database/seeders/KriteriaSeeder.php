@@ -86,7 +86,7 @@ class KriteriaSeeder extends Seeder
             [
                 'aspek' => 1,
                 'jenis' => 'khusus',
-                'nama' => 'Keahlian 1',
+                'nama' => 'Kompetensi Teknis',
                 'deskripsi' => 'Kemampuan dalam menguasai keterampilan teknis tertentu yang diperlukan untuk mendukung pekerjaan secara efektif.',
                 'indikator' => [
                     'Mampu mengoperasikan peralatan, aplikasi, atau sistem yang dibutuhkan sesuai bidang kerja.',
@@ -96,7 +96,7 @@ class KriteriaSeeder extends Seeder
             [
                 'aspek' => 1,
                 'jenis' => 'khusus',
-                'nama' => 'Keahlian 2',
+                'nama' => 'Kompetensi Bidang',
                 'deskripsi' => 'Kemampuan menganalisis, menyelesaikan masalah, dan mengembangkan solusi yang relevan dengan bidang pekerjaannya.',
                 'indikator' => [
                     'Dapat mengidentifikasi masalah teknis maupun non-teknis dalam pekerjaan dengan tepat.',
