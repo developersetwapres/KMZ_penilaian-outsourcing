@@ -9,21 +9,21 @@ import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const positions = [
-    { value: 'pengemudi', label: 'Pengemudi' },
-    { value: 'teknisi-kendaraan', label: 'Teknisi Kendaraan' },
-    { value: 'staf-administrasi', label: 'Staf Administrasi' },
-    { value: 'pramubakti-pramusaji', label: 'Pramubakti/Pramusaji' },
-    { value: 'petugas-tata-tempat', label: 'Petugas Tata Tempat' },
-    { value: 'teknisi-jaringan', label: 'Teknisi Jaringan' },
-    { value: 'teknisi-komputer', label: 'Teknisi Komputer' },
+    { value: 'desainer-grafis-dan-multimedia', label: 'Desainer Grafis dan Multimedia' },
     { value: 'juru-kamera-fotografer', label: 'Juru Kamera / Fotografer' },
-    { value: 'desainer-grafis-multimedia', label: 'Desainer Grafis dan Multimedia' },
-    { value: 'programmer', label: 'Programmer' },
-    { value: 'koordinator-pengawas', label: 'Koordinator dan Pengawas' },
-    { value: 'teknisi-mekanikal-elektrikal', label: 'Teknisi Mekanikal dan Elektrikal' },
-    { value: 'resepsionis', label: 'Resepsionis' },
+    { value: 'koordinator-dan-pengawas', label: 'Koordinator dan Pengawas' },
+    { value: 'pengemudi', label: 'Pengemudi' },
     { value: 'petugas-kebersihan', label: 'Petugas Kebersihan' },
     { value: 'petugas-taman', label: 'Petugas Taman' },
+    { value: 'petugas-tata-tempat', label: 'Petugas Tata Tempat' },
+    { value: 'pramubaktipramusaji', label: 'Pramubakti/Pramusaji' },
+    { value: 'programmer', label: 'Programmer' },
+    { value: 'resepsionis', label: 'Resepsionis' },
+    { value: 'staf-administrasi', label: 'Staf Administrasi' },
+    { value: 'teknisi-jaringan', label: 'Teknisi Jaringan' },
+    { value: 'teknisi-kendaraan', label: 'Teknisi Kendaraan' },
+    { value: 'teknisi-komputer', label: 'Teknisi Komputer' },
+    { value: 'teknisi-mekanikaldan-elektrikal', label: 'Teknisi Mekanikal dan Elektrikal' },
     { value: 'tenaga-administrasi', label: 'Tenaga Administrasi' },
 ];
 
@@ -59,7 +59,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RankingPage({ outsourcingData }: any) {
-    const [selectedPosition, setSelectedPosition] = useState('pengemudi');
+    console.log(outsourcingData);
+    console.log(positions);
+
+    const [selectedPosition, setSelectedPosition] = useState('desainer-grafis-dan-multimedia');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20;
 
@@ -99,7 +102,7 @@ export default function RankingPage({ outsourcingData }: any) {
                             <div className="flex items-center space-x-2">
                                 <Trophy className="h-4 w-4 text-muted-foreground" />
                                 <Select value={selectedPosition} onValueChange={handlePositionChange}>
-                                    <SelectTrigger className="w-56">
+                                    <SelectTrigger className="w-72">
                                         <SelectValue placeholder="Pilih Jabatan Outsourcing" />
                                     </SelectTrigger>
                                     <SelectContent>
