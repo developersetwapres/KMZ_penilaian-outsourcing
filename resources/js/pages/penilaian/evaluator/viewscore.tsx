@@ -298,7 +298,7 @@ export default function ViewScore({ employee, evaluator, evaluationData, overall
                                                                     {criterion.indicators.map((indicator: any, idx: number) => (
                                                                         <li key={idx} className="flex items-start space-x-2">
                                                                             <span className="mt-1 text-blue-500">•</span>
-                                                                            <span>{indicator}</span>
+                                                                            <span>{indicator?.indikator}</span>
                                                                         </li>
                                                                     ))}
                                                                 </ul>

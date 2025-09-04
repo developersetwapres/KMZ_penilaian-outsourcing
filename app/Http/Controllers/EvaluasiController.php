@@ -129,8 +129,16 @@ class EvaluasiController extends Controller
             return redirect()->intended(route('evaluator.card', absolute: false));
         }
 
+        $os = User::findOrFail($penugasanPeer->outsourcing_id);
+
         $evaluations = Evaluasi::where('penugasan_peer_id', $idPenugasanPeer)
             ->with('kriteria')
+            ->with([
+                'kriteria.getIndikators' => function ($query) use ($os) {
+                    $query->where('jabatan', $os->jabatan)
+                        ->orWhere('jabatan', 'Umum');
+                }
+            ])
             ->get();
 
         $totalScore = 0;
@@ -159,7 +167,7 @@ class EvaluasiController extends Controller
             $evaluationData[$groupKey]['criteria'][] = [
                 'id' => $kriteria->id,
                 'name' => $kriteria->nama,
-                'indicators' => $kriteria->indikator,
+                'indicators' => $kriteria->getIndikators,
                 'score' => $evaluation->skor,
             ];
         }
@@ -186,9 +194,16 @@ class EvaluasiController extends Controller
         $weightedAspectTotals = []; // aspekSlug => total skor berbobot
 
         foreach ($assignments as $assignment) {
-            $evaluations = Evaluasi::with(['kriteria.getAspek'])
+            $evaluations = Evaluasi::with([
+                'kriteria.getAspek',
+                'kriteria.getIndikators' => function ($query) use ($user) {
+                    $query->where('jabatan', $user->jabatan)
+                        ->orWhere('jabatan', 'Umum');
+                }
+            ])
                 ->where('penugasan_peer_id', $assignment->id)
                 ->get();
+
 
             // criteriaScores dalam format per-aspek
             $criteriaScores = [];
@@ -213,7 +228,7 @@ class EvaluasiController extends Controller
                 $criteriaScores[$aspekSlug]['criteria'][] = [
                     'id'         => $kriteria->id,
                     'name'       => $kriteria->nama,
-                    'indicators' => $kriteria->indikator,
+                    'indicators' => $kriteria->getIndikators,
                     'score'      => $evaluation->skor,
                 ];
 

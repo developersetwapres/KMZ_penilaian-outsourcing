@@ -18,8 +18,8 @@ class ImportPenugasanRequest extends FormRequest
     {
         return [
             '*.idPegawai' => ['required', 'integer', 'exists:users,id'],
-            // '*.idPenilai' => ['required', 'integer', 'exists:users,id', 'different:*.idPegawai'],
-            '*.idPenilai' => ['required', 'integer', 'exists:users,id'],
+            '*.idPenilai' => ['required', 'integer', 'exists:users,id', 'different:*.idPegawai'],
+            // '*.idPenilai' => ['required', 'integer', 'exists:users,id'],
             '*.type'      => ['required', 'in:atasan,penerima_layanan,teman'],
         ];
     }
