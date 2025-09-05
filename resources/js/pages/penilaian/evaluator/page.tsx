@@ -65,10 +65,10 @@ export default function EvaluatorPage({ penugasanPeer }: any) {
                             <Button
                                 variant="outline"
                                 onClick={handleLogout}
-                                className="flex items-center space-x-2 bg-transparent hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                                className="flex items-center space-x-2 bg-transparent hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:bg-gray-900"
                             >
                                 <LogOut className="h-4 w-4" />
-                                <span>Logout</span>
+                                <span className="">Logout</span>
                             </Button>
                         </div>
                     </div>

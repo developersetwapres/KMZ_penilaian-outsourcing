@@ -123,10 +123,10 @@ class PagesController extends Controller
 
     private function moveImageFromTemp(?string $imageUrl, ?string $role): ?string
     {
-
         $path = $role === 'outsourcing' ? 'os' : 'asn';
 
-        $imageUrlNew = Str::replace('temp/', '', $imageUrl,);
+        $imageUrlNew = Str::replace('temp/', '', $imageUrl);
+        $imageUrlNew = Str::replace('image/' . $path . '/', '', $imageUrlNew);
 
         $temp = Storage::disk('temp');
         $sourcePath = $temp->path($imageUrlNew);

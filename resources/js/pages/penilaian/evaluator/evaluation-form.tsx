@@ -53,8 +53,6 @@ interface EvaluationFormProps {
 }
 
 export default function EvaluationForm({ employee, evaluator, evaluationData, idPenugasanPeer }: EvaluationFormProps) {
-    console.log(evaluationData);
-
     const [currentStep, setCurrentStep] = useState(0);
     const [scores, setScores] = useState<Record<string, number>>({});
     const [overallNotes, setOverallNotes] = useState('');
@@ -167,11 +165,6 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
     }
 
     const renderPreview = () => {
-        const overallScore =
-            aspects.reduce((total, aspectKey) => {
-                return total + calculateAspectScore(aspectKey);
-            }, 0) / aspects.length;
-
         const getScoreColor = (score: number) => {
             if (score > 90) return 'text-green-600 bg-green-50';
             if (score > 80) return 'text-blue-600 bg-blue-50';
@@ -248,12 +241,6 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                 {/* Detailed Preview by Aspect */}
                 {aspects.map((aspectKey, aspectIndex) => {
                     const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
-                    console.log(aspect);
-
-                    {
-                        /*const aspectScore = calculateAspectScore(aspectKey);*/
-                    }
-
                     return (
                         <Card key={aspectKey} className="border-l-4 border-l-blue-500">
                             <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
@@ -619,7 +606,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                                 </Label>
                                                                 <Input
                                                                     id={criterion.id}
-                                                                    type="number"
+                                                                    type=""
                                                                     min={51}
                                                                     max={100}
                                                                     // value={scores[criterion.id] ?? ''}
