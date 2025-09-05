@@ -53,6 +53,8 @@ interface EvaluationFormProps {
 }
 
 export default function EvaluationForm({ employee, evaluator, evaluationData, idPenugasanPeer }: EvaluationFormProps) {
+    console.log(evaluationData);
+
     const [currentStep, setCurrentStep] = useState(0);
     const [scores, setScores] = useState<Record<string, number>>({});
     const [overallNotes, setOverallNotes] = useState('');
