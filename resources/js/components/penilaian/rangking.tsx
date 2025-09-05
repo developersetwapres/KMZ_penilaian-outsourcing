@@ -285,7 +285,7 @@ export default function RankingPage({ outsourcingData }: any) {
                                                         variant="outline"
                                                         style={{ backgroundColor: 'hsl(var(--chart-1) / 0.1)', color: 'hsl(var(--chart-1))' }}
                                                     >
-                                                        {outsourcing.A}
+                                                        {outsourcing.atasan}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
@@ -293,7 +293,7 @@ export default function RankingPage({ outsourcingData }: any) {
                                                         variant="outline"
                                                         style={{ backgroundColor: 'hsl(var(--chart-2) / 0.1)', color: 'hsl(var(--chart-2))' }}
                                                     >
-                                                        {outsourcing.B}
+                                                        {outsourcing.penerima_layanan}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
@@ -301,7 +301,7 @@ export default function RankingPage({ outsourcingData }: any) {
                                                         variant="outline"
                                                         style={{ backgroundColor: 'hsl(var(--chart-3) / 0.1)', color: 'hsl(var(--chart-3))' }}
                                                     >
-                                                        {outsourcing.C}
+                                                        {outsourcing.teman}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
