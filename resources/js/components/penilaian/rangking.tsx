@@ -60,7 +60,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function RankingPage({ outsourcingData }: any) {
     console.log(outsourcingData);
-    console.log(positions);
 
     const [selectedPosition, setSelectedPosition] = useState('desainer-grafis-dan-multimedia');
     const [currentPage, setCurrentPage] = useState(1);
@@ -285,7 +284,7 @@ export default function RankingPage({ outsourcingData }: any) {
                                                         variant="outline"
                                                         style={{ backgroundColor: 'hsl(var(--chart-1) / 0.1)', color: 'hsl(var(--chart-1))' }}
                                                     >
-                                                        {outsourcing.atasan}
+                                                        {outsourcing.Atasan}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
@@ -293,7 +292,7 @@ export default function RankingPage({ outsourcingData }: any) {
                                                         variant="outline"
                                                         style={{ backgroundColor: 'hsl(var(--chart-2) / 0.1)', color: 'hsl(var(--chart-2))' }}
                                                     >
-                                                        {outsourcing.penerima_layanan}
+                                                        {outsourcing['Penerima Layanan']}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
@@ -301,7 +300,7 @@ export default function RankingPage({ outsourcingData }: any) {
                                                         variant="outline"
                                                         style={{ backgroundColor: 'hsl(var(--chart-3) / 0.1)', color: 'hsl(var(--chart-3))' }}
                                                     >
-                                                        {outsourcing.teman}
+                                                        {outsourcing['Teman Setingkat']}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
