@@ -1,5 +1,6 @@
 'use client';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,15 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, CheckCircle, ClipboardCheck, FileText, Info, Target, UserCheck } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle, ClipboardCheck, FileText, Info, Target, UserCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { z } from 'zod';
-
-// Validation schema - now for criteria scores
-const evaluationSchema = z.object({
-    scores: z.record(z.string(), z.number().min(0).max(100)),
-    overallNotes: z.string().optional(),
-});
 
 // Classification function
 const getScoreClassification = (score: number) => {
@@ -53,8 +47,6 @@ interface EvaluationFormProps {
 }
 
 export default function EvaluationForm({ employee, evaluator, evaluationData, idPenugasanPeer }: EvaluationFormProps) {
-    console.log(evaluationData);
-
     const [currentStep, setCurrentStep] = useState(0);
     const [scores, setScores] = useState<Record<string, number>>({});
     const [overallNotes, setOverallNotes] = useState('');
@@ -73,35 +65,36 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
     }, [currentStep]);
 
     const handleScoreChange = (criteriaId: string, value: string) => {
-        // Ambil digit saja
-        const cleaned = value.replace(/\D/g, '');
+        // biarkan kosong
+        setScores((prev) => ({ ...prev, [criteriaId]: value }));
+    };
 
-        let finalValue = 0;
+    const handleScoreBlur = (criteriaId: string) => {
+        setScores((prev) => {
+            const raw = prev[criteriaId];
 
-        if (cleaned === '') {
-            finalValue = 0;
-        } else if (cleaned === '100') {
-            finalValue = 100;
-        } else if (cleaned.length > 2) {
-            finalValue = parseInt(cleaned.slice(0, 2), 10);
-        } else {
-            finalValue = parseInt(cleaned, 10);
-        }
+            if (raw === '' || raw === undefined) {
+                return { ...prev, [criteriaId]: '' }; // tetap kosong
+            }
 
-        // Validasi minimal 50 (kecuali jika kosong = 0)
-        if (finalValue !== 0 && finalValue < 51) {
-            finalValue = 51;
-        }
+            let n = parseInt(raw as string, 10);
 
-        setScores((prev) => ({ ...prev, [criteriaId]: finalValue }));
+            if (isNaN(n)) return { ...prev, [criteriaId]: '' };
+
+            if (n < 51) n = 51;
+            if (n > 100) n = 100;
+
+            return { ...prev, [criteriaId]: n };
+        });
     };
 
     const canProceed = () => {
         const currentCriteria = aspectData.criteria.map((c: any) => c.id);
-        return currentCriteria.every((id: any) => scores[id] !== undefined && scores[id] > 49);
+        return currentCriteria.every((id: any) => scores[id] !== undefined && scores[id] >= 51 && scores[id] <= 100);
     };
 
     const handleNext = () => {
+        if (!canProceed()) return; // stop kalau nilai invalid
         if (currentStep < aspects.length - 1) {
             setCurrentStep((prev) => prev + 1);
         } else {
@@ -142,16 +135,6 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                 setIsSubmitting(false);
             },
         });
-    };
-
-    const calculateAspectScore = (aspectKey: string) => {
-        const aspect = evaluationData[aspectKey as keyof typeof evaluationData];
-        if (!aspect) return 0;
-
-        const criteriaScores = aspect.criteria.map((criterion: any) => scores[criterion.id] || 0);
-        const totalScore = criteriaScores.reduce((sum: any, score: any) => sum + score, 0);
-
-        return criteriaScores.length > 0 ? totalScore / criteriaScores.length : 0;
     };
 
     function getAspectStats(aspectKey: string) {
@@ -508,26 +491,6 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                             </Card>
                         </div>
 
-                        {/* Progress */}
-                        {/* <Card>
-                  <CardContent className="pt-6">
-                      <div className="space-y-2">
-                          <div className="flex justify-between text-sm text-gray-600">
-                              <span>Progress Penilaian</span>
-                              <span>{Math.round(progress)}%</span>
-                          </div>
-                          <Progress value={progress} className="h-3" />
-                          <div className="flex justify-between text-xs text-gray-500">
-                              {aspects.map((aspect, index) => (
-                                  <span key={aspect} className={index <= currentStep ? 'font-medium text-blue-600' : ''}>
-                                      {evaluationData[aspect as keyof typeof evaluationData].title}
-                                  </span>
-                              ))}
-                          </div>
-                      </div>
-                  </CardContent>
-              </Card> */}
-
                         {/* Score Classification Reference */}
                         <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50">
                             <CardHeader>
@@ -604,20 +567,22 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                                     htmlFor={criterion.id}
                                                                     className="mb-2 block text-sm font-medium text-gray-700"
                                                                 >
-                                                                    Nilai untuk kriteria ini (51-100):
+                                                                    Berikan nilai 51 - 100 !
                                                                 </Label>
                                                                 <Input
                                                                     id={criterion.id}
                                                                     type=""
+                                                                    inputMode="numeric"
                                                                     min={51}
                                                                     max={100}
-                                                                    // value={scores[criterion.id] ?? ''}
+                                                                    value={scores[criterion.id] ?? ''} // bisa string atau number
                                                                     onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
+                                                                    onBlur={() => handleScoreBlur(criterion.id)} // clamp saat blur
                                                                     className="w-32 text-center text-lg font-bold"
                                                                     placeholder="Min 51"
                                                                 />
                                                             </div>
-                                                            {currentScore > 0 && (
+                                                            {currentScore > 50 && currentScore < 100 && (
                                                                 <div className="hidden flex-1 md:block">
                                                                     <div className="mb-2 text-sm text-gray-600">Klasifikasi:</div>
                                                                     <Badge
@@ -630,24 +595,38 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                                         </div>
 
                                                         {/* Real-time feedback */}
-                                                        {currentScore > 0 && (
-                                                            <div className="rounded-lg border-2 border-dashed border-gray-300 bg-white p-4">
-                                                                <div className="flex items-center space-x-3">
-                                                                    <div className="text-2xl font-bold text-gray-800">{currentScore}</div>
-                                                                    <div className="flex-1">
-                                                                        <div className="text-sm text-gray-600">Nilai yang diberikan</div>
-                                                                        <div
-                                                                            className={`text-sm font-medium ${classification.color.replace('bg-', 'text-').replace('-100', '-800')}`}
-                                                                        >
-                                                                            Kategori: {classification.label}
+                                                        {currentScore != null &&
+                                                            currentScore != undefined &&
+                                                            currentScore != '' &&
+                                                            (currentScore > 50 && currentScore < 101 ? (
+                                                                <div className="rounded-lg border-2 border-dashed border-gray-300 bg-white p-4">
+                                                                    <div className="flex items-center space-x-3">
+                                                                        <div className="text-2xl font-bold text-gray-800">{currentScore}</div>
+                                                                        <div className="flex-1">
+                                                                            <div className="text-sm text-gray-600">Nilai yang diberikan</div>
+                                                                            <div
+                                                                                className={`text-sm font-medium ${classification.color.replace('bg-', 'text-').replace('-100', '-800')}`}
+                                                                            >
+                                                                                Kategori: {classification.label}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <div className="text-xs text-gray-500">Range: {classification.range}</div>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="text-right">
-                                                                        <div className="text-xs text-gray-500">Range: {classification.range}</div>
-                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
+                                                            ) : (
+                                                                <div className="hidden flex-1 md:block">
+                                                                    <Alert variant="destructive" className="border-2">
+                                                                        <AlertCircle className="h-4 w-4" />
+                                                                        <AlertTitle>Nilai tidak valid</AlertTitle>
+                                                                        <AlertDescription className="inline">
+                                                                            Nilai tidak boleh di bawah <span className="font-bold"> 51 </span>
+                                                                            atau melebihi <span className="font-bold">100</span>.
+                                                                        </AlertDescription>
+                                                                    </Alert>
+                                                                </div>
+                                                            ))}
                                                     </div>
                                                 </div>
                                             </div>
@@ -692,7 +671,7 @@ export default function EvaluationForm({ employee, evaluator, evaluationData, id
                                         <Button
                                             onClick={handleNext}
                                             disabled={!canProceed()}
-                                            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+                                            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                                         >
                                             <span>Selanjutnya</span>
                                             <ArrowRight className="h-4 w-4" />

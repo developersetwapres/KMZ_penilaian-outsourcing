@@ -26,7 +26,7 @@ class StoreEvaluasiRequest extends FormRequest
             'catatan'           => ['nullable', 'string'],
             'nilai'             => ['required', 'array'],
             'nilai.*.kriteria_id' => ['required', 'exists:kriterias,id'],
-            'nilai.*.skor'        => ['required', 'integer', 'between:0,100'],
+            'nilai.*.skor'        => ['required', 'integer', 'between:51,100'],
         ];
     }
 }
