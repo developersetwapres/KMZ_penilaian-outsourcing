@@ -116,6 +116,18 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
         );
     };
 
+    const resetNilai = (idPenugasan) => {
+        router.post(route("evaluasi.resetscore"), idPenugasan, {
+
+            onSuccess: () => {
+            toast({
+                title: "Berhasil",
+                description: "Nilai sudah direset",
+            });
+            },
+        });
+        };
+
     return (
         <>
             <Head title="Dashboard" />
@@ -304,7 +316,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                     </CardHeader>
                                     <CardContent className="p-8">
                                         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                                            {employee.evaluatorScores.map((evaluator, index) => {
+                                            {employee.evaluatorScores.map((evaluator: any, index: any) => {
                                                 const evaluatorType =
                                                     evaluator.type === 'atasan'
                                                         ? 'Atasan'
@@ -324,7 +336,10 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                                 <span className="text-2xl font-bold">{index + 1}</span>
                                                             </div>
                                                             <h3 className="mb-2 text-xl font-bold text-blue-600">{evaluator.evaluatorName}</h3>
-                                                            <div className="mb-4 inline-block rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 backdrop-blur-sm">
+                                                            <div
+                                                                className="mb-4 inline-block rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 backdrop-blur-sm"
+                                                                onDoubleClick={() => resetNilai(evaluator?.penugasan_id)}
+                                                                >
                                                                 {evaluatorType}
                                                             </div>
                                                             <div className="mb-4 rounded-4xl bg-white p-4 backdrop-blur-sm">
@@ -336,6 +351,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                                             <div className="text-sm text-blue-600 opacity-90">
                                                                 Bobot: <span className="font-bold">{(evaluator.weight * 100).toFixed(0)}%</span>
                                                             </div>
+                                                            {/* <Button className={`bg-red-100 text-red-800 border-red-200 p-2 border font-medium text-sm mt-3`}>Reset Nilai</Button> */}
                                                         </div>
                                                     </div>
                                                 );
@@ -345,7 +361,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                 </Card>
                             </TabsContent>
 
-                            {/* Tab Content: Perbandingan */}
+                            {/* Tab Content: Detail */}
                             <TabsContent value="peraspek" className="space-y-6">
                                 {/* Weighted Scoring Info */}
                                 <Card className="border-blue-200 bg-blue-50 pt-0 pb-6">
@@ -554,7 +570,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                 </div>
                             </TabsContent>
 
-                            {/* Tab Content: Chart */}
+                            {/* Tab Content: Catatan */}
                             <TabsContent value="chart" className="space-y-6">
                                 {/* Evaluator Notes and Feedback */}
                                 <Card className="gap-0 py-0 shadow-xl">
@@ -633,8 +649,7 @@ export default function EmployeeDetailPage({ evaluationResults }: any) {
                                 </Card>
                             </TabsContent>
 
-                            {/* Tab Content: Detail */}
-
+                            {/* Tab Content: Per-Pertanyaan */}
                             <TabsContent value="detail" className="space-y-6">
                                 <div className="mb-6 flex space-x-2">
                                     <Button
