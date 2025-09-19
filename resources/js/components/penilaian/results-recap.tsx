@@ -1,5 +1,6 @@
 'use client';
 
+import exportToExcel from '@/components/penilaian/exportToExcel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -96,7 +97,7 @@ export default function ResultsRecap({ evaluationResults }: any) {
                                 ))}
                             </SelectContent>
                         </Select>
-                        <Button className="flex items-center space-x-2">
+                        <Button className="flex items-center space-x-2" onClick={() => exportToExcel(filteredResults)}>
                             <Download className="h-4 w-4" />
                             <span>Export</span>
                         </Button>

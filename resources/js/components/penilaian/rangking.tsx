@@ -23,7 +23,7 @@ const positions = [
     { value: 'teknisi-jaringan', label: 'Teknisi Jaringan' },
     { value: 'teknisi-kendaraan', label: 'Teknisi Kendaraan' },
     { value: 'teknisi-komputer', label: 'Teknisi Komputer' },
-    { value: 'teknisi-mekanikaldan-elektrikal', label: 'Teknisi Mekanikal dan Elektrikal' },
+    { value: 'teknisi-mekanikal-dan-elektrikal', label: 'Teknisi Mekanikal dan Elektrikal' },
     { value: 'tenaga-administrasi', label: 'Tenaga Administrasi' },
 ];
 
@@ -59,8 +59,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RankingPage({ outsourcingData }: any) {
-    console.log(outsourcingData);
-
     const [selectedPosition, setSelectedPosition] = useState('desainer-grafis-dan-multimedia');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20;
