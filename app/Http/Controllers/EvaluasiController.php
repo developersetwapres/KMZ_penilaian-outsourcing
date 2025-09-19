@@ -119,6 +119,7 @@ class EvaluasiController extends Controller
         return Inertia::render('penilaian/admin/results');
     }
 
+    //evaluator
     public function viewscore(Request $request): Response | RedirectResponse
     {
         $idPenugasanPeer = $request->idPenugasanPeer;
@@ -188,6 +189,7 @@ class EvaluasiController extends Controller
     public function scoredetail(User $user): Response
     {
         $assignments = $user->evaluators()->with(['penilai'])->get();
+
         $aspekList = Aspek::all()->keyBy(fn($a) => Str::slug($a->nama, "-"));
 
         $evaluatorScores = [];
@@ -208,6 +210,7 @@ class EvaluasiController extends Controller
             // criteriaScores dalam format per-aspek
             $criteriaScores = [];
             $aspectTemp = [];
+            $idPenugasan = [];
 
             foreach ($evaluations as $evaluation) {
                 $kriteria = $evaluation->kriteria;
@@ -231,6 +234,8 @@ class EvaluasiController extends Controller
                     'indicators' => $kriteria->getIndikators,
                     'score'      => $evaluation->skor,
                 ];
+
+                $idPenugasan[] = $evaluation->penugasan_peer_id;
 
                 // Data untuk hitung rata-rata per aspek
                 $aspectTemp[$aspekSlug][] = $evaluation->skor;
@@ -264,6 +269,7 @@ class EvaluasiController extends Controller
                 'overallScore'    => $overallScore,
                 'weightedScore'   => $weightedScore,
                 'notes'           => $assignment->catatan,
+                'penugasan_id'    => $idPenugasan,
             ];
         }
 
@@ -303,6 +309,17 @@ class EvaluasiController extends Controller
 
         return Inertia::render('penilaian/admin/employee-detail-page', [
             'evaluationResults' => $evaluationData,
+        ]);
+    }
+
+    public function resetscore(Request $request) {
+        foreach ($request->all() as $key => $idPenugasan) {
+            Evaluasi::where('penugasan_peer_id', $idPenugasan)->delete();
+        }
+
+        PenugasanPeer::findOrFail($request->all()[0])->update([
+            'catatan' => '',
+            'status' => 'incomplete'
         ]);
     }
 }

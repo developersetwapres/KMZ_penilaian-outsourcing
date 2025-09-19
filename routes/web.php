@@ -31,6 +31,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('dashboard/penugasan-peer', [PenugasanPeerController::class, 'store'])->name('penugasan.store');
 
     Route::get('dashboard-detail/{user:slug}', [EvaluasiController::class, 'scoredetail'])->name('evaluasi.scoredetail');
+    Route::post('dashboard-detail-reset', [EvaluasiController::class, 'resetscore'])->name('evaluasi.resetscore');
 
     Route::post('dashboard/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
     Route::put('dashboard/kriteria/{kriteria}', [KriteriaController::class, 'update'])->name('kriteria.update');
