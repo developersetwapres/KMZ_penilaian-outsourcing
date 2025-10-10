@@ -24,8 +24,6 @@ const jabatan = [
 ];
 
 export default function MasterDataManager({ masterData }: any) {
-    console.log(masterData);
-
     const [selectedLevel, setSelectedLevel] = useState<'aspects' | 'criteria'>('aspects');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
@@ -197,7 +195,7 @@ export default function MasterDataManager({ masterData }: any) {
                             </div>
                         </div>
 
-                        <div className="grid gap-4 pl-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-4 pl-4 lg:grid-cols-2">
                             {aspectCriteria.map((criteria: any) => (
                                 <Card key={criteria.id} className="gap-0 border-l-4 border-l-blue-500 transition-shadow hover:shadow-md">
                                     <CardHeader className="pb-3">
